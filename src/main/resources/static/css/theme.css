@@ -258,9 +258,12 @@ a { color: inherit; }
 }
 
 .nav-brand img {
-    height: 40px;
+    height: 44px;
     width: auto;
+    max-width: min(220px, 52vw);
+    aspect-ratio: 1024 / 431;
     display: block;
+    object-fit: contain;
     filter: drop-shadow(0 4px 12px rgba(232, 164, 184, 0.2));
 }
 

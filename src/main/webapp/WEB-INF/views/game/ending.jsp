@@ -536,7 +536,8 @@ body::after{content:"";position:fixed;inset:0;background:radial-gradient(circle 
               </c:if>
               <c:forEach var="m" items="${endingTopFour}" varStatus="st">
                 <c:set var="mTotal" value="${m.vocal + m.dance + m.star + m.mental + m.teamwork}" />
-                <c:set var="abilityPct" value="${mTotal >= 100 ? 100 : mTotal}" />
+                <c:set var="mAvg" value="${(mTotal - (mTotal mod 5)) / 5}" />
+                <c:set var="abilityPct" value="${mAvg}" />
                 <c:set var="tid" value="${m.traineeId}" />
                 <c:set var="likeCnt" value="${empty endingLikeCounts[tid] ? 0 : endingLikeCounts[tid]}" />
                 <c:set var="likeCntLabel" value="${empty endingLikeLabels[tid] ? '0' : endingLikeLabels[tid]}" />
@@ -555,17 +556,17 @@ body::after{content:"";position:fixed;inset:0;background:radial-gradient(circle 
                   </div>
                   <div class="member-quad-bottom">
                     <h3 class="member-quad-name">${m.name}</h3>
-                    <div class="member-quad-ability" title="다섯 능력치 합산 · 최대 100">
+                    <div class="member-quad-ability" title="다섯 능력치 평균 · 최대 20">
                       <div class="member-quad-ability-label">
                         <span>최종 능력치</span>
-                        <span>${mTotal} / 100</span>
+                        <span>${mAvg} / 100</span>
                       </div>
                       <div class="member-quad-ability-bar">
                         <div class="member-quad-ability-fill" style="width:${abilityPct}%"></div>
                       </div>
                     </div>
                     <div class="member-quad-row">
-                      <div class="member-quad-total">${mTotal}<small>TOTAL</small></div>
+                      <div class="member-quad-total">${mAvg}<small>AVG</small></div>
                       <c:choose>
                         <c:when test="${endingLikeLoggedIn and not empty tid}">
                           <button type="button" class="member-quad-like js-trainee-like ${endingLikedTraineeIds.contains(tid) ? 'is-on' : ''}"
@@ -756,18 +757,18 @@ window.addEventListener("load", function(){
 
     /** 팀·전체 평균(0~20)을 서버에서 ×5한 뒤 주입 — 막대는 0~100 만점 스케일 */
     var vals = [
-      ${teamAvgVocal * 5},
-      ${teamAvgDance * 5},
-      ${teamAvgStar * 5},
-      ${teamAvgMental * 5},
-      ${teamAvgTeamwork * 5}
+      ${teamAvgVocal},
+      ${teamAvgDance},
+      ${teamAvgStar},
+      ${teamAvgMental},
+      ${teamAvgTeamwork}
     ];
     var gvals = [
-      ${globalAvgVocal * 5},
-      ${globalAvgDance * 5},
-      ${globalAvgStar * 5},
-      ${globalAvgMental * 5},
-      ${globalAvgTeamwork * 5}
+      ${globalAvgVocal},
+      ${globalAvgDance},
+      ${globalAvgStar},
+      ${globalAvgMental},
+      ${globalAvgTeamwork}
     ];
 
     new Chart(canvas, {

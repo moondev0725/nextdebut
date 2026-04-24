@@ -178,27 +178,27 @@ public class Trainee {
 
 	@Transient
 	public int getVocalPercent() {
-		return this.vocal * 5;
+		return this.vocal;
 	}
 
 	@Transient
 	public int getDancePercent() {
-		return this.dance * 5;
+		return this.dance;
 	}
 
 	@Transient
 	public int getStarPercent() {
-		return this.star * 5;
+		return this.star;
 	}
 
 	@Transient
 	public int getMentalPercent() {
-		return this.mental * 5;
+		return this.mental;
 	}
 
 	@Transient
 	public int getTeamworkPercent() {
-		return this.teamwork * 5;
+		return this.teamwork;
 	}
 
 	/**
@@ -302,6 +302,6 @@ public class Trainee {
 
 	private static int clamp(int v) {
 		// 6주 플랜: 초기엔 0부터 시작, 최대 20까지
-		return Math.max(0, Math.min(20, v));
+		return Math.max(0, Math.min(100, v));
 	}
 }

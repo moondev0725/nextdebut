@@ -21,5 +21,6 @@
     "java.import.gradle.annotationProcessing.enabled": true,
     "java.server.launchMode": "Standard",
     "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m -Xlog:disable",
+    "spring-boot.ls.problem.application-properties.unknown-property": "ignore",
     "commentTranslate.targetLanguage": "ko"
 }

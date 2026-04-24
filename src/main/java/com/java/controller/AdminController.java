@@ -942,11 +942,11 @@ public class AdminController {
 		traineeRepository.findById(id).ifPresent(t -> {
 			t.setName(name);
 			// 스탯 스케일: 0~20
-			t.setVocal(Math.max(0, Math.min(20, vocal)));
-			t.setDance(Math.max(0, Math.min(20, dance)));
-			t.setStar(Math.max(0, Math.min(20, star)));
-			t.setMental(Math.max(0, Math.min(20, mental)));
-			t.setTeamwork(Math.max(0, Math.min(20, teamwork)));
+			t.setVocal(Math.max(0, Math.min(100, vocal)));
+			t.setDance(Math.max(0, Math.min(100, dance)));
+			t.setStar(Math.max(0, Math.min(100, star)));
+			t.setMental(Math.max(0, Math.min(100, mental)));
+			t.setTeamwork(Math.max(0, Math.min(100, teamwork)));
 			try {
 				t.setGrade(grade != null && !grade.isBlank() ? Grade.valueOf(grade.trim()) : null);
 			} catch (IllegalArgumentException ignored) {
@@ -2019,10 +2019,11 @@ public class AdminController {
 		long rule = 0L;
 		long fallback = 0L;
 		double confSum = 0.0;
+		Map<String, Long> mlDecisionReasonCounts = new LinkedHashMap<>();
 
 		Path p = resolveMlTrainingLogPath();
 		if (p == null || !Files.exists(p)) {
-			return mlChoiceStatsMap(total, ml, rule, fallback, confSum);
+			return mlChoiceStatsMap(total, ml, rule, fallback, confSum, mlDecisionReasonCounts);
 		}
 
 		try (var lines = Files.lines(p)) {
@@ -2043,11 +2044,15 @@ public class AdminController {
 					fallback++;
 				}
 				confSum += extractJsonDouble(raw, "predictionConfidence");
+				String mlDecisionReason = extractJsonString(raw, "mlDecisionReason");
+				if (!mlDecisionReason.isBlank()) {
+					mlDecisionReasonCounts.merge(mlDecisionReason, 1L, Long::sum);
+				}
 			}
 		} catch (IOException ignored) {
 			// 관리 페이지 지표는 부가 정보이므로 읽기 실패 시 빈 통계 반환
 		}
-		return mlChoiceStatsMap(total, ml, rule, fallback, confSum);
+		return mlChoiceStatsMap(total, ml, rule, fallback, confSum, mlDecisionReasonCounts);
 	}
 
 	private Path resolveMlTrainingLogPath() {
@@ -2062,7 +2067,8 @@ public class AdminController {
 		return Paths.get(System.getProperty("user.dir")).resolve(p).normalize();
 	}
 
-	private static Map<String, Object> mlChoiceStatsMap(long total, long ml, long rule, long fallback, double confSum) {
+	private static Map<String, Object> mlChoiceStatsMap(long total, long ml, long rule, long fallback, double confSum,
+			Map<String, Long> mlDecisionReasonCounts) {
 		Map<String, Object> out = new LinkedHashMap<>();
 		out.put("total", total);
 		out.put("ml", ml);
@@ -2074,6 +2080,7 @@ public class AdminController {
 		out.put("avgConfidence", avgConf);
 		out.put("mlRate", mlRate);
 		out.put("fallbackRate", fallbackRate);
+		out.put("mlDecisionReasonCounts", mlDecisionReasonCounts == null ? Map.of() : mlDecisionReasonCounts);
 		return out;
 	}
 

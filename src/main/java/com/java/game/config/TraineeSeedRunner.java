@@ -213,7 +213,7 @@ public class TraineeSeedRunner implements CommandLineRunner {
 		int added = 0;
 		while (added < target) {
 			int i = rnd.nextInt(5);
-			if (v[i] < 20) {
+			if (v[i] < 100) {
 				v[i]++;
 				added++;
 			}

@@ -1,24 +1,28 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
-$projectRoot = "C:\Users\KOSMO\Desktop\projectx1"
-$targetBat = Join-Path $projectRoot "PROJECTX1_LAUNCHER.bat"
+$projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$powershellExe = Join-Path $env:WINDIR "System32\WindowsPowerShell\v1.0\powershell.exe"
+$launcherPs = Join-Path $projectRoot "tools\Launch_NEXTDEBUT.ps1"
 $desktop = [Environment]::GetFolderPath("Desktop")
-$shortcutPath = Join-Path $desktop "ProjectX1 Launcher.lnk"
+$shortcutPath = Join-Path $desktop "NEXTDEBUT.lnk"
 
-if (-not (Test-Path $targetBat)) {
-    throw "Launcher bat not found: $targetBat"
+if (-not (Test-Path $launcherPs)) {
+    throw "Launch_NEXTDEBUT.ps1 없음: $launcherPs"
 }
+
+$args = "-NoProfile -ExecutionPolicy Bypass -Sta -WindowStyle Hidden -File `"$launcherPs`""
 
 $wsh = New-Object -ComObject WScript.Shell
 $sc = $wsh.CreateShortcut($shortcutPath)
-$sc.TargetPath = $targetBat
+$sc.TargetPath = $powershellExe
+$sc.Arguments = $args
 $sc.WorkingDirectory = $projectRoot
-$sc.Description = "ProjectX1 Launcher"
-$sc.WindowStyle = 1
-$iconPath = Join-Path $projectRoot "assets\projectx1.ico"
+$sc.Description = "NEXTDEBUT"
+$sc.WindowStyle = 7
+$iconPath = Join-Path $projectRoot "assets\nextdebut.ico"
 if (Test-Path $iconPath) {
     $sc.IconLocation = "$iconPath,0"
 }
 $sc.Save()
 
-Write-Output "Fixed shortcut: $shortcutPath"
+Write-Output "바로가기 저장: $shortcutPath"

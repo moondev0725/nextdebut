@@ -1,6 +1,100 @@
 {
   "properties": [
     {
+      "name": "app.seed.demo-members",
+      "type": "java.lang.Boolean",
+      "description": "기동 시 데모 회원 생성 여부"
+    },
+    {
+      "name": "app.seed.demo-members.force",
+      "type": "java.lang.Boolean",
+      "description": "데모 회원 강제 재시드 여부"
+    },
+    {
+      "name": "app.seed.curated-trainee-sync",
+      "type": "java.lang.Boolean",
+      "description": "큐레이션 연습생 동기화 실행 여부"
+    },
+    {
+      "name": "app.seed.community-demo",
+      "type": "java.lang.Boolean",
+      "description": "커뮤니티 데모 글 시드 여부"
+    },
+    {
+      "name": "app.seed.report-demo",
+      "type": "java.lang.Boolean",
+      "description": "신고 게시판 데모 글 시드 여부"
+    },
+    {
+      "name": "app.seed.fanmeeting-demo",
+      "type": "java.lang.Boolean",
+      "description": "팬미팅 데모 글 시드 여부"
+    },
+    {
+      "name": "app.seed.fanmeeting-participants-demo",
+      "type": "java.lang.Boolean",
+      "description": "팬미팅 참여자 백필 여부"
+    },
+    {
+      "name": "app.security.jumin-key",
+      "type": "java.lang.String",
+      "description": "주민번호 암호화 키"
+    },
+    {
+      "name": "app.ml.enabled",
+      "type": "java.lang.Boolean",
+      "description": "채팅 선택 ML 사용 여부"
+    },
+    {
+      "name": "app.ml.predict-url",
+      "type": "java.lang.String",
+      "description": "ML 예측 API URL"
+    },
+    {
+      "name": "app.ml.threshold",
+      "type": "java.lang.Double",
+      "description": "ML 기본 confidence 임계값"
+    },
+    {
+      "name": "app.ml.accept-if-margin",
+      "type": "java.lang.Boolean",
+      "description": "마진 기반 보조 채택 여부"
+    },
+    {
+      "name": "app.ml.secondary-min-confidence",
+      "type": "java.lang.Double",
+      "description": "마진 채택 시 최소 confidence"
+    },
+    {
+      "name": "app.ml.secondary-min-top-gap",
+      "type": "java.lang.Double",
+      "description": "마진 채택 시 최소 top1-top2 gap"
+    },
+    {
+      "name": "app.ml.threshold-non-primary-delta",
+      "type": "java.lang.Double",
+      "description": "C/D/SPECIAL 예측에 적용할 임계값 완화치"
+    },
+    {
+      "name": "app.ml.timeout-ms",
+      "type": "java.lang.Long",
+      "description": "ML 예측 호출 타임아웃(ms)"
+    },
+    {
+      "name": "app.ml.training-log-enabled",
+      "type": "java.lang.Boolean",
+      "description": "학습 로그(JSONL) 기록 여부"
+    },
+    {
+      "name": "app.ml.training-log-path",
+      "type": "java.lang.String",
+      "description": "학습 로그(JSONL) 파일 경로"
+    }
+  ]
+}
+{
+  "properties": [
+    {
       "name": "gemini.api-key",
       "type": "java.lang.String",
       "description": "Google Generative Language API (Gemini) key."

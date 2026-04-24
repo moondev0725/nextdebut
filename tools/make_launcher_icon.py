@@ -57,7 +57,7 @@ def make_icon(out_path: Path) -> None:
 
 
 if __name__ == "__main__":
-    target = Path(__file__).resolve().parents[1] / "assets" / "projectx1.ico"
+    target = Path(__file__).resolve().parents[1] / "assets" / "nextdebut.ico"
     make_icon(target)
     print(f"Created: {target}")
 

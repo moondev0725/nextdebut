@@ -43,7 +43,10 @@ public class GeminiClient implements AiClient {
     @Value("${gemini.api-key-2:}")
     private String apiKey2;
 
-    private static final String MODEL = "gemini-2.5-flash";
+    /** 챗봇·게임 공통 Gemini 모델 id (예: gemini-2.5-flash). */
+    @Value("${gemini.model:gemini-2.5-flash}")
+    private String model = "gemini-2.5-flash";
+
     private HttpClient http = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper;
 
@@ -105,7 +108,7 @@ public class GeminiClient implements AiClient {
             String key = keys.get(i);
             try {
                 String url = "https://generativelanguage.googleapis.com/v1beta/models/"
-                        + MODEL + ":generateContent?key=" + key;
+                        + model + ":generateContent?key=" + key;
                 HttpRequest req = HttpRequest.newBuilder()
                         .uri(URI.create(url))
                         .header("Content-Type", "application/json")
@@ -236,7 +239,7 @@ public class GeminiClient implements AiClient {
             String key = keys.get(i);
             try {
                 String url = "https://generativelanguage.googleapis.com/v1beta/models/"
-                        + MODEL + ":generateContent?key=" + key;
+                        + model + ":generateContent?key=" + key;
 
                 HttpRequest req = HttpRequest.newBuilder()
                         .uri(URI.create(url))

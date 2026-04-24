@@ -40,7 +40,9 @@ public class ChatChoiceTrainingLogger {
 			String resolverType,
 			String predictedKey,
 			double predictionConfidence,
-			boolean usedFallback) {
+			boolean usedFallback,
+			String mlDecisionReason,
+			Double scoreMargin) {
 		if (!enabled) {
 			return;
 		}
@@ -54,7 +56,9 @@ public class ChatChoiceTrainingLogger {
 					resolverType,
 					predictedKey,
 					predictionConfidence,
-					usedFallback);
+					usedFallback,
+					mlDecisionReason,
+					scoreMargin);
 			synchronized (lock) {
 				Path parent = filePath.getParent();
 				if (parent != null) {
@@ -77,7 +81,9 @@ public class ChatChoiceTrainingLogger {
 			String resolverType,
 			String predictedKey,
 			double predictionConfidence,
-			boolean usedFallback) {
+			boolean usedFallback,
+			String mlDecisionReason,
+			Double scoreMargin) {
 		StringBuilder sb = new StringBuilder(512);
 		sb.append('{');
 		appendJsonField(sb, "timestamp", Instant.now().toString()).append(',');
@@ -89,6 +95,12 @@ public class ChatChoiceTrainingLogger {
 		appendJsonField(sb, "predictedKey", safe(predictedKey)).append(',');
 		sb.append("\"predictionConfidence\":").append(predictionConfidence).append(',');
 		sb.append("\"usedFallback\":").append(usedFallback).append(',');
+		appendJsonField(sb, "mlDecisionReason", safe(mlDecisionReason)).append(',');
+		if (scoreMargin == null || !Double.isFinite(scoreMargin)) {
+			sb.append("\"scoreMargin\":null").append(',');
+		} else {
+			sb.append("\"scoreMargin\":").append(scoreMargin).append(',');
+		}
 		sb.append("\"choices\":").append(toChoicesJson(choices));
 		sb.append('}').append(System.lineSeparator());
 		return sb.toString();

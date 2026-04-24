@@ -17,3 +17,138 @@
 [2026-04-20 11:13:21] launcher open
 [2026-04-20 11:13:47] User mode started
 [2026-04-20 11:14:47] servers stopped (pid: 13536, 18964)
+[2026-04-20 11:41:43] launcher open
+[2026-04-20 11:42:01] User mode started
+[2026-04-20 17:00:30] servers stopped (pid: 11320, 12096, 15560)
+[2026-04-21 11:31:25] launcher open
+[2026-04-21 11:31:48] User mode started
+[2026-04-21 11:38:07] servers stopped (pid: 8932, 18440, 18624)
+[2026-04-21 12:22:33] User mode started
+[2026-04-21 12:35:44] servers stopped (pid: 16476, 23416, 24784)
+[2026-04-21 12:36:32] launcher open
+[2026-04-21 14:42:53] launcher open
+[2026-04-21 15:09:16] User mode started
+[2026-04-21 15:09:29] User mode opened (fast path)
+[2026-04-21 15:35:53] servers stopped (pid: 6968, 20288, 26612)
+[2026-04-21 15:36:27] User mode started
+[2026-04-21 15:53:32] servers stopped (pid: 22404, 22796, 25232)
+[2026-04-21 16:00:17] User mode started
+[2026-04-21 16:35:35] servers stopped (pid: 18680, 20356)
+[2026-04-21 16:35:56] User mode started
+[2026-04-21 17:35:05] servers stopped (pid: 17988, 20176, 22476)
+[2026-04-21 17:36:42] launcher open
+[2026-04-21 17:50:20] launcher open
+[2026-04-21 17:52:49] launcher open
+[2026-04-21 18:18:42] launcher open
+[2026-04-21 18:19:03] User mode started
+[2026-04-21 18:24:35] servers stopped (pid: 10168, 13848, 29232)
+[2026-04-21 18:24:55] User mode started
+[2026-04-21 18:26:31] launcher open
+[2026-04-21 18:26:32] User mode opened (fast path)
+[2026-04-21 18:26:36] servers stopped (pid: 12188, 20412, 25388)
+[2026-04-21 18:26:59] User mode started
+[2026-04-21 18:27:06] servers stopped (pid: 6360, 13884, 25384)
+[2026-04-22 09:41:54] launcher open
+[2026-04-22 09:42:15] User mode started
+[2026-04-22 09:51:14] servers stopped (pid: 17348, 24412)
+[2026-04-22 10:16:18] launcher open
+[2026-04-22 10:16:59] launcher error: Runtime bootstrap failed. Set NEXTDEBUT_PY_RUNTIME_URL and NEXTDEBUT_JAVA_RUNTIME_URL.
+[2026-04-22 10:30:06] launcher open
+[2026-04-22 10:30:27] Manual mode started
+[2026-04-22 10:33:54] launcher open
+[2026-04-22 10:34:02] servers stopped (pid: 17764, 26432, 28732)
+[2026-04-22 10:34:25] Manual mode started
+[2026-04-22 10:34:52] servers stopped (pid: 9608, 19080, 28516)
+[2026-04-22 10:34:53] launcher closed — servers stopped
+[2026-04-22 10:38:43] launcher open
+[2026-04-22 10:39:03] Manual mode started
+[2026-04-22 10:41:58] servers stopped (pid: 1660, 17780, 24820)
+[2026-04-22 10:50:01] launcher closed — servers stopped
+[2026-04-22 11:02:40] launcher open
+[2026-04-22 11:03:01] Manual mode started
+[2026-04-22 11:09:43] servers stopped (pid: 17544, 26308, 28264)
+[2026-04-22 11:10:04] Manual mode started
+[2026-04-22 11:10:42] Manual mode started
+[2026-04-22 11:12:00] servers stopped (pid: 5916, 10396, 27864)
+[2026-04-22 11:12:21] Manual mode started
+[2026-04-22 11:36:01] servers stopped (pid: 19160, 24440)
+[2026-04-22 11:36:20] Manual mode started
+[2026-04-22 11:38:13] launcher open
+[2026-04-22 11:38:36] servers stopped (pid: 8664, 23264, 27740)
+[2026-04-22 11:38:38] launcher closed — servers stopped
+[2026-04-22 11:39:44] launcher open
+[2026-04-22 11:40:09] Manual mode started
+[2026-04-22 11:40:18] servers stopped (pid: 14548, 21332, 24844)
+[2026-04-22 11:40:20] launcher closed — servers stopped
+[2026-04-22 11:43:06] launcher open
+[2026-04-22 11:43:34] Manual mode started
+[2026-04-22 11:43:55] servers stopped (pid: 4692, 21348, 22196)
+[2026-04-22 11:46:28] launcher closed — servers stopped
+[2026-04-22 11:46:46] launcher open
+[2026-04-22 11:47:26] Manual mode started
+[2026-04-22 11:47:37] servers stopped (pid: 20552, 22304, 27368)
+[2026-04-22 11:47:47] launcher closed — servers stopped
+[2026-04-22 11:49:46] launcher open
+[2026-04-22 12:05:11] launcher open
+[2026-04-22 12:05:39] Manual mode started
+[2026-04-22 12:07:18] servers stopped (pid: 10332, 11636, 17588)
+[2026-04-22 12:07:20] launcher closed — servers stopped
+[2026-04-22 12:09:11] launcher open
+[2026-04-22 12:09:37] Manual mode started
+[2026-04-22 12:09:44] servers stopped (pid: 18748, 21836, 28860)
+[2026-04-22 12:09:49] launcher closed — servers stopped
+[2026-04-22 12:11:02] launcher open
+[2026-04-22 12:11:30] Manual mode started
+[2026-04-22 12:11:42] servers stopped (pid: 8612, 12712, 18692, 27748, 27880)
+[2026-04-22 12:11:44] launcher closed — servers stopped
+[2026-04-22 14:27:42] launcher open
+[2026-04-22 14:28:14] Manual mode started
+[2026-04-22 14:39:14] servers stopped (pid: 3348, 7544, 15132, 24948, 25444)
+[2026-04-22 14:39:16] launcher closed — servers stopped
+[2026-04-23 11:22:26] launcher open
+[2026-04-23 11:22:54] Manual mode started
+[2026-04-23 11:36:09] servers stopped (pid: 10540, 19960, 25472, 26804, 28384)
+[2026-04-23 11:36:11] launcher closed — servers stopped
+[2026-04-23 18:17:06] launcher open
+[2026-04-23 18:17:13] launcher closed — servers stopped
+[2026-04-23 18:22:45] launcher open
+[2026-04-23 18:23:17] Manual mode started
+[2026-04-23 18:25:02] servers stopped (pid: 11408, 15696, 16188, 18144, 19336)
+[2026-04-23 18:25:03] launcher closed — servers stopped
+[2026-04-23 21:58:28] launcher open
+[2026-04-23 21:58:33] installing Python dependencies from python-ml\requirements.txt
+[2026-04-23 21:59:04] launcher error:   WARNING: The scripts f2py.exe and numpy-config.exe are installed in 'C:\Users\Master\AppData\Local\Programs\Python\Python313\Scripts' which is not on PATH.
+[2026-04-23 21:59:18] launcher closed — servers stopped
+[2026-04-23 23:43:23] launcher open
+[2026-04-23 23:45:55] launcher closed — servers stopped
+[2026-04-23 23:46:02] launcher open
+[2026-04-23 23:46:06] launcher closed — servers stopped
+[2026-04-23 23:47:56] launcher open
+[2026-04-24 09:37:41] launcher open
+[2026-04-24 09:37:48] portable runtime missing: Python=False Java21=False, running ensure_runtime.ps1
+[2026-04-24 09:39:32] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-24 09:39:32] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-24 09:39:32] [NEXTDEBUT] Downloading: https://api.adoptium.net/v3/binary/latest/21/ga/windows/x64/jdk/hotspot/normal/eclipse?project=jdk&archive_type=zip
+[2026-04-24 09:39:32] [NEXTDEBUT] Extracting: C:\Users\KOSMO\Desktop\NEXTDEBUT\runtime\_downloads\java-runtime-263f1091132d40249cdb55e0f77f61e3.zip
+[2026-04-24 09:39:32] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-24 09:39:33] python scripts path ready: C:\python\Scripts
+[2026-04-24 09:39:34] python scripts path ready: C:\python\Scripts
+[2026-04-24 09:39:46] python scripts path ready: C:\python\Scripts
+[2026-04-24 09:39:47] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-24 09:39:47] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-24 09:40:47] Manual mode started
+[2026-04-24 09:41:17] servers stopped (pid: 2956, 13640, 16556, 17648, 19180)
+[2026-04-24 09:41:19] launcher closed - servers stopped
+[2026-04-24 09:42:22] launcher open
+[2026-04-24 09:42:26] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-24 09:42:37] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-24 09:42:37] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-24 09:42:37] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-24 09:42:37] python scripts path ready: C:\python\Scripts
+[2026-04-24 09:42:38] python scripts path ready: C:\python\Scripts
+[2026-04-24 09:42:39] python scripts path ready: C:\python\Scripts
+[2026-04-24 09:42:40] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-24 09:42:40] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-24 09:43:07] Manual mode started
+[2026-04-24 09:44:55] servers stopped (pid: 10460, 12264, 14216, 16100)
+[2026-04-24 09:44:56] launcher closed - servers stopped

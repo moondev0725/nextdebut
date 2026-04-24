@@ -3931,13 +3931,13 @@ body{
 /* 멤버 카드: 좌열 높이를 살짝 나눠 쓰되 min-height로 과도한 늘어남 완화 */
 #gsWrap .panel-l .panel-l-inner .mcard{
   flex:0 0 auto;
-  min-height:132px;
+  min-height:126px;
   align-items:stretch;
 }
 /* 사진은 세로로 줄이지 않고, 우측(cinfo) 높이에 맞춰 늘어남(object-fit:cover) */
 #gsWrap .panel-l .cpho{
-  width:84px;
-  min-width:84px;
+  width:82px;
+  min-width:82px;
   flex-shrink:0;
   align-self:stretch;
   min-height:0;
@@ -3952,7 +3952,7 @@ body{
 #gsWrap .panel-l .cstats{
   flex:0 0 auto;
   min-height:0;
-  gap:2px;
+  gap:1px;
   margin:0;
   padding:0;
   justify-content:flex-start;
@@ -3961,18 +3961,18 @@ body{
   margin-bottom:0;
 }
 #gsWrap .panel-l .srow{
-  gap:4px;
+  gap:3px;
   align-items:center;
 }
 #gsWrap .panel-l .slbl{
-  font-size:10px;
-  width:30px;
+  font-size:9px;
+  width:28px;
   font-weight:600;
   letter-spacing:-0.02em;
 }
 #gsWrap .panel-l .strk{
-  height:9px;
-  min-height:9px;
+  height:7px;
+  min-height:7px;
   border-radius:999px;
 }
 #gsWrap .panel-l .sval{
@@ -3991,8 +3991,8 @@ body{
   flex:1 1 auto;
   min-width:0;
   min-height:0;
-  padding:9px 11px 6px;
-  gap:4px;
+  padding:8px 10px 5px;
+  gap:3px;
   justify-content:flex-start;
   align-self:stretch;
   width:100%;
@@ -4006,11 +4006,13 @@ body{
   margin-bottom:1px;
   flex-wrap:nowrap;
   row-gap:0;
-  column-gap:8px;
+  column-gap:5px;
 }
 #gsWrap .panel-l .cbadges{
   margin-bottom:0;
   padding-bottom:0;
+  flex-wrap:nowrap;
+  gap:3px;
 }
 /* 뱃지(파란선 위치) ↔ 스탯 막대 사이 여백 */
 #gsWrap .panel-l .cbadges + .cstats{
@@ -4018,7 +4020,7 @@ body{
   padding-top:0;
 }
 #gsWrap .panel-l .cname{
-  font-size:14px;
+  font-size:15px;
   line-height:1.2;
   white-space:nowrap !important;
   overflow:hidden !important;
@@ -4032,19 +4034,38 @@ body{
   align-items:flex-start;
   flex-wrap:nowrap;
   row-gap:0;
+  gap:4px;
   width:100%;
   flex:1 1 auto;
   min-width:0;
+}
+#gsWrap .panel-l .member-status-inline{
+  min-width:0;
+  flex:0 1 auto;
+}
+#gsWrap .panel-l .member-status-trigger{
+  min-width:24px;
+  height:18px;
+  padding:0 5px;
+  font-size:9px;
+}
+#gsWrap .panel-l .item-daily-badge{
+  display:none;
 }
 #gsWrap .panel-l .ctotal{
   margin-left:auto;
   flex:0 0 auto;
   align-items:flex-end;
-  min-width:52px;
+  min-width:42px;
 }
 #gsWrap .panel-l .ctotal-num{
   line-height:1;
   white-space:nowrap;
+  font-size:20px;
+}
+#gsWrap .panel-l .ctotal-lbl{
+  font-size:9px;
+  margin-top:1px;
 }
 #gsWrap .panel-l .enhance-badge,
 #gsWrap .panel-l .pc-glow-badge{
@@ -4052,12 +4073,13 @@ body{
 }
 #gsWrap .panel-l .sval{
   width:auto;
-  min-width:26px;
+  min-width:22px;
   display:inline-flex;
   justify-content:flex-end;
   align-items:center;
-  gap:3px;
+  gap:2px;
   white-space:nowrap;
+  font-size:10px;
 }
 #gsWrap .panel-l .sval[data-eb]:not([data-eb="0"])::after{
   content:"(+" attr(data-eb) ")";

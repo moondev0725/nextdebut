@@ -13,7 +13,7 @@
 <title>NEXT DEBUT — GAME</title>
 <%@ include file="/WEB-INF/views/fragments/head-common.jspf" %>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${ctx}/css/game.css?v=20260417_name_fix_v2">
+<link rel="stylesheet" href="${ctx}/css/game.css?v=20260421_targeting_modal_totalavg_v1">
 <link rel="stylesheet" href="${ctx}/css/sim-status-presentation.css?v=20260403_sim_ui">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -343,7 +343,7 @@
 <div class="combo-banner" id="comboBanner">2 COMBO!</div>
 
 <%-- 결과 오버레이 --%>
-<div class="rov" id="rov">
+<div class="rov" id="rov" tabindex="-1">
   <div class="rcard">
     <div class="rav" id="res-av"><div class="rav-ph"><i class="fas fa-user"></i></div></div>
     <div class="rname" id="res-name">연습생</div>
@@ -431,6 +431,8 @@
         <c:when test="${m.enhanceLevel == 2}"><c:set var="enhanceBonus" value="2"/></c:when>
         <c:when test="${m.enhanceLevel == 1}"><c:set var="enhanceBonus" value="1"/></c:when>
       </c:choose>
+      <c:set var="mTotalSum" value="${m.vocal + m.dance + m.star + m.mental + m.teamwork}" />
+      <c:set var="mTotalDisplay" value="${mTotalSum}" />
       <div class="mcard mcard--${m.gender == 'MALE' ? 'm' : 'f'} ${pcGlowClass}" data-tid="${m.traineeId}" data-personality-code="<c:out value='${m.personalityCode}' />">
         <div class="cpho">
           <c:choose>
@@ -449,7 +451,7 @@
               <span class="enhance-badge enhance-badge--lv-${m.enhanceLevel}">${m.enhanceLevel >= 5 ? 'MAX' : '+'.concat(m.enhanceLevel)}</span>
             </div>
             <div class="ctotal">
-              <div class="ctotal-num">${m.vocal + m.dance + m.star + m.mental + m.teamwork}</div>
+              <div class="ctotal-num" data-total-sum="${mTotalSum}">${mTotalDisplay}</div>
               <div class="ctotal-lbl">TOTAL</div>
             </div>
           </div>
@@ -493,11 +495,11 @@
             </div>
           </div>
           <div class="cstats">
-            <div class="srow${not stripItemBonus && itemStatBonusMap['v'] > 0 ? ' item-on item-on--v' : ''}${not stripItemBonus && fn:contains(latestActiveItemStatKeysCsv, 'v') and itemGlowEnabled ? ' item-recent item-on item-on--v' : ''}" data-stat="v"><span class="slbl">보컬<c:if test="${not stripItemBonus && itemStatBonusMap['v'] > 0}"><span class="item-daily-badge">+${itemStatBonusMap['v']}</span></c:if></span><div class="strk"><div class="sfill sfill--v" data-w="${m.vocal}"></div></div><span class="sval" data-key="v" data-eb="${enhanceBonus}">${m.vocal}</span></div>
-            <div class="srow${not stripItemBonus && itemStatBonusMap['d'] > 0 ? ' item-on item-on--d' : ''}${not stripItemBonus && fn:contains(latestActiveItemStatKeysCsv, 'd') and itemGlowEnabled ? ' item-recent item-on item-on--d' : ''}" data-stat="d"><span class="slbl">댄스<c:if test="${not stripItemBonus && itemStatBonusMap['d'] > 0}"><span class="item-daily-badge">+${itemStatBonusMap['d']}</span></c:if></span><div class="strk"><div class="sfill sfill--d" data-w="${m.dance}"></div></div><span class="sval" data-key="d" data-eb="${enhanceBonus}">${m.dance}</span></div>
-            <div class="srow${not stripItemBonus && itemStatBonusMap['s'] > 0 ? ' item-on item-on--s' : ''}${not stripItemBonus && fn:contains(latestActiveItemStatKeysCsv, 's') and itemGlowEnabled ? ' item-recent item-on item-on--s' : ''}" data-stat="s"><span class="slbl">스타<c:if test="${not stripItemBonus && itemStatBonusMap['s'] > 0}"><span class="item-daily-badge">+${itemStatBonusMap['s']}</span></c:if></span><div class="strk"><div class="sfill sfill--s" data-w="${m.star}"></div></div><span class="sval" data-key="s" data-eb="${enhanceBonus}">${m.star}</span></div>
-            <div class="srow${not stripItemBonus && itemStatBonusMap['m'] > 0 ? ' item-on item-on--m' : ''}${not stripItemBonus && fn:contains(latestActiveItemStatKeysCsv, 'm') and itemGlowEnabled ? ' item-recent item-on item-on--m' : ''}" data-stat="m"><span class="slbl">멘탈<c:if test="${not stripItemBonus && itemStatBonusMap['m'] > 0}"><span class="item-daily-badge">+${itemStatBonusMap['m']}</span></c:if></span><div class="strk"><div class="sfill sfill--m" data-w="${m.mental}"></div></div><span class="sval" data-key="m" data-eb="${enhanceBonus}">${m.mental}</span></div>
-            <div class="srow${not stripItemBonus && itemStatBonusMap['t'] > 0 ? ' item-on item-on--t' : ''}${not stripItemBonus && fn:contains(latestActiveItemStatKeysCsv, 't') and itemGlowEnabled ? ' item-recent item-on item-on--t' : ''}" data-stat="t"><span class="slbl">팀웍<c:if test="${not stripItemBonus && itemStatBonusMap['t'] > 0}"><span class="item-daily-badge">+${itemStatBonusMap['t']}</span></c:if></span><div class="strk"><div class="sfill sfill--t" data-w="${m.teamwork}"></div></div><span class="sval" data-key="t" data-eb="${enhanceBonus}">${m.teamwork}</span></div>
+            <div class="srow${not stripItemBonus && itemStatBonusMap['v'] > 0 ? ' item-on item-on--v' : ''}${not stripItemBonus && fn:contains(latestActiveItemStatKeysCsv, 'v') and itemGlowEnabled ? ' item-recent item-on item-on--v' : ''}" data-stat="v"><span class="slbl">보컬<c:if test="${not stripItemBonus && itemStatBonusMap['v'] > 0}"><span class="item-daily-badge">+${itemStatBonusMap['v']}</span></c:if></span><div class="strk"><div class="sfill sfill--v" data-w="${m.vocal}"></div></div><span class="sval" data-key="v" data-raw="${m.vocal}" data-eb="${enhanceBonus}">${m.vocal}</span></div>
+            <div class="srow${not stripItemBonus && itemStatBonusMap['d'] > 0 ? ' item-on item-on--d' : ''}${not stripItemBonus && fn:contains(latestActiveItemStatKeysCsv, 'd') and itemGlowEnabled ? ' item-recent item-on item-on--d' : ''}" data-stat="d"><span class="slbl">댄스<c:if test="${not stripItemBonus && itemStatBonusMap['d'] > 0}"><span class="item-daily-badge">+${itemStatBonusMap['d']}</span></c:if></span><div class="strk"><div class="sfill sfill--d" data-w="${m.dance}"></div></div><span class="sval" data-key="d" data-raw="${m.dance}" data-eb="${enhanceBonus}">${m.dance}</span></div>
+            <div class="srow${not stripItemBonus && itemStatBonusMap['s'] > 0 ? ' item-on item-on--s' : ''}${not stripItemBonus && fn:contains(latestActiveItemStatKeysCsv, 's') and itemGlowEnabled ? ' item-recent item-on item-on--s' : ''}" data-stat="s"><span class="slbl">스타<c:if test="${not stripItemBonus && itemStatBonusMap['s'] > 0}"><span class="item-daily-badge">+${itemStatBonusMap['s']}</span></c:if></span><div class="strk"><div class="sfill sfill--s" data-w="${m.star}"></div></div><span class="sval" data-key="s" data-raw="${m.star}" data-eb="${enhanceBonus}">${m.star}</span></div>
+            <div class="srow${not stripItemBonus && itemStatBonusMap['m'] > 0 ? ' item-on item-on--m' : ''}${not stripItemBonus && fn:contains(latestActiveItemStatKeysCsv, 'm') and itemGlowEnabled ? ' item-recent item-on item-on--m' : ''}" data-stat="m"><span class="slbl">멘탈<c:if test="${not stripItemBonus && itemStatBonusMap['m'] > 0}"><span class="item-daily-badge">+${itemStatBonusMap['m']}</span></c:if></span><div class="strk"><div class="sfill sfill--m" data-w="${m.mental}"></div></div><span class="sval" data-key="m" data-raw="${m.mental}" data-eb="${enhanceBonus}">${m.mental}</span></div>
+            <div class="srow${not stripItemBonus && itemStatBonusMap['t'] > 0 ? ' item-on item-on--t' : ''}${not stripItemBonus && fn:contains(latestActiveItemStatKeysCsv, 't') and itemGlowEnabled ? ' item-recent item-on item-on--t' : ''}" data-stat="t"><span class="slbl">팀웍<c:if test="${not stripItemBonus && itemStatBonusMap['t'] > 0}"><span class="item-daily-badge">+${itemStatBonusMap['t']}</span></c:if></span><div class="strk"><div class="sfill sfill--t" data-w="${m.teamwork}"></div></div><span class="sval" data-key="t" data-raw="${m.teamwork}" data-eb="${enhanceBonus}">${m.teamwork}</span></div>
 
           </div>
         </div>
@@ -1014,7 +1016,7 @@ window.NDX_GAME_CONFIG = {
     <c:forEach var="m" items="${result.roster}" varStatus="st">'${m.traineeId}':'${m.imagePath}'<c:if test="${!st.last}">,</c:if></c:forEach>
   },
   rosterStats: [
-    <c:forEach var="m" items="${result.roster}" varStatus="st">{traineeId:'${m.traineeId}', vocal:${m.vocal}, dance:${m.dance}, star:${m.star}, mental:${m.mental}, teamwork:${m.teamwork}}<c:if test="${!st.last}">,</c:if></c:forEach>
+    <c:forEach var="m" items="${result.roster}" varStatus="st">{traineeId:'${m.traineeId}', vocal:${m.vocal}, dance:${m.dance}, star:${m.star}, mental:${m.mental}, teamwork:${m.teamwork}, statusCode:'${fn:escapeXml(m.statusCode)}', statusLabel:'${fn:escapeXml(m.statusLabel)}', statusDesc:'${fn:escapeXml(m.statusDesc)}', statusTurnsLeft:${empty m.statusTurnsLeft ? 'null' : m.statusTurnsLeft}}<c:if test="${!st.last}">,</c:if></c:forEach>
   ],
   appliedItemCount: ${empty appliedItems ? 0 : appliedItems.size()},
   /** ms: 턴 스탯 플래시·결과 확인 후 AI 상황·대사를 채팅에 붙이기까지 추가 대기 */
@@ -1100,7 +1102,7 @@ window.NDX_GAME_CONFIG = {
 <script src="${ctx}/js/condition-panel-ui.js?v=20260404_daily_bars"></script>
 <script src="${ctx}/js/chat-simulation-logic.js?v=20260404_intent_chat"></script>
 <script src="${ctx}/js/sim-status-presentation.js?v=20260404_daily_bars"></script>
-<script src="${ctx}/js/game.js?v=20260416_event_quiz_admin"></script>
+<script src="${ctx}/js/game.js?v=20260421_targeting_modal_totalavg_v1"></script>
 <script>
 (function(){
   if(typeof window.toggleStatGrowth2x !== 'function'){

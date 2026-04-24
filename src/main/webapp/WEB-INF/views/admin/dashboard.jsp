@@ -2219,7 +2219,7 @@ function renderTraineeStatBars(vocal, dance, star, mental, teamwork) {
     ['보컬', vocal], ['댄스', dance], ['스타', star], ['멘탈', mental], ['팀워크', teamwork]
   ];
   return stats.map(function(s) {
-    var w = Math.min(100, Math.max(0, s[1] * 5));
+    var w = Math.min(100, Math.max(0, s[1]));
     return '<div class="stat"><div class="stat-head"><span>' + s[0] + '</span><span>' + s[1] + '</span></div>' +
       '<div class="bar"><span style="width:' + w + '%;"></span></div></div>';
   }).join('');

@@ -1,37 +1,40 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
-# 스크립트 위치 기준으로 프로젝트 루트를 계산해, 다른 PC/경로에서도 그대로 동작
+# 스크립트 위치 기준으로 프로젝트 루트 (이 스크립트가 tools\ 에 있음)
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$launcherBat = Join-Path $projectRoot "RUN_PROJECTX1.bat"
-$launcherGuiPs1 = Join-Path $projectRoot "tools\launch_projectx1_gui.ps1"
-$launcherSilentVbs = Join-Path $projectRoot "RUN_PROJECTX1_SILENT.vbs"
+$launcherBat = Join-Path $projectRoot "NEXTDEBUT.bat"
+$silentLauncher = Join-Path $projectRoot "launcher\RUN_NEXTDEBUT_SILENT.vbs"
+$launcherPs = Join-Path $projectRoot "tools\Launch_NEXTDEBUT.ps1"
+$guiScript = Join-Path $projectRoot "tools\launch_nextdebut_gui.ps1"
 $powershellExe = Join-Path $env:WINDIR "System32\WindowsPowerShell\v1.0\powershell.exe"
-$wscriptExe = Join-Path $env:WINDIR "System32\wscript.exe"
+
 $desktopCandidates = @(
     [Environment]::GetFolderPath("Desktop"),
     (Join-Path $env:USERPROFILE "Desktop")
 ) | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
 
 if (-not (Test-Path $launcherBat)) {
-    throw "Launcher file not found: $launcherBat"
+    throw "NEXTDEBUT.bat 없음: $launcherBat"
 }
-if (-not (Test-Path $launcherGuiPs1)) {
-    throw "GUI launcher script not found: $launcherGuiPs1"
+if (-not (Test-Path $silentLauncher)) {
+    throw "RUN_NEXTDEBUT_SILENT.vbs 없음: $silentLauncher"
 }
-if (-not (Test-Path $launcherSilentVbs)) {
-    throw "Silent launcher script not found: $launcherSilentVbs"
+if (-not (Test-Path $launcherPs)) {
+    throw "Launch_NEXTDEBUT.ps1 없음: $launcherPs"
+}
+if (-not (Test-Path $guiScript)) {
+    throw "GUI 스크립트 없음: $guiScript"
 }
 
 $wsh = New-Object -ComObject WScript.Shell
 
 $iconCandidates = @(
-    (Join-Path $projectRoot "assets\projectx1.ico"),
+    (Join-Path $projectRoot "assets\nextdebut.ico"),
     (Join-Path $projectRoot "icon.ico"),
     (Join-Path $projectRoot "src\main\resources\static\favicon.ico")
 )
 
 $iconLocation = $null
-
 foreach ($icon in $iconCandidates) {
     if (Test-Path $icon) {
         $iconLocation = "$icon,0"
@@ -40,30 +43,35 @@ foreach ($icon in $iconCandidates) {
 }
 
 if (-not $desktopCandidates -or $desktopCandidates.Count -eq 0) {
-    throw "Desktop path not found."
+    throw "바탕화면 경로를 찾을 수 없습니다."
 }
+
+# 바로가기는 wscript.exe → launcher\RUN_NEXTDEBUT_SILENT.vbs 로 통일
+$wscriptExe = Join-Path $env:WINDIR "System32\wscript.exe"
+$shortcutArgs = "`"$silentLauncher`""
 
 foreach ($desktopPath in $desktopCandidates) {
-    $launcherShortcutPath = Join-Path $desktopPath "ProjectX1 Launcher.lnk"
+    $launcherShortcutPath = Join-Path $desktopPath "NEXTDEBUT.lnk"
     $launcherShortcut = $wsh.CreateShortcut($launcherShortcutPath)
     $launcherShortcut.TargetPath = $wscriptExe
-    $launcherShortcut.Arguments = "`"$launcherSilentVbs`""
+    $launcherShortcut.Arguments = $shortcutArgs
     $launcherShortcut.WorkingDirectory = $projectRoot
-    $launcherShortcut.Description = "ProjectX1 Auto Launcher"
-    $launcherShortcut.WindowStyle = 1
+    $launcherShortcut.Description = "NEXTDEBUT — 프로젝트 폴더 옮긴 뒤에는 이 스크립트를 다시 실행해 바로가기를 갱신하세요."
+    $launcherShortcut.WindowStyle = 7
     if ($iconLocation) { $launcherShortcut.IconLocation = $iconLocation }
     $launcherShortcut.Save()
-    Write-Output "Created shortcut: $launcherShortcutPath"
+    Write-Output "바로가기 생성: $launcherShortcutPath"
 }
 
-# 과거 분기형 바로가기는 정리
 $oldShortcuts = @(
-    (Join-Path ([Environment]::GetFolderPath("Desktop")) "ProjectX1 Launcher (Silent).lnk"),
-    (Join-Path ([Environment]::GetFolderPath("Desktop")) "ProjectX1 Launcher (Console).lnk"),
-    (Join-Path (Join-Path $env:USERPROFILE "Desktop") "ProjectX1 Launcher (Silent).lnk"),
-    (Join-Path (Join-Path $env:USERPROFILE "Desktop") "ProjectX1 Launcher (Console).lnk"),
-    (Join-Path $projectRoot "ProjectX1 Launcher (user).lnk"),
-    (Join-Path $projectRoot "ProjectX1 Launcher (Console).lnk")
+    (Join-Path ([Environment]::GetFolderPath("Desktop")) "NEXTDEBUT Launcher.lnk"),
+    (Join-Path ([Environment]::GetFolderPath("Desktop")) "NEXTDEBUT Launcher (Silent).lnk"),
+    (Join-Path ([Environment]::GetFolderPath("Desktop")) "NEXTDEBUT Launcher (Console).lnk"),
+    (Join-Path (Join-Path $env:USERPROFILE "Desktop") "NEXTDEBUT Launcher.lnk"),
+    (Join-Path (Join-Path $env:USERPROFILE "Desktop") "NEXTDEBUT Launcher (Silent).lnk"),
+    (Join-Path (Join-Path $env:USERPROFILE "Desktop") "NEXTDEBUT Launcher (Console).lnk"),
+    (Join-Path $projectRoot "NEXTDEBUT Launcher (user).lnk"),
+    (Join-Path $projectRoot "NEXTDEBUT Launcher (Console).lnk")
 )
 foreach ($old in $oldShortcuts) {
     if (Test-Path $old) {

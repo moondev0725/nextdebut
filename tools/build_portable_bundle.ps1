@@ -1,5 +1,5 @@
 param(
-    [string]$BundleName = "ProjectX1-Portable",
+    [string]$BundleName = "NEXTDEBUT-Portable",
     [switch]$IncludeJre,
     [switch]$IncludePythonRuntime
 )
@@ -39,7 +39,7 @@ $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $distRoot = Join-Path $projectRoot "dist"
 $bundleRoot = Join-Path $distRoot $BundleName
 $runtimeRoot = Join-Path $bundleRoot "runtime"
-$bundleJarPath = Join-Path $bundleRoot "projectx1.jar"
+$bundleJarPath = Join-Path $bundleRoot "nextdebut.jar"
 
 # Default behavior: include JRE unless explicitly disabled in script.
 $effectiveIncludeJre = $true
@@ -73,9 +73,7 @@ $copyItems = @(
     "python-ml",
     "assets",
     "tools",
-    "RUN_PROJECTX1.bat",
-    "RUN_PROJECTX1_SILENT.vbs",
-    "PROJECTX1_LAUNCHER.bat"
+    "NEXTDEBUT.bat"
 )
 foreach ($item in $copyItems) {
     $src = Join-Path $projectRoot $item
@@ -128,16 +126,15 @@ if ($IncludePythonRuntime.IsPresent) {
 }
 
 $readme = @"
-ProjectX1 Portable Bundle
+NEXTDEBUT Portable Bundle
 
 How to run:
-1) Double-click PROJECTX1_LAUNCHER.bat
-2) Or run RUN_PROJECTX1.bat directly
+1) Double-click NEXTDEBUT.bat (starts servers, opens browser; close window or use Stop to shut down)
 
 Runtime resolution order:
 - Python: runtime\python\python.exe -> system python -> py -3
 - Java: runtime\jre\bin\java.exe -> system java
-- Spring boot: projectx1.jar (preferred) -> gradlew.bat bootRun (dev fallback)
+- Spring boot: nextdebut.jar (preferred) -> gradlew.bat bootRun (dev fallback)
 
 If it does not start on another PC:
 - Ensure this folder still contains runtime\jre and runtime\python (do not zip only part of the folder).

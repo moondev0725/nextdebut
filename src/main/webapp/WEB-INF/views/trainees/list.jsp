@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
@@ -54,10 +55,11 @@
             pointer-events: none;
         }
 
+        /* 도감 상단: 통계 + 필터 한 장의 카드(.archive-hero-toolbar) 안에서 사용 */
         .page-hero {
             position: relative;
-            padding: 34px;
-            margin-bottom: 22px;
+            padding: 26px 28px 12px;
+            margin-bottom: 0;
         }
         .hero-topline {
             display: inline-flex;
@@ -104,52 +106,69 @@
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 14px;
-            margin-top: 28px;
+            gap: 10px;
+            margin-top: 16px;
+            align-items: stretch;
         }
         .summary-item {
             position: relative;
-            padding: 18px 18px 16px;
-            border-radius: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 0;
+            padding: 11px 12px 10px;
+            border-radius: 16px;
             border: 1px solid rgba(255,255,255,0.7);
             background: rgba(255,255,255,0.48);
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
         }
         .summary-label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-family: "Orbitron", sans-serif;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 700;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.18em;
             color: #8087a1;
         }
         .summary-value {
             display: flex;
             align-items: baseline;
-            gap: 8px;
+            flex-wrap: wrap;
+            gap: 6px;
+            row-gap: 2px;
             color: #1f2638;
         }
         .summary-value strong {
             font-family: "Orbitron", sans-serif;
-            font-size: 30px;
+            font-size: 22px;
             font-weight: 900;
-            line-height: 1;
+            line-height: 1.1;
         }
         .summary-value span {
-            font-size: 12px;
+            font-size: 11px;
             color: #70778e;
         }
         .summary-item--pink { background: linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,244,248,0.82)); }
         .summary-item--blue { background: linear-gradient(180deg, rgba(255,255,255,0.58), rgba(244,248,255,0.88)); }
         .summary-item--lavender { background: linear-gradient(180deg, rgba(255,255,255,0.58), rgba(247,244,255,0.86)); }
 
+        .archive-hero-toolbar {
+            margin-bottom: 22px;
+        }
+        .archive-hero-toolbar .toolbar.trainee-toolbar {
+            margin-top: 4px;
+            margin-bottom: 0;
+            padding: 14px 28px 18px;
+            border-top: 1px solid rgba(255,255,255,0.55);
+            gap: 14px;
+        }
         .toolbar.trainee-toolbar {
             display: flex;
             flex-direction: column;
             gap: 18px;
             padding: 20px 22px;
-            margin-bottom: 20px;
+            margin-bottom: 0;
         }
         .trainee-toolbar__filters {
             display: flex;
@@ -1062,6 +1081,8 @@
             .detail-photo { min-height: 360px; }
         }
         @media (max-width: 720px) {
+            .archive-hero-toolbar .page-hero,
+            .archive-hero-toolbar .toolbar.trainee-toolbar,
             .page-hero,
             .toolbar,
             .board-card,
@@ -1443,39 +1464,40 @@
 
 <main class="flex-1 px-6 pb-16" style="padding-top: calc(var(--nav-h) + 32px);">
     <div class="container mx-auto max-w-6xl archive-shell">
-        <section class="archive-card page-hero">
-            <span class="hero-topline"><i class="fas fa-book-open"></i> TRAINEE INDEX</span>
-            <h1 class="hero-title">연습생 <strong>도감</strong></h1>
-            <p class="hero-sub">
-                연습생의 프로필·능력치·카드 강화 단계를 한 번에 확인할 수 있습니다.
-                <c:choose>
-                    <c:when test="${loggedIn}">로그인 시 <strong>보유한 멤버</strong>는 컬러, 미보유 멤버는 흑백으로 표시되며, 상세 모달에서 <strong>카드 강화</strong>를 진행할 수 있습니다.</c:when>
-                    <c:otherwise>로그인하면 보유 여부를 컬러/흑백으로 구분해 보고, 상세 모달에서 카드 강화 기능을 이용할 수 있습니다.</c:otherwise>
-                </c:choose>
-                현재 <strong>${totalCount}명</strong>이 등록되어 있습니다.
-            </p>
+        <section class="archive-card archive-hero-toolbar">
+            <div class="page-hero">
+                <span class="hero-topline"><i class="fas fa-book-open"></i> TRAINEE INDEX</span>
+                <h1 class="hero-title">연습생 <strong>도감</strong></h1>
+                <p class="hero-sub">
+                    연습생의 프로필·능력치·카드 강화 단계를 한 번에 확인할 수 있습니다.
+                    <c:choose>
+                        <c:when test="${loggedIn}">로그인 시 <strong>보유한 멤버</strong>는 컬러, 미보유 멤버는 흑백으로 표시되며, 상세 모달에서 <strong>카드 강화</strong>를 진행할 수 있습니다.</c:when>
+                        <c:otherwise>로그인하면 보유 여부를 컬러/흑백으로 구분해 보고, 상세 모달에서 카드 강화 기능을 이용할 수 있습니다.</c:otherwise>
+                    </c:choose>
+                    현재 <strong>${totalCount}명</strong>이 등록되어 있습니다.
+                </p>
 
-            <div class="summary-grid">
-                <div class="summary-item summary-item--lavender">
-                    <span class="summary-label">TOTAL TRAINEES</span>
-                    <div class="summary-value"><strong>${totalCount}</strong><span>명 등록</span></div>
-                </div>
-                <div class="summary-item summary-item--blue">
-                    <span class="summary-label">MALE</span>
-                    <div class="summary-value"><strong>${maleCount}</strong><span>남자 연습생</span></div>
-                </div>
-                <div class="summary-item summary-item--pink">
-                    <span class="summary-label">FEMALE</span>
-                    <div class="summary-value"><strong>${femaleCount}</strong><span>여자 연습생</span></div>
-                </div>
-                <div class="summary-item summary-item--lavender">
-                    <span class="summary-label">AVG SCORE</span>
-                    <div class="summary-value"><strong>${avgScore}</strong><span>평균 종합점수</span></div>
+                <div class="summary-grid">
+                    <div class="summary-item summary-item--lavender">
+                        <span class="summary-label">TOTAL TRAINEES</span>
+                        <div class="summary-value"><strong>${totalCount}</strong><span>명 등록</span></div>
+                    </div>
+                    <div class="summary-item summary-item--blue">
+                        <span class="summary-label">MALE</span>
+                        <div class="summary-value"><strong>${maleCount}</strong><span>남자 연습생</span></div>
+                    </div>
+                    <div class="summary-item summary-item--pink">
+                        <span class="summary-label">FEMALE</span>
+                        <div class="summary-value"><strong>${femaleCount}</strong><span>여자 연습생</span></div>
+                    </div>
+                    <div class="summary-item summary-item--lavender">
+                        <span class="summary-label">AVG SCORE</span>
+                        <div class="summary-value"><strong><fmt:formatNumber value="${avgScore}" maxFractionDigits="2" minFractionDigits="2"/></strong><span>평균 종합점수</span></div>
+                    </div>
                 </div>
             </div>
-        </section>
 
-        <section class="archive-card toolbar trainee-toolbar">
+            <div class="toolbar trainee-toolbar">
             <div class="trainee-toolbar__filters">
                 <div class="trainee-toolbar__row">
                     <span class="trainee-toolbar__label">성별</span>
@@ -1544,6 +1566,7 @@
                     <option value="teamwork">팀워크순</option>
                 </select>
             </div>
+        </div>
         </section>
 
         <section class="archive-card board-card">
@@ -1970,7 +1993,7 @@
             var pct = Number(bonusPercent || 0);
             if (pct <= 0 || b <= 0) return b;
             var add = Math.round(b * (pct / 100));
-            return Math.max(0, Math.min(20, b + add));
+            return Math.max(0, Math.min(100, b + add));
         }
         function enhanceBonusByLevel(level) {
             var lv = Math.max(0, Number(level || 0));

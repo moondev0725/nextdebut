@@ -36,18 +36,26 @@
     align-items: center;
     gap: 6px;
     height: 36px;
-    padding: 0 6px 0 10px;
+    width: 36px;
+    padding: 0;
     border-radius: 999px;
     border: 1px solid rgba(232, 164, 184, 0.24);
     background: rgba(255, 255, 255, 0.9);
     box-shadow: 0 8px 20px rgba(28, 25, 23, 0.08);
+    justify-content: flex-end;
+    overflow: hidden;
+    transition: width .28s ease, padding .28s ease, border-color .2s ease, box-shadow .2s ease;
 }
 .nav-global-search:focus-within {
     border-color: rgba(232, 164, 184, 0.48);
     box-shadow: 0 10px 24px rgba(232, 164, 184, 0.16);
 }
+.nav-global-search.is-open {
+    width: 220px;
+    padding: 0 6px 0 10px;
+}
 .nav-global-search__input {
-    width: 170px;
+    width: 0;
     min-width: 0;
     border: 0;
     outline: 0;
@@ -55,6 +63,16 @@
     font-size: 12px;
     font-weight: 600;
     color: rgba(28, 25, 23, 0.88);
+    opacity: 0;
+    transform: translateX(10px);
+    pointer-events: none;
+    transition: width .28s ease, opacity .2s ease, transform .28s ease;
+}
+.nav-global-search.is-open .nav-global-search__input {
+    width: 170px;
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
 }
 .nav-global-search__input::placeholder {
     color: rgba(120, 113, 108, 0.66);
@@ -85,6 +103,12 @@
 @media (max-width: 768px) {
     .nav-global-search--dock {
         right: 56px;
+    }
+    .nav-global-search.is-open {
+        width: 190px;
+    }
+    .nav-global-search.is-open .nav-global-search__input {
+        width: 140px;
     }
 }
 
@@ -152,12 +176,12 @@
 .fan-pin__count{margin-top:3px;font-family:"Noto Sans KR",sans-serif;font-size:11px;font-weight:800;line-height:1;}
 </style>
 
-<nav class="premium-glass premium-glass--lobby fixed top-0 left-0 right-0 z-50" aria-label="UNITX 주요 메뉴">
+<nav class="premium-glass premium-glass--lobby fixed top-0 left-0 right-0 z-50" aria-label="NEXT DEBUT 주요 메뉴">
     <div class="container mx-auto px-6 flex items-center" style="height: var(--nav-h);">
 
         <div class="flex items-center shrink-0 mr-8">
-            <a href="${ctx}/main" class="nav-brand" aria-label="UNITX 홈">
-                <img src="${ctx}/images/unitx-logo.png" alt="UNITX" width="120" height="40" />
+            <a href="${ctx}/main" class="nav-brand" aria-label="NEXT DEBUT 홈">
+                <img src="${ctx}/images/nextdebut-logo.png?v=20260421b" alt="NEXT DEBUT" width="1024" height="431" decoding="async" />
             </a>
         </div>
 
@@ -307,6 +331,88 @@ window.__NAV_RANK_GAIN__ = {
     </button>
 </form>
 <div id="globalBgmSlot" class="unitx-bgm-dock"></div>
+
+<script>
+(function () {
+    var form = document.querySelector('.nav-global-search');
+    if (!form) return;
+
+    var input = form.querySelector('.nav-global-search__input');
+    var button = form.querySelector('.nav-global-search__btn');
+    if (!input || !button) return;
+    var openedAt = 0;
+
+    function openSearch() {
+        openedAt = Date.now();
+        form.classList.add('is-open');
+        requestAnimationFrame(function () {
+            input.focus();
+            if (input.value) {
+                var len = input.value.length;
+                input.setSelectionRange(len, len);
+            }
+        });
+    }
+
+    function closeSearch() {
+        if ((input.value || '').trim()) return;
+        form.classList.remove('is-open');
+    }
+
+    function isOpen() {
+        return form.classList.contains('is-open');
+    }
+
+    if ((input.value || '').trim()) {
+        form.classList.add('is-open');
+    }
+
+    button.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!isOpen()) {
+            openSearch();
+            return;
+        }
+
+        if (!(input.value || '').trim()) {
+            input.focus();
+            return;
+        }
+
+        form.submit();
+    });
+
+    form.addEventListener('click', function (e) {
+        e.stopPropagation();
+    });
+
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            input.value = '';
+            closeSearch();
+            button.focus();
+            return;
+        }
+
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if ((input.value || '').trim()) {
+                form.submit();
+            }
+        }
+    });
+
+    document.addEventListener('pointerdown', function (e) {
+        if (!isOpen()) return;
+        if (Date.now() - openedAt < 250) return;
+        if (!form.contains(e.target)) {
+            closeSearch();
+        }
+    });
+})();
+</script>
 
 <div class="fanmap-modal" id="fanMapModal" aria-hidden="true">
     <div class="fanmap-modal__dim" data-close-fan-map></div>
@@ -616,5 +722,5 @@ window.__NAV_RANK_GAIN__ = {
 </c:if>
 
 <script defer src="<c:url value='/js/unitx-effects-toggle.js'/>"></script>
-<script defer src="<c:url value='/js/chat-widget.js'/>"></script>
-<script defer src="<c:url value='/js/chatroom-widget.js'/>"></script>
+<script defer src="<c:url value='/js/chat-widget.js?v=20260422b'/>"></script>
+<script defer src="<c:url value='/js/chatroom-widget.js?v=20260422b'/>"></script>

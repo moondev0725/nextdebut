@@ -60,7 +60,7 @@ public interface PhotoCardService {
 			return baseStat;
 		}
 		int add = (int) Math.round(baseStat * (bonusPercent / 100.0));
-		return Math.max(0, Math.min(20, baseStat + add));
+		return Math.max(0, Math.min(100, baseStat + add));
 	}
 
 	/**

@@ -293,7 +293,7 @@
         var row = document.createElement('div');
         row.innerHTML = '<div style="display:flex;justify-content:space-between;font-size:12px;"><span>'
           + input.dataset.label + '</span><strong>' + v + '</strong></div>'
-          + '<div class="bar"><span style="width:' + Math.max(0, Math.min(100, v * 5)) + '%;"></span></div>';
+          + '<div class="bar"><span style="width:' + Math.max(0, Math.min(100, v)) + '%;"></span></div>';
         preview.appendChild(row);
       });
     }

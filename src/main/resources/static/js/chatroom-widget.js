@@ -546,8 +546,10 @@
 
   // ── 토글 버튼 반환 ──
   function getChatroomBtn() {
-    return document.getElementById('chatroom-toggle-btn')
-        || document.querySelector('.hero-side-nav button[onclick*="toggleChatroomWidget"]');
+    const sideNavBtn = document.querySelector('.hero-side-nav button[onclick*="toggleChatroomWidget"]');
+    if (sideNavBtn) return sideNavBtn;
+
+    return document.getElementById('chatroom-toggle-btn');
   }
 
   /**
@@ -564,17 +566,14 @@
     const vh        = document.documentElement.clientHeight;
 
     // hero-side-nav: 버튼이 오른쪽 세로 배치 → 모달을 버튼 왼쪽에 붙임
-    if (document.querySelector('.hero-side-nav')) {
-      const nav = document.querySelector('.hero-side-nav');
-      const navRect = nav ? nav.getBoundingClientRect() : null;
-      const rightDock = (navRect ? (vw - navRect.left + gap) : 68);
-      const top = Math.max(margin, Math.min(vh - boxHeight - margin, Math.round((vh - boxHeight) / 2)));
-      const left = Math.max(margin, vw - boxWidth - rightDock);
-      return { top, left };
-    }
-
     const btn = getChatroomBtn();
     if (!btn) return null;
+    const sideNav = btn.closest('.hero-side-nav');
+    if (sideNav) {
+      const navRect = sideNav.getBoundingClientRect();
+      const right = Math.max(margin, Math.round(navRect ? (vw - navRect.left + gap) : 68));
+      return { mode: 'side-nav', right };
+    }
     const rect = btn.getBoundingClientRect();
 
     let top  = rect.bottom + gap;
@@ -589,7 +588,7 @@
     if (top  < margin)  top  = margin;
     if (top  > maxTop)  top  = maxTop;
 
-    return { top, left };
+    return { mode: 'free', top, left };
   }
 
   function clampCrPosition(top, left) {
@@ -1311,9 +1310,26 @@
 
   function applyBoxPos(pos) {
     const box = document.getElementById('cr-box');
+    if (!box || !pos) return;
+
+    if (pos.mode === 'side-nav') {
+      const right = Math.max(8, Number(pos.right) || 68);
+      box.style.top = '50%';
+      box.style.left = 'auto';
+      box.style.right = right + 'px';
+      box.style.transform = 'translateY(-50%)';
+      box.style.display = 'flex';
+      box.style.flexDirection = 'column';
+      sessionStorage.setItem('cr_pos_top', '50%');
+      sessionStorage.setItem('cr_pos_left', 'auto');
+      return;
+    }
+
     const clamped = clampCrPosition(pos.top, pos.left);
     box.style.top           = clamped.top  + 'px';
     box.style.left          = clamped.left + 'px';
+    box.style.right         = 'auto';
+    box.style.transform     = 'none';
     box.style.display       = 'flex';
     box.style.flexDirection = 'column';
     sessionStorage.setItem('cr_pos_top', String(clamped.top));

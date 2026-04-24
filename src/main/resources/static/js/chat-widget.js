@@ -202,9 +202,13 @@
   }
 
   function getToggleBtn() {
-    return document.getElementById('chat-toggle-btn')
-        || document.getElementById('chat-toggle-btn-global')
-        || document.querySelector('.hero-side-nav button[onclick*="toggleChatWidget"]');
+    const localBtn = document.getElementById('chat-toggle-btn');
+    if (localBtn) return localBtn;
+
+    const sideNavBtn = document.querySelector('.hero-side-nav button[onclick*="toggleChatWidget"]');
+    if (sideNavBtn) return sideNavBtn;
+
+    return document.getElementById('chat-toggle-btn-global');
   }
 
   function calcPositionFromBtn() {
@@ -215,17 +219,14 @@
     const vw        = document.documentElement.clientWidth;
     const vh        = document.documentElement.clientHeight;
 
-    if (document.querySelector('.hero-side-nav')) {
-      const nav = document.querySelector('.hero-side-nav');
-      const navRect = nav ? nav.getBoundingClientRect() : null;
-      const rightDock = (navRect ? (vw - navRect.left + gap) : 68);
-      const top = Math.max(margin, Math.min(vh - boxHeight - margin, Math.round((vh - boxHeight) / 2)));
-      const left = Math.max(margin, vw - boxWidth - rightDock);
-      return { top, left };
-    }
-
     const btn = getToggleBtn();
     if (!btn) return null;
+    const sideNav = btn.closest('.hero-side-nav');
+    if (sideNav) {
+      const navRect = sideNav.getBoundingClientRect();
+      const right = Math.max(margin, Math.round(navRect ? (vw - navRect.left + gap) : 68));
+      return { mode: 'side-nav', right };
+    }
     const rect = btn.getBoundingClientRect();
 
     let top  = rect.bottom + gap;
@@ -240,7 +241,7 @@
     if (top  < margin)  top  = margin;
     if (top  > maxTop)  top  = maxTop;
 
-    return { top, left };
+    return { mode: 'free', top, left };
   }
 
   function clampPosition(top, left) {
@@ -262,12 +263,37 @@
     return { top: nextTop, left: nextLeft };
   }
 
-  function applyBoxPosition(top, left) {
+  function applyBoxPosition(topOrPos, left) {
     const box = document.getElementById('chat-box');
     if (!box) return;
-    const pos = clampPosition(top, left);
+
+    if (typeof topOrPos === 'object' && topOrPos !== null) {
+      if (topOrPos.mode === 'side-nav') {
+        const right = Math.max(8, Number(topOrPos.right) || 68);
+        box.style.top = '50%';
+        box.style.left = 'auto';
+        box.style.right = right + 'px';
+        box.style.transform = 'translateY(-50%)';
+        box.style.display = 'flex';
+        saveBoxState(true, '50%', 'auto');
+        return;
+      }
+
+      const pos = clampPosition(topOrPos.top, topOrPos.left);
+      box.style.top = pos.top + 'px';
+      box.style.left = pos.left + 'px';
+      box.style.right = 'auto';
+      box.style.transform = 'none';
+      box.style.display = 'flex';
+      saveBoxState(true, pos.top, pos.left);
+      return;
+    }
+
+    const pos = clampPosition(topOrPos, left);
     box.style.top = pos.top + 'px';
     box.style.left = pos.left + 'px';
+    box.style.right = 'auto';
+    box.style.transform = 'none';
     box.style.display = 'flex';
     saveBoxState(true, pos.top, pos.left);
   }
@@ -284,7 +310,11 @@
   }
 
   function initGlobalChatBar() {
-    if (document.querySelector('.hero-side-nav')) return;
+    if (document.querySelector('.hero-side-nav')) {
+      const staleBar = document.getElementById('globalChatBar');
+      if (staleBar) staleBar.remove();
+      return;
+    }
 
     const dayBar = document.querySelector('.day-bar');
     if (dayBar) {
@@ -344,7 +374,7 @@
     const savedLeft = sessionStorage.getItem('chat_pos_left');
     const pos = calcPositionFromBtn();
     if (pos) {
-      applyBoxPosition(pos.top, pos.left);
+      applyBoxPosition(pos);
       return;
     }
     if (savedTop !== null && savedLeft !== null) {
@@ -358,7 +388,7 @@
     if (!box || box.style.display !== 'flex') return;
     const pos = calcPositionFromBtn();
     if (pos) {
-      applyBoxPosition(pos.top, pos.left);
+      applyBoxPosition(pos);
       return;
     }
     applyBoxPosition(parseFloat(box.style.top), parseFloat(box.style.left));
@@ -371,7 +401,7 @@
       if (!box || box.style.display !== 'flex') return;
       const pos = calcPositionFromBtn();
       if (pos) {
-        applyBoxPosition(pos.top, pos.left);
+        applyBoxPosition(pos);
         return;
       }
       tries += 1;
@@ -385,7 +415,7 @@
     if (!box || box.style.display !== 'flex') return;
     const pos = calcPositionFromBtn();
     if (!pos) return;
-    applyBoxPosition(pos.top, pos.left);
+    applyBoxPosition(pos);
   }
 
   window.toggleChatWidget = function () {
@@ -406,7 +436,7 @@
     const pos = calcPositionFromBtn();
     if (!pos) return;
 
-    applyBoxPosition(pos.top, pos.left);
+    applyBoxPosition(pos);
     document.getElementById('chat-input').focus();
   };
 

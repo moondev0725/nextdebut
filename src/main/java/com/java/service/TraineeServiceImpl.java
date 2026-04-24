@@ -157,7 +157,7 @@ public class TraineeServiceImpl implements TraineeService {
 		if (value == null) {
 			return 0;
 		}
-		return Math.max(0, Math.min(20, value));
+		return Math.max(0, Math.min(100, value));
 	}
 
 	private String trimToNull(String value) {

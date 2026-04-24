@@ -168,7 +168,7 @@ setTimeout(function(){
     try{
       var totalEl=card.querySelector('.ctotal-num');
       if(!totalEl)return;
-      var t=parseInt(totalEl.textContent.replace(/[^0-9\-]/g,''))||0;
+      var t=memberRawTotalFromCard(card);
       // 임시 LV 규칙: 총합 기준
       var lv=1;
       if(t>=260)lv=5; else if(t>=220)lv=4; else if(t>=180)lv=3; else if(t>=140)lv=2;
@@ -180,7 +180,7 @@ setTimeout(function(){
       var bestName='ALL-ROUND',bestVal=-1;
       Object.keys(vs).forEach(function(k){
         var vEl=card.querySelector('.sval[data-key="'+vs[k]+'"]');
-        var v=parseInt(vEl? vEl.textContent.replace(/[^0-9\-]/g,'') : '0')||0;
+        var v=memberRawStatFromValueEl(vEl);
         if(v>bestVal){bestVal=v;bestName=k;}
       });
       var roleLabel='ALL-ROUND';
@@ -214,14 +214,6 @@ setTimeout(function(){
     if(dl&&typeof effProg==='number') dl.textContent=effProg+'%';
   }catch(e){}
 
-  try{
-    if(typeof __initialRoster!=='undefined' && __initialRoster && __initialRoster.length){
-      __initialRoster.forEach(function(m){
-        var card=document.querySelector('.mcard[data-tid="'+String(m.traineeId)+'"]');
-        // (removed) mcard vitals
-      });
-    }
-  }catch(e){}
 },2100);
 
 /* ══════════════════════════════════
@@ -2223,7 +2215,7 @@ function collectRosterFromDom(){
     if(card.classList.contains('mcard--eliminated')) return;
     function gv(key){
       var el=card.querySelector('.sval[data-key="'+key+'"]');
-      return parseInt(el&&el.textContent,10)||0;
+      return memberRawStatFromValueEl(el);
     }
     var pCode=(card.getAttribute('data-personality-code')||'').trim();
     out.push({
@@ -2305,6 +2297,7 @@ function openBriefingResultOverlay(){
   if(pb) pb.style.display='none';
 
   rov.classList.add('show');
+  try{ rov.focus(); }catch(eFocus){}
   var card=document.querySelector('.rcard');
   if(card){
     card.style.boxShadow='0 0 0 1px rgba(167,139,250,.22),0 0 36px rgba(167,139,250,.12),0 24px 72px rgba(30,41,59,.18)';
@@ -3366,7 +3359,7 @@ function flashStatOnTraineeCard(traineeId, key, delta, displayName){
     var who=displayName?'<span class="mcard-stat-nudge__who">'+escMiniHtml(displayName)+'</span>':'';
     nudge.innerHTML='<span class="mcard-stat-nudge__pick">'+(pickNum?pickNum+'번':'')+'</span>'
       +who
-      +'<span class="mcard-stat-nudge__badge">'+(isUp?'▲ +':'▼ ')+Math.abs(delta)+'</span>'
+      +'<span class="mcard-stat-nudge__badge">'+(isUp?'▲ +':'▼ ')+Math.abs(memberDisplayDeltaFromRaw(delta))+'</span>'
       +'<span class="mcard-stat-nudge__lbl">'+lbl+'</span>'
       +'<span class="mcard-stat-nudge__fx">✨</span>';
     strip.appendChild(nudge);
@@ -3379,7 +3372,7 @@ function flashStatOnTraineeCard(traineeId, key, delta, displayName){
     row.classList.add('sup');
     var bdg=document.createElement('span');
     bdg.className='sup-badge'+(isUp?'':' dn');
-    bdg.textContent=(isUp?'▲ +':'▼ ')+Math.abs(delta);
+    bdg.textContent=(isUp?'▲ +':'▼ ')+Math.abs(memberDisplayDeltaFromRaw(delta));
     valEl.insertAdjacentElement('afterend',bdg);
     setTimeout(function(){
       try{
@@ -3753,6 +3746,7 @@ function openTurnResultOverlayFromPending(){
 
   window._resultOverlayMode='turn';
   document.getElementById('rov').classList.add('show');
+  try{ document.getElementById('rov').focus(); }catch(eFocus){}
   var card=document.querySelector('.rcard');
   if(card){
     card.style.boxShadow='0 0 0 1px rgba(251,191,36,.24),0 0 40px rgba(251,191,36,.16),0 24px 80px rgba(0,0,0,.42)';
@@ -3763,6 +3757,22 @@ function openTurnResultOverlayFromPending(){
   },350);
   return true;
 }
+
+(function bindTurnResultOverlayDismiss(){
+  document.addEventListener('click', function(evt){
+    var rov=document.getElementById('rov');
+    if(!rov || !rov.classList.contains('show')) return;
+    if(evt.target === rov) goNext();
+  });
+  document.addEventListener('keydown', function(evt){
+    var rov=document.getElementById('rov');
+    if(!rov || !rov.classList.contains('show')) return;
+    if(evt.key === 'Enter' || evt.key === 'Escape'){
+      evt.preventDefault();
+      goNext();
+    }
+  });
+})();
 
 function buildEventCopy(data){
   var tone=data.delta>=0?'긍정':'변수';
@@ -3801,6 +3811,46 @@ function phaseLabel(p){
   return month+'개월 '+week+'주차 '+dayName+' '+(isMorning?'☀️ 아침':'🌙 저녁');
 }
 
+function memberRawTotalFromRosterMember(m){
+  if(!m) return 0;
+  return (Number(m.vocal)||0) + (Number(m.dance)||0) + (Number(m.star)||0)
+    + (Number(m.mental)||0) + (Number(m.teamwork)||0);
+}
+
+function memberDisplayStatFromRaw(raw){
+  return Number(raw)||0;
+}
+
+function memberDisplayDeltaFromRaw(delta){
+  return Number(delta)||0;
+}
+
+function memberDisplayTotalFromRosterMember(m){
+  return memberRawTotalFromRosterMember(m);
+}
+
+function memberRawStatFromValueEl(el){
+  if(!el) return 0;
+  var rawAttr = parseInt(el.getAttribute('data-raw'), 10);
+  if(isFinite(rawAttr)) return rawAttr;
+  var displayVal = parseInt(String(el.textContent || '').replace(/[^0-9\-]/g,''), 10);
+  if(!isFinite(displayVal)) return 0;
+  return displayVal;
+}
+
+function memberRawTotalFromCard(card){
+  if(!card) return 0;
+  var totalEl=card.querySelector('.ctotal-num');
+  var sumAttr=totalEl ? parseInt(totalEl.getAttribute('data-total-sum'),10) : NaN;
+  if(isFinite(sumAttr)) return sumAttr;
+  var sum=0;
+  ['v','d','s','m','t'].forEach(function(key){
+    var valEl=card.querySelector('.sval[data-key="'+key+'"]');
+    sum += memberRawStatFromValueEl(valEl);
+  });
+  return sum;
+}
+
 function updateStats(roster){
   var skMap={v:'vocal',d:'dance',s:'star',m:'mental',t:'teamwork'};
   roster.forEach(function(m){
@@ -3808,19 +3858,24 @@ function updateStats(roster){
     if(!card)return;
     if(card.classList.contains('mcard--eliminated')) return;
     /* total 업데이트 */
-    var tot=m.vocal+m.dance+m.star+m.mental+m.teamwork;
+    var rawTot=memberRawTotalFromRosterMember(m);
+    var tot=memberDisplayTotalFromRosterMember(m);
     var totEl=card.querySelector('.ctotal-num');
     if(totEl){
       var fromTot=parseInt(totEl.textContent.replace(/[^0-9\-]/g,''))||0;
+      totEl.setAttribute('data-total-sum', String(rawTot));
       animateNumber(totEl,fromTot,tot,420);
     }
     Object.keys(skMap).forEach(function(k){
+      var rawVal = Number(m[skMap[k]]) || 0;
+      var displayVal = memberDisplayStatFromRaw(rawVal);
       var bar=card.querySelector('.sfill--'+k);
       var valEl=card.querySelector('.sval[data-key="'+k+'"]');
-      if(bar){bar.style.transition='width .7s cubic-bezier(.23,1,.46,1)';bar.style.width=m[skMap[k]]+'%';}
+      if(bar){bar.style.transition='width .7s cubic-bezier(.23,1,.46,1)';bar.style.width=displayVal+'%';}
       if(valEl){
         var from=parseInt(valEl.textContent.replace(/[^0-9\-]/g,''))||0;
-        animateNumber(valEl,from,m[skMap[k]],420);
+        valEl.setAttribute('data-raw', String(rawVal));
+        animateNumber(valEl,from,displayVal,420);
       }
     });
     renderMemberStatus(card, m);
@@ -3887,18 +3942,18 @@ function computeConditionPcts(roster){
   var avT = avgStat(roster,'teamwork');
   var mentalN = countFiniteRosterStat(roster, 'mental');
 
-  var focus = clampPct(((avV + avD + avS) / 60) * 100);
+  var focus = clampPct(((avV + avD + avS) / 300) * 100);
   var stress;
   if(mentalN === 0){
     var w0 = window.__ndxLastConditionBasePcts;
     stress = (w0 && typeof w0.stress === 'number') ? clampPct(w0.stress) : 25;
   }else{
-    stress = clampPct(100 - ((avM / 20) * 100));
+    stress = clampPct(100 - avM);
   }
-  var team = clampPct((avT / 20) * 100);
+  var team = clampPct(avT);
   var phys = (avV + avD + avS) / 3;
   var condition = clampPct(
-    28 + (mentalN === 0 ? 40 : (avM / 20) * 42) + Math.min(30, (phys / 20) * 30)
+    28 + (mentalN === 0 ? 40 : (avM / 100) * 42) + Math.min(30, (phys / 100) * 30)
   );
   var out = { focus: focus, stress: stress, team: team, condition: condition };
   window.__ndxLastConditionBasePcts = {
@@ -4098,7 +4153,7 @@ function getTraineeTotalStatFromDom(traineeId){
   if(!card) return 0;
   function gv(k){
     var el = card.querySelector('.sval[data-key="'+k+'"]');
-    return parseInt(el && el.textContent, 10) || 0;
+    return memberRawStatFromValueEl(el);
   }
   return gv('v') + gv('d') + gv('s') + gv('m') + gv('t');
 }
@@ -4477,13 +4532,30 @@ function renderMemberStatus(card, member){
   var host=card.querySelector('[data-status-inline="true"]');
   if(!host) return;
 
-  var label=(member && member.statusLabel) ? String(member.statusLabel).trim() : '';
-  var desc=(member && member.statusDesc) ? String(member.statusDesc).trim() : '';
-  var turns=(member && typeof member.statusTurnsLeft !== 'undefined' && member.statusTurnsLeft !== null) ? Number(member.statusTurnsLeft) : 0;
-  var code=(member && member.statusCode) ? String(member.statusCode).trim().toUpperCase() : '';
   var items=[];
-  if(label && turns > 0){
-    items.push({label:label, desc:desc, turns:turns, code:code});
+  if(member && Array.isArray(member.statusEffects)){
+    items=member.statusEffects.map(function(effect){
+      if(!effect) return null;
+      var effectLabel=effect.label != null ? String(effect.label).trim() : '';
+      var effectTurns=effect.turnsLeft != null ? Number(effect.turnsLeft) : 0;
+      if(!effectLabel) return null;
+      return {
+        label:effectLabel,
+        desc:effect.desc != null ? String(effect.desc).trim() : '',
+        turns:effectTurns > 0 ? effectTurns : 1,
+        code:effect.code != null ? String(effect.code).trim().toUpperCase() : ''
+      };
+    }).filter(Boolean);
+  }
+
+  if(!items.length){
+    var label=(member && member.statusLabel) ? String(member.statusLabel).trim() : '';
+    var desc=(member && member.statusDesc) ? String(member.statusDesc).trim() : '';
+    var turns=(member && typeof member.statusTurnsLeft !== 'undefined' && member.statusTurnsLeft !== null) ? Number(member.statusTurnsLeft) : 0;
+    var code=(member && member.statusCode) ? String(member.statusCode).trim().toUpperCase() : '';
+    if(label){
+      items.push({label:label, desc:desc, turns:turns > 0 ? turns : 1, code:code});
+    }
   }
 
   if(!items.length){
@@ -4516,6 +4588,21 @@ function renderMemberStatus(card, member){
     + '  <div class="member-status-popover__body">'+itemHtml+'</div>'
     + '</div>';
 }
+
+(function initMemberStatusBadges(){
+  function run(){
+    try{
+      var roster = (typeof __initialRoster !== 'undefined' && Array.isArray(__initialRoster)) ? __initialRoster : [];
+      roster.forEach(function(m){
+        if(!m || m.traineeId == null) return;
+        var card=document.querySelector('.mcard[data-tid="'+String(m.traineeId)+'"]');
+        if(card) renderMemberStatus(card, m);
+      });
+    }catch(e){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+})();
 
 function closeAllMemberStatusPopovers(){
   document.querySelectorAll('[data-status-popover="true"]').forEach(function(pop){
@@ -4654,7 +4741,7 @@ function triggerPeak(delta, statName){
     var det=document.getElementById('peakDetail');
     var isUp = delta > 0;
     if(lbl) lbl.textContent = isUp ? 'BIG UP!' : 'BIG DOWN';
-    if(det) det.textContent = (isUp?'+':'')+Math.abs(delta)+' '+(statName || '');
+    if(det) det.textContent = (isUp?'+':'')+Math.abs(memberDisplayDeltaFromRaw(delta))+' '+(statName || '');
     ov.classList.remove('show');
     void ov.offsetWidth;
     ov.classList.add('show');
@@ -4875,7 +4962,11 @@ function rosterJsonToUpdateStatsArray(roster){
       dance: m.dance,
       star: m.star,
       mental: m.mental,
-      teamwork: m.teamwork
+      teamwork: m.teamwork,
+      statusCode: m.statusCode,
+      statusLabel: m.statusLabel,
+      statusDesc: m.statusDesc,
+      statusTurnsLeft: m.statusTurnsLeft
     };
   });
 }
@@ -5102,6 +5193,7 @@ function fetchPlayStateAndApply(fallbackUrl){
       if(data && data.ok){
         applyPlayStatePayload(data);
         releaseUi();
+        setTimeout(focusGameChatInputAuto, 0);
         return;
       }
       releaseUi();
@@ -5116,6 +5208,17 @@ function fetchPlayStateAndApply(fallbackUrl){
     });
 }
 
+function focusGameChatInputAuto(){
+  try{
+    var inp=document.getElementById('gameChatInput');
+    if(!inp || inp.disabled) return;
+    if(typeof inp.focus === 'function'){
+      try{ inp.focus({ preventScroll: true }); }
+      catch(e2){ inp.focus(); }
+    }
+  }catch(e){}
+}
+
 /* ══════════════════════════════════
    다음으로
 ══════════════════════════════════ */
@@ -5125,6 +5228,7 @@ function goNext(){
     window._resultOverlayMode='';
     var card=document.querySelector('.rcard');
     if(card) card.style.boxShadow='';
+    setTimeout(focusGameChatInputAuto, 0);
     return;
   }
 
@@ -5171,11 +5275,11 @@ function attachStatBadgeOne(traineeId, delta, statName){
   var isUp=delta>0;
   var bdg=document.createElement('span');
   bdg.className='sup-badge'+(isUp?'':' dn');
-  bdg.textContent=(isUp?'\u25b2 +':'\u25bc ')+Math.abs(delta);
+  bdg.textContent=(isUp?'\u25b2 +':'\u25bc ')+Math.abs(memberDisplayDeltaFromRaw(delta));
   valEl.insertAdjacentElement('afterend',bdg);
   var f=document.createElement('span');
   f.className='stat-float'+(isUp?'':' dn');
-  f.textContent=(isUp?'+':'')+Math.abs(delta)+' '+statName+' \u2728';
+  f.textContent=(isUp?'+':'')+Math.abs(memberDisplayDeltaFromRaw(delta))+' '+statName+' \u2728';
   row.appendChild(f);
   setTimeout(function(){
     try{

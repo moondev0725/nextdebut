@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.stereotype.Component;
 
@@ -25,20 +26,20 @@ public class GameChatKeywordResolver {
 	}
 
 	private static final String[] VOCAL_KW = {
-			"보컬", "발성", "노래", "라이브", "음정", "호흡", "가성", "파트", "후렴", "보이스", "vocal", "싱잉"
+			"보컬", "발성", "노래", "라이브", "음정", "호흡", "가성", "파트", "후렴", "보이스", "보창", "싱잉", "vocal", "sing"
 	};
 	private static final String[] DANCE_KW = {
-			"댄스", "안무", "춤", "동선", "퍼포", "제스처", "포인트", "댄브", "dance", "킥", "스텝"
+			"댄스", "안무", "춤", "동선", "퍼포", "제스처", "포인트", "댄브", "dance", "킥", "스텝", "칼군무", "군무", "안무합"
 	};
 	private static final String[] TEAM_KW = {
-			"팀", "팀워크", "협업", "화합", "역할", "소통", "합의", "분배", "조율"
+			"팀워크", "팀웍", "협업", "화합", "역할", "소통", "합의", "분배", "조율", "합", "호흡", "케미", "팀플", "유닛합"
 	};
 	private static final String[] MENTAL_KW = {
 			"쉬", "쉬어", "휴식", "쉼", "포기", "그만", "멘탈", "컨디션", "회복", "스트레스", "무리", "번아웃",
-			"잠", "쉬자", "맑게", "정리", "쉴래"
+			"잠", "쉬자", "맑게", "정리", "쉴래", "안정", "진정", "긴장", "부담", "집중력", "멘붕"
 	};
 	private static final String[] STAR_KW = {
-			"스타", "카메라", "미디어", "노출", "존재감", "임팩트", "화제", "클립", "star", "한 컷", "비주얼"
+			"스타", "카메라", "미디어", "노출", "존재감", "임팩트", "화제", "클립", "star", "한 컷", "비주얼", "센터", "직캠", "팬어필"
 	};
 	private static final String[] RISK_KW = {
 			"승부수", "도전", "리스크", "올인", "한계", "파격", "과감", "승부", "무리해", "승부걸"
@@ -106,6 +107,13 @@ public class GameChatKeywordResolver {
 			return new ChoiceResolution("NONE", false);
 		}
 		String norm = t.toLowerCase(Locale.ROOT);
+		String directKey = resolveDirectStatCommandKey(norm, choices);
+		if (directKey != null) {
+			return new ChoiceResolution(directKey, true);
+		}
+		if (isMeaninglessUtterance(norm)) {
+			return new ChoiceResolution(randomNoneOrFirstChoice(choices), false);
+		}
 
 		// 1) DB 룰 우선 적용 (운영/밸런싱 편의). 매칭되면 곧장 choiceKey 반환.
 		try {
@@ -163,9 +171,123 @@ public class GameChatKeywordResolver {
 			}
 		}
 		if (bestScore <= 0) {
-			return new ChoiceResolution(firstAvailableKey(choices, "A"), false);
+			return new ChoiceResolution(randomNoneOrFirstChoice(choices), false);
 		}
 		return new ChoiceResolution(best, true);
+	}
+
+	private static String resolveDirectStatCommandKey(String norm, List<SceneResult.ChoiceItem> choices) {
+		if (containsAny(norm, "none", "없음", "무응답", "패스", "스킵", "아무거나", "모르겠")) {
+			return "NONE";
+		}
+		if (containsAny(norm, "보컬", "vocal") && isChoicePresent("A", choices)) {
+			return "A";
+		}
+		if (containsAny(norm, "댄스", "dance") && isChoicePresent("B", choices)) {
+			return "B";
+		}
+		if (containsAny(norm, "팀웍", "팀워크", "teamwork", "team") && isChoicePresent("C", choices)) {
+			return "C";
+		}
+		if (containsAny(norm, "멘탈", "mental") && isChoicePresent("D", choices)) {
+			return "D";
+		}
+		if (containsAny(norm, "스타성", "스타", "star") && isChoicePresent("SPECIAL", choices)) {
+			return "SPECIAL";
+		}
+		return null;
+	}
+
+	private static boolean isMeaninglessUtterance(String norm) {
+		if (norm == null || norm.isBlank()) {
+			return true;
+		}
+		String compact = norm.replaceAll("\\s+", "");
+		if (compact.length() <= 2) {
+			return true;
+		}
+		if (compact.matches("^[ㄱ-ㅎㅏ-ㅣ]+$")) {
+			return true;
+		}
+		if (compact.matches("^(.)\\1{2,}$")) {
+			return true;
+		}
+		return compact.matches("^[a-z0-9]+$") && compact.length() <= 4;
+	}
+
+	private static String randomNoneOrFirstChoice(List<SceneResult.ChoiceItem> choices) {
+		if (ThreadLocalRandom.current().nextBoolean()) {
+			return "NONE";
+		}
+		return firstAvailableKey(choices, "A");
+	}
+
+	/**
+	 * 문장에 명시적으로 드러난 스탯 의도를 키(A/B/C/D/SPECIAL)로 추정한다.
+	 * ML 결과와 충돌할 때 가드레일 용도로만 사용한다.
+	 */
+	public String resolveExplicitIntentKey(String rawUserText, List<SceneResult.ChoiceItem> choices) {
+		if (choices == null || choices.isEmpty()) {
+			return null;
+		}
+		String t = rawUserText == null ? "" : rawUserText.trim();
+		if (t.isEmpty()) {
+			return null;
+		}
+		String norm = t.toLowerCase(Locale.ROOT);
+		// 유저가 스탯명을 직접 말한 경우는 가장 강한 의도로 본다.
+		if (containsAny(norm, "보컬", "vocal", "싱잉") && isChoicePresent("A", choices)) return "A";
+		if (containsAny(norm, "댄스", "dance", "안무", "춤") && isChoicePresent("B", choices)) return "B";
+		if (containsAny(norm, "팀워크", "팀웍", "협업", "teamwork", "team") && isChoicePresent("C", choices)) return "C";
+		if (containsAny(norm, "멘탈", "회복", "휴식", "컨디션", "mental") && isChoicePresent("D", choices)) return "D";
+		if (containsAny(norm, "스타", "스타성", "카메라", "비주얼", "star") && isChoicePresent("SPECIAL", choices)) return "SPECIAL";
+
+		Map<String, Integer> intentScores = new LinkedHashMap<>();
+		intentScores.put("A", countHits(norm, VOCAL_KW));
+		intentScores.put("B", countHits(norm, DANCE_KW));
+		intentScores.put("C", countHits(norm, TEAM_KW));
+		intentScores.put("D", countHits(norm, MENTAL_KW));
+		intentScores.put("SPECIAL", countHits(norm, STAR_KW));
+		int max = 0;
+		int second = 0;
+		String bestKey = null;
+		for (Map.Entry<String, Integer> e : intentScores.entrySet()) {
+			int score = e.getValue() == null ? 0 : e.getValue();
+			if (score > max) {
+				second = max;
+				max = score;
+				bestKey = e.getKey();
+			} else if (score > second) {
+				second = score;
+			}
+		}
+		if (max <= 0) {
+			return null;
+		}
+		// 너무 약한 신호(단일 키워드 1회)는 ML을 막지 않도록 한다.
+		if (max < 2) {
+			return null;
+		}
+		// 동점/근접 점수 문장은 의도가 모호하다고 보고 강제 보정을 하지 않는다.
+		if (max - second < 2) {
+			return null;
+		}
+		if (bestKey != null && isChoicePresent(bestKey, choices)) {
+			return bestKey;
+		}
+		return null;
+	}
+
+	private static boolean containsAny(String text, String... keywords) {
+		if (text == null || text.isBlank() || keywords == null || keywords.length == 0) {
+			return false;
+		}
+		for (String kw : keywords) {
+			if (kw != null && !kw.isBlank() && text.contains(kw.toLowerCase(Locale.ROOT))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static void bumpIfPresent(Map<String, Integer> scores, String key, int d) {
@@ -185,6 +307,16 @@ public class GameChatKeywordResolver {
 			}
 		}
 		return fallback;
+	}
+
+	private static boolean isChoicePresent(String key, List<SceneResult.ChoiceItem> choices) {
+		for (SceneResult.ChoiceItem ch : choices) {
+			String nk = normalizeKey(ch == null ? null : ch.getKey());
+			if (key.equals(nk)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static String normalizeKey(String key) {

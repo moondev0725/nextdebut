@@ -596,7 +596,7 @@
                     <div class="info-box">
                         <div class="info-box__icon"><i class="fas fa-crown"></i></div>
                         <div class="info-box__title">한 가지 점수, 세 가지 결과</div>
-                        <div class="info-box__desc">멤버 4명의 <strong>다섯 스탯 합(최대 400)</strong>이 데뷔 등급·<strong>글로벌 랭킹 점수</strong>·일부 엔딩 분기의 기준이 됩니다. 팬 수는 별도로 계정 경험치에 쓰입니다.</div>
+                        <div class="info-box__desc">멤버 4명의 <strong>다섯 스탯 합(최대 2000)</strong>이 데뷔 등급·<strong>글로벌 랭킹 점수</strong>·일부 엔딩 분기의 기준이 됩니다. 팬 수는 별도로 계정 경험치에 쓰입니다.</div>
                     </div>
                 </div>
             </section>
@@ -607,7 +607,7 @@
                     <h2 class="section-title">플레이 점수 산출 방식</h2>
                     <div class="section-sub">
                         데뷔 결과·글로벌 랭킹에 쓰이는 <strong>0~1000</strong> 점수는 아래 순서로 계산됩니다.
-                        스탯은 DB에 <strong>0~20 원점</strong>으로 저장되며, 화면의 팀 능력치 막대 그래프(만점 100)는 이 원점을 <strong>×5</strong>해 표시한 값입니다.
+                        스탯은 DB와 화면 모두 <strong>0~100</strong> 기준으로 사용됩니다.
                     </div>
                 </div>
                 <div class="system-grid" style="padding-top:0;grid-template-columns:1fr;">
@@ -621,7 +621,7 @@
                     <div class="system-card">
                         <div class="system-card__title">② 만점 1000 스케일로 환산 (케미 제외)</div>
                         <div class="system-card__desc">
-                            <span class="account-rank-formula">① × (1000 ÷ 400) = ① × 2.5</span>
+                            <span class="account-rank-formula">① × (1000 ÷ 2000) = ① × 0.5</span>
                             반올림하며 상한은 1000입니다. 이 단계까지는 <strong>케미 보너스가 들어가지 않습니다</strong>.
                         </div>
                     </div>
@@ -1008,6 +1008,43 @@
             </section>
         </div>
     </main>
+
+    <script>
+        (function updateDebutGradeGuide(){
+            var sections = document.querySelectorAll('.guide-section.guide-card');
+            var target = Array.prototype.find.call(sections, function(section){
+                var kicker = section.querySelector('.section-kicker');
+                return kicker && kicker.textContent && kicker.textContent.trim() === 'DEBUT GRADE';
+            });
+            if (!target) return;
+
+            var title = target.querySelector('.section-title');
+            if (title) title.textContent = '데뷔 등급 기준';
+
+            var sub = target.querySelector('.section-sub');
+            if (sub) {
+                sub.innerHTML = '최종 데뷔 평가는 결과 화면에 표시되는 <strong>TOTAL SCORE(만점 1000)</strong>를 기준으로 판정됩니다. 아래 점수 구간에 따라 S부터 D까지 등급이 부여됩니다.';
+            }
+
+            var cards = target.querySelectorAll('.grade-card');
+            var grades = [
+                { title: '월드클래스 데뷔', desc: 'TOTAL SCORE 800점 이상. 완성도와 화제성이 모두 높은 최상위 데뷔 결과입니다.' },
+                { title: '성공적인 데뷔', desc: 'TOTAL SCORE 700점 이상. 팀 밸런스와 퍼포먼스가 안정적으로 갖춰진 상위권 결과입니다.' },
+                { title: '기대되는 데뷔', desc: 'TOTAL SCORE 600점 이상. 기본 경쟁력은 충분하며, 추가 성장 여지가 남아 있는 준수한 결과입니다.' },
+                { title: '평범한 데뷔', desc: 'TOTAL SCORE 500점 이상. 데뷔는 가능하지만 완성도와 운영 면에서 보완이 필요한 결과입니다.' },
+                { title: '아쉬운 데뷔', desc: 'TOTAL SCORE 500점 미만. 특히 400점대부터는 D 등급으로 분류되며, 팀 운영과 성장 방향을 다시 점검해 재도전이 필요한 단계입니다.' }
+            ];
+
+            cards.forEach(function(card, index){
+                var titleEl = card.querySelector('.grade-title');
+                var descEl = card.querySelector('p');
+                var grade = grades[index];
+                if (!grade) return;
+                if (titleEl) titleEl.textContent = grade.title;
+                if (descEl) descEl.textContent = grade.desc;
+            });
+        })();
+    </script>
 
     <%@ include file="/WEB-INF/views/fragments/footer.jspf" %>
 </body>

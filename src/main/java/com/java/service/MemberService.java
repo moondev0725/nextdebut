@@ -145,11 +145,11 @@ public class MemberService {
 		boolean hasPerfectMember = roster.stream()
 				.map(m -> m.getTrainee())
 				.filter(java.util.Objects::nonNull)
-				.anyMatch(t -> t.getVocal() >= 20
-						&& t.getDance() >= 20
-						&& t.getStar() >= 20
-						&& t.getMental() >= 20
-						&& t.getTeamwork() >= 20);
+				.anyMatch(t -> t.getVocal() >= 100
+						&& t.getDance() >= 100
+						&& t.getStar() >= 100
+						&& t.getMental() >= 100
+						&& t.getTeamwork() >= 100);
 		int beforeMask = member.getGroupUnlockMask();
 		int afterMask = traineeGroupService.applyUnlockByProgress(beforeMask, avg, hasPerfectMember);
 		if (afterMask != beforeMask) {

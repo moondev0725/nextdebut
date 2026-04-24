@@ -38,6 +38,7 @@ import com.java.repository.MyTraineeRepository;
 import com.java.photocard.service.PhotoCardService;
 import com.java.game.ml.ChatChoicePredictor;
 import com.java.game.ml.ChatChoiceTrainingLogger;
+import com.java.game.ml.MlSkipReason;
 import com.java.game.ml.PredictionResult;
 
 @Service
@@ -60,6 +61,10 @@ public class GameService {
 	private final ChatChoicePredictor chatChoicePredictor;
 	private final ChatChoiceTrainingLogger trainingLogger;
 	private final double mlThreshold;
+	private final boolean mlAcceptIfMargin;
+	private final double mlSecondaryMinConfidence;
+	private final double mlSecondaryMinTopGap;
+	private final double mlNonPrimaryThresholdDelta;
 
 	public GameService(TraineeRepository traineeRepository, MyTraineeRepository myTraineeRepository,
 			GameRunRepository gameRunRepository, GameRunMemberRepository gameRunMemberRepository,
@@ -69,7 +74,11 @@ public class GameService {
 			ChemistryService chemistryService, PhotoCardService photoCardService,
 			ChatChoicePredictor chatChoicePredictor,
 			ChatChoiceTrainingLogger trainingLogger,
-			@Value("${app.ml.threshold:0.55}") double mlThreshold) {
+			@Value("${app.ml.threshold:0.22}") double mlThreshold,
+			@Value("${app.ml.accept-if-margin:true}") boolean mlAcceptIfMargin,
+			@Value("${app.ml.secondary-min-confidence:0.17}") double mlSecondaryMinConfidence,
+			@Value("${app.ml.secondary-min-top-gap:0.022}") double mlSecondaryMinTopGap,
+			@Value("${app.ml.threshold-non-primary-delta:0.02}") double mlNonPrimaryThresholdDelta) {
 		this.traineeRepository = traineeRepository;
 		this.myTraineeRepository = myTraineeRepository;
 		this.gameRunRepository = gameRunRepository;
@@ -85,6 +94,10 @@ public class GameService {
 		this.chatChoicePredictor = chatChoicePredictor;
 		this.trainingLogger = trainingLogger;
 		this.mlThreshold = mlThreshold;
+		this.mlAcceptIfMargin = mlAcceptIfMargin;
+		this.mlSecondaryMinConfidence = mlSecondaryMinConfidence;
+		this.mlSecondaryMinTopGap = mlSecondaryMinTopGap;
+		this.mlNonPrimaryThresholdDelta = mlNonPrimaryThresholdDelta;
 	}
 
 	private final Random random = new Random();
@@ -153,6 +166,12 @@ public class GameService {
 	@Transactional
 	public StatChangeResult applyChoice(Long runId, String choiceKey, Set<Long> eliminatedTraineeIds,
 			boolean statGrowth2x) {
+		return applyChoice(runId, choiceKey, eliminatedTraineeIds, statGrowth2x, null);
+	}
+
+	@Transactional
+	public StatChangeResult applyChoice(Long runId, String choiceKey, Set<Long> eliminatedTraineeIds,
+			boolean statGrowth2x, Long preferredTraineeId) {
 		GameRun run = gameRunRepository.findById(runId)
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 runId: " + runId));
 
@@ -167,7 +186,7 @@ public class GameService {
 
 		tickMemberStatuses(members);
 
-		GameRunMember target = pickRandomEligibleMember(members, eliminatedTraineeIds);
+		GameRunMember target = pickRandomEligibleMember(members, eliminatedTraineeIds, preferredTraineeId);
 		Trainee trainee = target.getTrainee();
 		String statName = resolveStatName(choiceKey);
 
@@ -241,18 +260,40 @@ public class GameService {
 		);
 	}
 
-	/**
-	 * 탈락 멤버를 제외하고 랜덤 1명 선택. 모두 탈락 처리된 비정상 상태면 기존처럼 전원 풀에서 선택.
-	 */
-	private GameRunMember pickRandomEligibleMember(List<GameRunMember> members, Set<Long> eliminatedTraineeIds) {
+	private GameRunMember pickRandomEligibleMember(List<GameRunMember> members, Set<Long> eliminatedTraineeIds,
+			Long preferredTraineeId) {
 		if (eliminatedTraineeIds == null || eliminatedTraineeIds.isEmpty()) {
+			if (preferredTraineeId != null) {
+				for (GameRunMember member : members) {
+					if (member != null && member.getTrainee() != null
+							&& preferredTraineeId.equals(member.getTrainee().getId())) {
+						return member;
+					}
+				}
+			}
 			return members.get(random.nextInt(members.size()));
 		}
 		List<GameRunMember> pool = members.stream()
 				.filter(m -> m.getTrainee() != null && !eliminatedTraineeIds.contains(m.getTrainee().getId()))
 				.collect(Collectors.toList());
 		if (pool.isEmpty()) {
+			if (preferredTraineeId != null) {
+				for (GameRunMember member : members) {
+					if (member != null && member.getTrainee() != null
+							&& preferredTraineeId.equals(member.getTrainee().getId())) {
+						return member;
+					}
+				}
+			}
 			return members.get(random.nextInt(members.size()));
+		}
+		if (preferredTraineeId != null) {
+			for (GameRunMember member : pool) {
+				if (member != null && member.getTrainee() != null
+						&& preferredTraineeId.equals(member.getTrainee().getId())) {
+					return member;
+				}
+			}
 		}
 		return pool.get(random.nextInt(pool.size()));
 	}
@@ -357,32 +398,41 @@ public class GameService {
 			choices = buildChoiceItems(bucket, sceneEntity);
 		}
 
+		List<GameRunMember> members = gameRunMemberRepository.findRoster(runId);
+		Long preferredTraineeId = resolvePreferredTraineeIdFromText(userText, members, eliminatedTraineeIds);
 		PredictionResult prediction = chatChoicePredictor.predict(userText, choices, sceneEntity.getId(), phase);
 		String predictedKey = normalizeChoiceKey(prediction.predictedKey());
 		double predictionConfidence = prediction.confidence();
 		Map<String, Double> predictionScores = prediction.scoreByKey() == null ? Map.of() : prediction.scoreByKey();
+		double scoreMargin = topTwoScoreMargin(predictionScores);
+		MlSkipReason mlSkipReason = classifyMlSkip(userText, prediction, choices, predictedKey, predictionConfidence,
+				scoreMargin);
+
 		boolean usedFallback = true;
 		String resolverType = "RULE";
 		String key = null;
 
-		if (!prediction.fallbackRecommended()
-				&& predictedKey != null
-				&& isChoiceKeyInSceneChoices(predictedKey, choices)
-				&& predictionConfidence >= mlThreshold) {
+		if (mlSkipReason == null) {
 			key = predictedKey;
 			usedFallback = false;
 			resolverType = "ML";
+			log.debug(
+					"chat.choice.resolver ML runId={}, sceneId={}, key={}, conf={}, margin={}, threshold={}, secGap={}",
+					runId, sceneEntity.getId(), predictedKey, predictionConfidence, scoreMargin, mlThreshold,
+					mlSecondaryMinTopGap);
 		} else {
 			GameChatKeywordResolver.ChoiceResolution kw = chatKeywordResolver.resolveDetailed(userText, choices);
 			key = kw.key();
-			log.debug("RULE fallback 사용 runId={}, sceneId={}, predictedKey={}, confidence={}",
-					runId, sceneEntity.getId(), predictedKey, predictionConfidence);
+			log.info(
+					"chat.choice.resolver RULE runId={}, sceneId={}, mlSkipReason={}, predictedKey={}, conf={}, margin={}, threshold={}",
+					runId, sceneEntity.getId(), mlSkipReason.name(), predictedKey, predictionConfidence, scoreMargin,
+					mlThreshold);
 		}
 		String category = chatKeywordResolver.categorizeTrainingStyle(userText);
 		String sceneTitle = sceneEntity.getTitle();
 		String sceneDesc = formatDescription(sceneEntity);
 		if ("NONE".equalsIgnoreCase(key)) {
-			StatChangeResult noop = buildChatNoOpStatResult(runId, eliminatedTraineeIds);
+			StatChangeResult noop = buildChatNoOpStatResult(runId, eliminatedTraineeIds, preferredTraineeId);
 			trainingLogger.recordSample(
 					userText,
 					sceneEntity.getId(),
@@ -392,12 +442,14 @@ public class GameService {
 					resolverType,
 					predictedKey,
 					predictionConfidence,
-					usedFallback);
+					usedFallback,
+					mlDecisionReasonLabel(resolverType, mlSkipReason),
+					Double.valueOf(scoreMargin));
 			return new ChatTurnDbSnapshot(
 					"NONE", category, noop, sceneTitle, sceneDesc, sceneEntity.getId(), userText, null,
 					predictedKey, predictionConfidence, predictionScores, usedFallback, resolverType);
 		}
-		StatChangeResult stat = applyChoice(runId, key, eliminatedTraineeIds, statGrowth2x);
+		StatChangeResult stat = applyChoice(runId, key, eliminatedTraineeIds, statGrowth2x, preferredTraineeId);
 		MiniGamePenalty penalty = null;
 		if (miniGameFailed) {
 			penalty = applyMiniGameFailurePenalty(runId, eliminatedTraineeIds);
@@ -415,10 +467,79 @@ public class GameService {
 				resolverType,
 				predictedKey,
 				predictionConfidence,
-				usedFallback);
+				usedFallback,
+				mlDecisionReasonLabel(resolverType, mlSkipReason),
+				Double.valueOf(scoreMargin));
 		return new ChatTurnDbSnapshot(
 				key, category, stat, sceneTitle, sceneDesc, sceneEntity.getId(), userText, penalty,
 				predictedKey, predictionConfidence, predictionScores, usedFallback, resolverType);
+	}
+
+	private static String mlDecisionReasonLabel(String resolverType, MlSkipReason mlSkipReason) {
+		if ("ML".equalsIgnoreCase(resolverType)) {
+			return "ML_APPLIED";
+		}
+		return mlSkipReason != null ? mlSkipReason.name() : MlSkipReason.UNKNOWN.name();
+	}
+
+	private MlSkipReason classifyMlSkip(String userText, PredictionResult prediction, List<SceneResult.ChoiceItem> choices,
+			String predictedKey, double confidence, double margin) {
+		if (choices == null || choices.isEmpty()) {
+			return MlSkipReason.CANDIDATES_EMPTY;
+		}
+		if (prediction.predictorFailureReason() != null) {
+			return prediction.predictorFailureReason();
+		}
+		if (prediction.fallbackRecommended()) {
+			return MlSkipReason.ML_AMBIGUOUS_OR_NONE;
+		}
+		if (predictedKey == null) {
+			return MlSkipReason.ML_INVALID_PREDICTED_KEY;
+		}
+		if (!isChoiceKeyInSceneChoices(predictedKey, choices)) {
+			return MlSkipReason.PREDICTED_KEY_NOT_IN_SCENE;
+		}
+		String explicitIntentKey = normalizeChoiceKey(chatKeywordResolver.resolveExplicitIntentKey(userText, choices));
+		if (explicitIntentKey != null && !explicitIntentKey.equals(predictedKey)) {
+			return MlSkipReason.EXPLICIT_INTENT_CONFLICT;
+		}
+		if (passesMlConfidencePolicy(predictedKey, confidence, margin)) {
+			return null;
+		}
+		return MlSkipReason.CONFIDENCE_POLICY_REJECT;
+	}
+
+	private boolean passesMlConfidencePolicy(String predictedKey, double confidence, double margin) {
+		if (confidence >= effectiveMlThreshold(predictedKey)) {
+			return true;
+		}
+		if (!mlAcceptIfMargin) {
+			return false;
+		}
+		return margin >= mlSecondaryMinTopGap && confidence >= mlSecondaryMinConfidence;
+	}
+
+	private double effectiveMlThreshold(String predictedKey) {
+		// C/D/SPECIAL은 데이터 희소 구간이라 소폭 완화해 ML 적용률 편향(A/B 쏠림)을 줄인다.
+		if ("C".equals(predictedKey) || "D".equals(predictedKey) || "SPECIAL".equals(predictedKey)) {
+			return Math.max(0.0, mlThreshold - mlNonPrimaryThresholdDelta);
+		}
+		return mlThreshold;
+	}
+
+	private static double topTwoScoreMargin(Map<String, Double> scores) {
+		if (scores == null || scores.isEmpty()) {
+			return 0.0;
+		}
+		List<Double> vals = scores.values().stream()
+				.filter(v -> v != null && Double.isFinite(v.doubleValue()))
+				.sorted(Comparator.reverseOrder())
+				.limit(2)
+				.toList();
+		if (vals.size() < 2) {
+			return vals.isEmpty() ? 0.0 : 1.0;
+		}
+		return vals.get(0).doubleValue() - vals.get(1).doubleValue();
 	}
 
 	private boolean isChoiceKeyInSceneChoices(String key, List<SceneResult.ChoiceItem> choices) {
@@ -445,7 +566,8 @@ public class GameService {
 	/**
 	 * 채팅이 키워드에 걸리지 않았을 때: 페이즈·스탯·팬·턴로그 없이 현재 스냅샷만 반환.
 	 */
-	private StatChangeResult buildChatNoOpStatResult(Long runId, Set<Long> eliminatedTraineeIds) {
+	private StatChangeResult buildChatNoOpStatResult(Long runId, Set<Long> eliminatedTraineeIds,
+			Long preferredTraineeId) {
 		GameRun run = gameRunRepository.findById(runId)
 				.orElseThrow(() -> new IllegalArgumentException("없는 runId: " + runId));
 		List<GameRunMember> members = gameRunMemberRepository.findRoster(runId);
@@ -454,7 +576,7 @@ public class GameService {
 		}
 		Long pno = run.getPlayerMno();
 		List<RosterItem> roster = members.stream().map(m -> toRosterItem(m, pno)).collect(Collectors.toList());
-		GameRunMember target = pickRandomEligibleMember(members, eliminatedTraineeIds);
+		GameRunMember target = pickRandomEligibleMember(members, eliminatedTraineeIds, preferredTraineeId);
 		Trainee trainee = target.getTrainee();
 		String phase = run.getPhase();
 		return new StatChangeResult(
@@ -482,6 +604,41 @@ public class GameService {
 				target.getStatusDesc(),
 				target.getStatusTurnsLeft(),
 				null);
+	}
+
+	private Long resolvePreferredTraineeIdFromText(String userText, List<GameRunMember> members,
+			Set<Long> eliminatedTraineeIds) {
+		if (userText == null || userText.isBlank() || members == null || members.isEmpty()) {
+			return null;
+		}
+		String norm = userText.trim().toLowerCase(Locale.ROOT);
+		if (norm.isBlank()) {
+			return null;
+		}
+		List<GameRunMember> candidates = members.stream()
+				.filter(m -> m != null && m.getTrainee() != null && m.getTrainee().getName() != null)
+				.filter(m -> eliminatedTraineeIds == null || eliminatedTraineeIds.isEmpty()
+						|| !eliminatedTraineeIds.contains(m.getTrainee().getId()))
+				.sorted(Comparator
+						.comparingInt((GameRunMember m) -> m.getTrainee().getName().trim().length())
+						.reversed()
+						.thenComparingInt(GameRunMember::getPickOrder))
+				.toList();
+		List<Long> matchedIds = new ArrayList<>();
+		for (GameRunMember member : candidates) {
+			String traineeName = member.getTrainee().getName();
+			String cleanName = traineeName == null ? "" : traineeName.trim().toLowerCase(Locale.ROOT);
+			if (cleanName.isBlank()) {
+				continue;
+			}
+			if (norm.contains(cleanName)) {
+				matchedIds.add(member.getTrainee().getId());
+			}
+		}
+		if (matchedIds.size() != 1) {
+			return null;
+		}
+		return matchedIds.get(0);
 	}
 
 	private StatChangeResult withUpdatedRoster(StatChangeResult stat, List<RosterItem> roster) {
@@ -1118,10 +1275,10 @@ public class GameService {
 	}
 
 	private String midEvalTierByTotal(int total) {
-		if (total >= 240) return "S";
-		if (total >= 200) return "A";
-		if (total >= 160) return "B";
-		if (total >= 120) return "C";
+		if (total >= 1200) return "S";
+		if (total >= 1000) return "A";
+		if (total >= 800) return "B";
+		if (total >= 600) return "C";
 		return "D";
 	}
 
@@ -1454,10 +1611,10 @@ public class GameService {
 				.mapToInt(t -> t.getVocal() + t.getDance() + t.getStar() + t.getMental() + t.getTeamwork())
 				.sum();
 		// 중간평가: 절반 시점(112턴)이라 기준을 조금 완화
-		if (total >= 240) return "MID_EVAL_S";
-		if (total >= 200) return "MID_EVAL_A";
-		if (total >= 160) return "MID_EVAL_B";
-		if (total >= 120) return "MID_EVAL_C";
+		if (total >= 1200) return "MID_EVAL_S";
+		if (total >= 1000) return "MID_EVAL_A";
+		if (total >= 800) return "MID_EVAL_B";
+		if (total >= 600) return "MID_EVAL_C";
 		return "MID_EVAL_D";
 	}
 
@@ -1470,10 +1627,10 @@ public class GameService {
 				.sum();
 		ChemistryResult chemistry = chemistryService.analyze(roster);
 		int score = EndingService.computeDebutDisplayScore(statSum, chemistry);
-		if (score >= 800) return "DEBUT_EVAL_S";
-		if (score >= 650) return "DEBUT_EVAL_A";
-		if (score >= 525) return "DEBUT_EVAL_B";
-		if (score >= 400) return "DEBUT_EVAL_C";
+		if (score >= EndingService.DEBUT_GRADE_S_MIN) return "DEBUT_EVAL_S";
+		if (score >= EndingService.DEBUT_GRADE_A_MIN) return "DEBUT_EVAL_A";
+		if (score >= EndingService.DEBUT_GRADE_B_MIN) return "DEBUT_EVAL_B";
+		if (score >= EndingService.DEBUT_GRADE_C_MIN) return "DEBUT_EVAL_C";
 		return "DEBUT_EVAL_D";
 	}
 

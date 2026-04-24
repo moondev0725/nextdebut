@@ -254,8 +254,6 @@ public class AuthController {
         List<GameRunResult> history = gameService.getPlayerHistory(loginMember.mno());
         model.addAttribute("gameHistory", history);
 
-        int playCount = history == null ? 0 : history.size();
-
         Map<String, Long> groupCounts = history == null ? Map.of()
                 : history.stream().collect(Collectors.groupingBy(r -> r.groupType() == null ? "UNKNOWN" : r.groupType(), Collectors.counting()));
         String topGroupType = groupCounts.entrySet().stream()

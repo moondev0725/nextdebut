@@ -16,9 +16,14 @@ import com.java.service.MemberService;
 public class EndingService {
 
 	/** 스탯만 합산했을 때의 이론 상한 */
-	public static final int STAT_SUM_MAX = 400;
+	public static final int STAT_SUM_MAX = 2000;
 	/** 결과·랭킹에 쓰는 만점 */
 	public static final int DISPLAY_SCORE_MAX = 1000;
+	public static final int DEBUT_GRADE_S_MIN = 800;
+	public static final int DEBUT_GRADE_A_MIN = 700;
+	public static final int DEBUT_GRADE_B_MIN = 600;
+	public static final int DEBUT_GRADE_C_MIN = 500;
+	public static final int DEBUT_GRADE_D_MIN = 400;
 	/** 최종 데뷔 평가에 해당하는 턴 인덱스(게임 내 일수·페이즈와 동기) */
 	public static final int ENDING_MAX_TURN_INDEX = 169;
 	/**
@@ -108,22 +113,22 @@ public class EndingService {
 
 		String grade, label, desc, color;
 
-		if (total >= 800) {
+		if (total >= DEBUT_GRADE_S_MIN) {
 			grade = "S";
 			label = "월드클래스 데뷔";
 			desc = "압도적인 실력으로 데뷔 즉시 전 세계를 강타했습니다. 역사에 남을 그룹이 탄생했습니다.";
 			color = "#fbbf24";
-		} else if (total >= 650) {
+		} else if (total >= DEBUT_GRADE_A_MIN) {
 			grade = "A";
 			label = "성공적인 데뷔";
 			desc = "뛰어난 기량으로 데뷔 무대를 완벽하게 소화했습니다. 차세대 대표 그룹으로 주목받고 있습니다.";
 			color = "#e9b0c4";
-		} else if (total >= 525) {
+		} else if (total >= DEBUT_GRADE_B_MIN) {
 			grade = "B";
 			label = "기대되는 데뷔";
 			desc = "안정적인 실력으로 무대를 마쳤습니다. 꾸준한 성장으로 더 큰 무대를 노려볼 수 있습니다.";
 			color = "#cbbad8";
-		} else if (total >= 400) {
+		} else if (total >= DEBUT_GRADE_C_MIN) {
 			grade = "C";
 			label = "평범한 데뷔";
 			desc = "아직 부족한 부분이 있지만 가능성은 충분합니다. 더 많은 훈련이 필요합니다.";

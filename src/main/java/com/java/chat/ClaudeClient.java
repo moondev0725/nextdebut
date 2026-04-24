@@ -7,9 +7,14 @@ import java.net.http.HttpResponse;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+/**
+ * 기본 비활성. {@code anthropic.enabled=true} 일 때만 등록(챗봇은 {@link GeminiClient}가 @Primary).
+ */
 @Component
+@ConditionalOnProperty(name = "anthropic.enabled", havingValue = "true")
 public class ClaudeClient implements AiClient {
 
     @Value("${anthropic.api-key:}")

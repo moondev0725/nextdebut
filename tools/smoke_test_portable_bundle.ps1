@@ -52,7 +52,7 @@ function Test-PortOpen([int]$port, [int]$timeoutMs = 400) {
 }
 
 if (-not $BundlePath) {
-    $BundlePath = Join-Path (Resolve-Path (Join-Path $PSScriptRoot "..")).Path "dist\ProjectX1-Portable"
+    $BundlePath = Join-Path (Resolve-Path (Join-Path $PSScriptRoot "..")).Path "dist\NEXTDEBUT-Portable"
 }
 
 if (-not (Test-Path $BundlePath)) {
@@ -66,7 +66,7 @@ New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
 
 $py = Join-Path $bundle "runtime\python\python.exe"
 $java = Get-BundleJavaExe $bundle
-$jar = Join-Path $bundle "projectx1.jar"
+$jar = Join-Path $bundle "nextdebut.jar"
 $pyDir = Join-Path $bundle "python-ml"
 
 foreach ($p in @($py, $jar, (Join-Path $pyDir "app.py"))) {
@@ -112,7 +112,7 @@ Start-Process -FilePath $py -ArgumentList @(
 ) -WorkingDirectory $pyDir -WindowStyle Hidden -RedirectStandardOutput $pyOut -RedirectStandardError $pyErr
 
 # Do not redirect Spring stdout to a file: massive Hibernate logs can fill the pipe and stall the JVM.
-$springProc = Start-Process -FilePath $java -ArgumentList @("-jar", "projectx1.jar") -WorkingDirectory $bundle `
+$springProc = Start-Process -FilePath $java -ArgumentList @("-jar", "nextdebut.jar") -WorkingDirectory $bundle `
     -WindowStyle Hidden -PassThru
 
 $ready = $false

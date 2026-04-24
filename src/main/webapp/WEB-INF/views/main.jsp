@@ -4253,12 +4253,12 @@
                               <div class="ref-stat-list">
                                 <div class="ref-stat-row">
                                   <span>퍼포먼스</span>
-                                  <div class="ref-stat-row__bar"><b style="width:${pick.dance * 5}%"></b></div>
+                                  <div class="ref-stat-row__bar"><b style="width:${pick.dance}%"></b></div>
                                   <strong>${pick.dance}</strong>
                                 </div>
                                 <div class="ref-stat-row">
                                   <span>스타성</span>
-                                  <div class="ref-stat-row__bar"><b style="width:${pick.star * 5}%"></b></div>
+                                  <div class="ref-stat-row__bar"><b style="width:${pick.star}%"></b></div>
                                   <strong>${pick.star}</strong>
                                 </div>
                                 <div class="ref-stat-row">

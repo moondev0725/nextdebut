@@ -24,7 +24,6 @@ import com.java.game.service.SceneResult;
 public class PythonChatChoicePredictor implements ChatChoicePredictor {
 
 	private static final Logger log = LoggerFactory.getLogger(PythonChatChoicePredictor.class);
-	private static final PredictionResult DISABLED_RESULT = new PredictionResult(null, 0.0, Map.of(), true, "RULE");
 
 	private final boolean enabled;
 	private final String predictUrl;
@@ -46,11 +45,12 @@ public class PythonChatChoicePredictor implements ChatChoicePredictor {
 	@Override
 	public PredictionResult predict(String userText, List<SceneResult.ChoiceItem> choices, Long sceneId, String phase) {
 		if (!enabled) {
-			return DISABLED_RESULT;
+			log.debug("ML 비활성(app.ml.enabled=false), RULE fallback");
+			return PredictionResult.predictorUnavailable(MlSkipReason.ML_DISABLED);
 		}
 		if (predictUrl == null || predictUrl.isBlank()) {
 			log.warn("ML predict-url 미설정으로 RULE fallback 사용");
-			return DISABLED_RESULT;
+			return PredictionResult.predictorUnavailable(MlSkipReason.ML_PREDICT_URL_MISSING);
 		}
 		try {
 			List<ChoicePayload> payloadChoices = choices == null ? List.of()
@@ -75,16 +75,22 @@ public class PythonChatChoicePredictor implements ChatChoicePredictor {
 			PythonPredictionResponse body = response.getBody();
 			if (body == null) {
 				log.warn("ML 응답 본문이 비어 있어 RULE fallback 사용");
-				return DISABLED_RESULT;
+				return PredictionResult.predictorUnavailable(MlSkipReason.ML_RESPONSE_EMPTY);
 			}
 			String predictedKey = normalizeKey(body.predictedKey());
 			Map<String, Double> normalizedScores = normalizeScores(body.scoreByKey());
 			double confidence = sanitizeConfidence(body.confidence());
 			boolean invalidPrediction = predictedKey == null || predictedKey.isBlank();
-			return new PredictionResult(predictedKey, confidence, normalizedScores, invalidPrediction, "ML");
+			boolean noneAmbiguous = !invalidPrediction && "NONE".equalsIgnoreCase(predictedKey);
+			boolean fallbackRecommended = invalidPrediction || noneAmbiguous;
+			MlSkipReason predictorFail = invalidPrediction ? MlSkipReason.ML_INVALID_PREDICTED_KEY
+					: noneAmbiguous ? MlSkipReason.ML_AMBIGUOUS_OR_NONE : null;
+			return new PredictionResult(predictedKey, confidence, normalizedScores, fallbackRecommended, "ML",
+					predictorFail);
 		} catch (Exception ex) {
-			log.warn("ML 예측 호출 실패. RULE fallback 사용: {}", ex.getMessage());
-			return DISABLED_RESULT;
+			log.warn("ML 예측 호출 실패. RULE fallback 사용 (reason={}): {}",
+					MlSkipReason.ML_HTTP_OR_PARSE_ERROR, ex.getMessage());
+			return PredictionResult.predictorUnavailable(MlSkipReason.ML_HTTP_OR_PARSE_ERROR);
 		}
 	}
 

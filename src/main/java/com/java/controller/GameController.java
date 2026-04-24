@@ -426,9 +426,29 @@ public String continueLatestRun(@RequestParam(name = "runId", required = false) 
         model.addAttribute("ending", ending);
         model.addAttribute("chemistry", chemistry);
 
-        List<RosterItem> rosterItems = ending.getRoster();
-        List<RosterItem> endingTopFour = (rosterItems == null || rosterItems.isEmpty()) ? List.of()
-                : rosterItems.stream()
+        @SuppressWarnings("unchecked")
+        List<MyItemDto> endingSessionItems =
+                (List<MyItemDto>) session.getAttribute("APPLIED_ITEMS_RUN_" + runId);
+        List<MyItemDto> endingAppliedItems = endingSessionItems != null ? endingSessionItems : List.of();
+        Map<String, Integer> endingItemStatBonusMap = createEmptyItemStatBonusMap();
+        for (MyItemDto item : endingAppliedItems) {
+            if (item == null || item.getItemName() == null) {
+                continue;
+            }
+            String statKey = getItemStatKey(item.getItemName());
+            int bonus = getItemStartBonus(item.getItemName());
+            if (statKey != null && bonus > 0) {
+                endingItemStatBonusMap.put(statKey, endingItemStatBonusMap.getOrDefault(statKey, 0) + bonus);
+            }
+        }
+        Set<Long> endingEliminatedTraineeIds = copyEliminatedTraineeIds(session, runId);
+        List<RosterItem> rosterItemsDisplay = ending.getRoster() == null ? List.of()
+                : ending.getRoster().stream()
+                        .map(m -> applyItemBonusToRosterItem(m, endingItemStatBonusMap, endingEliminatedTraineeIds))
+                        .toList();
+
+        List<RosterItem> endingTopFour = rosterItemsDisplay.isEmpty() ? List.of()
+                : rosterItemsDisplay.stream()
                         .sorted(Comparator.comparingInt(
                                 (RosterItem r) -> r.vocal() + r.dance() + r.star() + r.mental() + r.teamwork())
                                 .reversed())
@@ -436,18 +456,18 @@ public String continueLatestRun(@RequestParam(name = "runId", required = false) 
                         .toList();
         model.addAttribute("endingTopFour", endingTopFour);
 
-        int rosterN = (rosterItems == null || rosterItems.isEmpty()) ? 0 : rosterItems.size();
+        int rosterN = rosterItemsDisplay.size();
         if (rosterN > 0) {
             model.addAttribute("teamAvgVocal",
-                    rosterItems.stream().mapToInt(RosterItem::vocal).average().orElse(0));
+                    rosterItemsDisplay.stream().mapToInt(RosterItem::vocal).average().orElse(0));
             model.addAttribute("teamAvgDance",
-                    rosterItems.stream().mapToInt(RosterItem::dance).average().orElse(0));
+                    rosterItemsDisplay.stream().mapToInt(RosterItem::dance).average().orElse(0));
             model.addAttribute("teamAvgStar",
-                    rosterItems.stream().mapToInt(RosterItem::star).average().orElse(0));
+                    rosterItemsDisplay.stream().mapToInt(RosterItem::star).average().orElse(0));
             model.addAttribute("teamAvgMental",
-                    rosterItems.stream().mapToInt(RosterItem::mental).average().orElse(0));
+                    rosterItemsDisplay.stream().mapToInt(RosterItem::mental).average().orElse(0));
             model.addAttribute("teamAvgTeamwork",
-                    rosterItems.stream().mapToInt(RosterItem::teamwork).average().orElse(0));
+                    rosterItemsDisplay.stream().mapToInt(RosterItem::teamwork).average().orElse(0));
         } else {
             model.addAttribute("teamAvgVocal", 0.0);
             model.addAttribute("teamAvgDance", 0.0);

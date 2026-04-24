@@ -14,6 +14,13 @@ from sklearn.pipeline import Pipeline
 
 TOKEN_RE = re.compile(r"[가-힣a-zA-Z0-9]+")
 DEFAULT_DATA_PATH = Path(__file__).resolve().parent / "data" / "chat_choice_training.jsonl"
+STAT_TARGET_ALIASES: Dict[str, set[str]] = {
+    "VOCAL": {"vocal", "보컬", "노래", "발성", "음정", "싱잉"},
+    "DANCE": {"dance", "댄스", "안무", "춤", "퍼포", "동선"},
+    "TEAMWORK": {"teamwork", "team", "팀워크", "팀웍", "협업", "합", "호흡", "조율"},
+    "MENTAL": {"mental", "멘탈", "회복", "휴식", "컨디션", "스트레스", "안정"},
+    "STAR": {"star", "스타", "카메라", "미디어", "노출", "존재감", "비주얼"},
+}
 
 
 @dataclass(frozen=True)
@@ -35,7 +42,9 @@ class ChoicePredictModel:
         min_train_samples: int = 30,
         auto_retrain_interval_sec: int = 8,
         auto_retrain_new_samples: int = 1,
-        ambiguity_gap_threshold: float = 0.03,
+        # 이 값보다 top1-top2 격차가 작으면 NONE으로 보내 RULE을 태운다.
+        # 너무 크면(예: 0.03) 소프트맥스가 균등에 가까울 때 거의 항상 NONE이 되어 ML 적용률이 급락한다.
+        ambiguity_gap_threshold: float = 0.004,
     ) -> None:
         self.data_path = data_path
         self.min_train_samples = min_train_samples
@@ -136,13 +145,19 @@ class ChoicePredictModel:
 
     def _heuristic_scores(self, user_text: str, choices: List[ChoiceInput]) -> Dict[str, float]:
         user_tokens = _tokenize(user_text)
+        explicit_intent_key = _detect_explicit_intent_key(user_tokens)
         scores: Dict[str, float] = {}
         for choice in choices:
-            choice_tokens = _tokenize(f"{choice.text} {choice.stat_target}")
+            stat_hint_text = _stat_hint_text(choice.stat_target)
+            choice_tokens = _tokenize(f"{choice.text} {choice.stat_target} {stat_hint_text}")
             overlap = _jaccard(user_tokens, choice_tokens)
             bias = _keyword_bias_score(user_tokens, self.keyword_bias.get(choice.key, set()))
-            stat_bias = _keyword_bias_score(user_tokens, _tokenize(choice.stat_target))
-            score = 0.55 * overlap + 0.35 * bias + 0.10 * stat_bias
+            stat_bias = _keyword_bias_score(user_tokens, _tokenize(stat_hint_text))
+            intent_boost = 0.0
+            if explicit_intent_key and choice.key == explicit_intent_key:
+                # 희소 클래스(C/D/SPECIAL) 쏠림 완화: 명시 의도어가 있으면 해당 키 점수를 확실히 끌어올린다.
+                intent_boost = 0.20 if explicit_intent_key in {"C", "D", "SPECIAL"} else 0.14
+            score = 0.50 * overlap + 0.32 * bias + 0.10 * stat_bias + intent_boost
             scores[choice.key] = max(0.0, score)
         return scores
 
@@ -197,6 +212,16 @@ def _count_lines(path: Path) -> int:
             if line.strip():
                 count += 1
     return count
+
+
+def _stat_hint_text(stat_target: str) -> str:
+    st = (stat_target or "").strip().upper()
+    if not st:
+        return ""
+    aliases = STAT_TARGET_ALIASES.get(st, set())
+    if not aliases:
+        return st.lower()
+    return " ".join(sorted(aliases))
 
 
 def _build_feature_text(user_text: str, choices: List[dict], phase: str, scene_id: int | None) -> str:
@@ -261,3 +286,19 @@ def _top_two_gap(scores: Dict[str, float]) -> float:
     if len(vals) < 2:
         return vals[0]
     return vals[0] - vals[1]
+
+
+def _detect_explicit_intent_key(tokens: set[str]) -> str | None:
+    if not tokens:
+        return None
+    if tokens & {"팀워크", "팀웍", "협업", "teamwork", "team", "조율", "합", "케미"}:
+        return "C"
+    if tokens & {"멘탈", "휴식", "회복", "컨디션", "스트레스", "안정", "mental"}:
+        return "D"
+    if tokens & {"스타", "스타성", "카메라", "비주얼", "노출", "star"}:
+        return "SPECIAL"
+    if tokens & {"보컬", "노래", "발성", "음정", "vocal", "싱잉"}:
+        return "A"
+    if tokens & {"댄스", "안무", "춤", "동선", "퍼포", "dance"}:
+        return "B"
+    return None
