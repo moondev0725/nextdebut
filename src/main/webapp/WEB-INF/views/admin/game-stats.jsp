@@ -127,31 +127,31 @@
   </section>
 
   <section class="card">
-    <div class="section-head">채팅 선택 ML 적용 통계</div>
+    <div class="section-head">채팅 선택 ML 예측 통계</div>
     <div class="section-body">
-      <p class="hint"><code>app.ml.training-log-path</code> 로그 기준으로 ML/RULE 및 fallback 비율을 집계합니다.</p>
+      <p class="hint"><code>app.ml.training-log-path</code> 누적 예측 로그 기준으로 ML 예측/미예측 비율을 집계합니다.</p>
       <div class="members-table-wrap">
         <table class="members-table">
           <thead><tr><th>항목</th><th style="text-align:right;">값</th></tr></thead>
           <tbody>
             <tr>
-              <td>총 샘플 수</td>
+              <td>총 평가 샘플 수</td>
               <td class="num"><fmt:formatNumber value="${mlChoiceStats.total}" pattern="#,##0"/></td>
             </tr>
             <tr>
-              <td>resolverType = ML</td>
+              <td>ML 예측 건수</td>
               <td class="num"><fmt:formatNumber value="${mlChoiceStats.ml}" pattern="#,##0"/> 건</td>
             </tr>
             <tr>
-              <td>resolverType = RULE</td>
+              <td>미예측 건수</td>
               <td class="num"><fmt:formatNumber value="${mlChoiceStats.rule}" pattern="#,##0"/> 건</td>
             </tr>
             <tr>
-              <td>ML 적용률</td>
+              <td>ML 예측률</td>
               <td class="num"><fmt:formatNumber value="${mlChoiceStats.mlRate}" pattern="#,##0.0"/>%</td>
             </tr>
             <tr>
-              <td>Fallback 사용률</td>
+              <td>미예측 비율</td>
               <td class="num"><fmt:formatNumber value="${mlChoiceStats.fallbackRate}" pattern="#,##0.0"/>%</td>
             </tr>
             <tr>

@@ -1292,7 +1292,10 @@ box-shadow:0 4px 10px rgba(233,176,196,0.18),inset 0 3px 6px rgba(0,0,0,0.15);
                                                     </c:choose>
                                                 </c:if>
                                                 <a class="underline decoration-slate-300 hover:decoration-slate-500" href="${ctx}/boards/${p.boardType}/${p.id}">
-                                                    ${p.title}
+                                                    <c:choose>
+                                                        <c:when test="${boardType eq 'report'}">${reportDisplayTitleMap[p.id]}</c:when>
+                                                        <c:otherwise>${p.title}</c:otherwise>
+                                                    </c:choose>
                                                 </a>
                                                 <c:if test="${not empty p.originalFilename}">
                                                     <i class="fa-solid fa-paperclip text-slate-400 ml-1" style="font-size:10px;"></i>

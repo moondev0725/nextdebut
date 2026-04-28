@@ -453,10 +453,14 @@ public class BoardPageController {
 				statusFilter = reportStatus.toLowerCase();
 			}
 			Map<Long, Boolean> reportHandledMap = new LinkedHashMap<>();
+			Map<Long, String> reportDisplayTitleMap = new LinkedHashMap<>();
 			for (Board p : boardPage.getContent()) {
-				reportHandledMap.put(p.getId(), boardService.isReportHandled(p));
+				boolean handled = boardService.isReportHandled(p);
+				reportHandledMap.put(p.getId(), handled);
+				reportDisplayTitleMap.put(p.getId(), boardService.maskedBoardTitle(p, handled));
 			}
 			model.addAttribute("reportHandledMap", reportHandledMap);
+			model.addAttribute("reportDisplayTitleMap", reportDisplayTitleMap);
 			model.addAttribute("reportStatusFilter", statusFilter);
 		}
 		return "boards/list";
@@ -698,10 +702,12 @@ public class BoardPageController {
 				return "redirect:/boards/" + type;
 			}
 		}
-		if (!canAccessFanMeetPost(post, lm)) {
+		if (!canAccessBoardPost(post, lm)) {
 			String err = "fanmeeting".equals(post.getBoardType())
 					? "승인 대기 중이거나 비공개인 팬미팅 글입니다."
-					: "승인 대기 중이거나 비공개인 캐스팅 이벤트 글입니다.";
+					: ("map".equals(post.getBoardType())
+							? "승인 대기 중이거나 비공개인 캐스팅 이벤트 글입니다."
+							: "블라인드 처리되었거나 비공개인 게시글입니다.");
 			ra.addFlashAttribute("error", err);
 			return "redirect:/boards/" + type;
 		}
@@ -1107,7 +1113,7 @@ public class BoardPageController {
 			ra.addFlashAttribute("error", "게시글을 찾을 수 없습니다.");
 			return "redirect:/boards/" + type;
 		}
-		if (!canAccessFanMeetPost(post, lm)) {
+		if (!canAccessBoardPost(post, lm)) {
 			ra.addFlashAttribute("error", "이 글에 댓글을 달 수 없습니다.");
 			return "redirect:/boards/" + type;
 		}
@@ -1142,7 +1148,7 @@ public class BoardPageController {
 			ra.addFlashAttribute("error", "댓글을 찾을 수 없습니다.");
 			return "redirect:/boards/" + type + "/" + id;
 		}
-		if (!canAccessFanMeetPost(comment.getBoard(), lm)) {
+		if (!canAccessBoardPost(comment.getBoard(), lm)) {
 			ra.addFlashAttribute("error", "이 글의 댓글을 수정할 수 없습니다.");
 			return "redirect:/boards/" + type;
 		}
@@ -1182,7 +1188,7 @@ public class BoardPageController {
 			ra.addFlashAttribute("error", "댓글을 찾을 수 없습니다.");
 			return "redirect:/boards/" + type + "/" + id;
 		}
-		if (!canAccessFanMeetPost(comment.getBoard(), lm)) {
+		if (!canAccessBoardPost(comment.getBoard(), lm)) {
 			ra.addFlashAttribute("error", "이 글의 댓글을 삭제할 수 없습니다.");
 			return "redirect:/boards/" + type;
 		}
@@ -1219,7 +1225,7 @@ public class BoardPageController {
 				return ResponseEntity.status(403).body(Map.of("error", "이 글에 좋아요를 할 수 없습니다."));
 			}
 		}
-		if (!canAccessFanMeetPost(post, lm)) {
+		if (!canAccessBoardPost(post, lm)) {
 			return ResponseEntity.status(403).body(Map.of("error", "이 글에 좋아요를 할 수 없습니다."));
 		}
 
@@ -1255,6 +1261,9 @@ public class BoardPageController {
 		}
 		if (!type.equals(post.getBoardType())) {
 			return ResponseEntity.status(404).body(Map.of("error", "게시글을 찾을 수 없습니다."));
+		}
+		if (!canAccessBoardPost(post, lm)) {
+			return ResponseEntity.status(403).body(Map.of("error", "이 글은 신고할 수 없습니다."));
 		}
 		if (lm.mno() != null && lm.mno().equals(post.getAuthorMno())) {
 			return ResponseEntity.badRequest().body(Map.of("error", "본인 게시글은 신고할 수 없습니다."));
@@ -1421,10 +1430,17 @@ public class BoardPageController {
 		return lm.nickname() != null && lm.nickname().equals(post.getAuthorNick());
 	}
 
-	private static boolean canAccessFanMeetPost(Board post, LoginMember lm) {
+	private static boolean canAccessBoardPost(Board post, LoginMember lm) {
+		if (post == null) {
+			return false;
+		}
 		if (!post.isVisible()) {
 			return lm != null && "ADMIN".equals(lm.role());
 		}
+		return canAccessFanMeetPost(post, lm);
+	}
+
+	private static boolean canAccessFanMeetPost(Board post, LoginMember lm) {
 		if (!"map".equals(post.getBoardType()) && !"fanmeeting".equals(post.getBoardType())) {
 			return true;
 		}

@@ -102,11 +102,26 @@ public class AdminTraineeController {
 		return "admin/trainees";
 	}
 
+	@GetMapping("/trainees/new")
+	public String newTraineeForm(HttpSession session) {
+		if (session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
+			return "redirect:/login?redirect=/admin/trainees/new";
+		}
+		return "admin/trainee-create";
+	}
+
 	@PostMapping("/trainee")
 	@Transactional
 	public String createTrainee(
 			@RequestParam("name") String name,
 			@RequestParam("gender") String gender,
+			@RequestParam(name = "grade", defaultValue = "N") String grade,
+			@RequestParam(name = "age", required = false) Integer age,
+			@RequestParam(name = "birthday", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthday,
+			@RequestParam(name = "height", required = false) Integer height,
+			@RequestParam(name = "hobby", required = false) String hobby,
+			@RequestParam(name = "instagram", required = false) String instagram,
+			@RequestParam(name = "unlockScore", required = false) Integer unlockScore,
 			@RequestParam(name = "image", required = false) MultipartFile image,
 			@RequestParam("vocal") Integer vocal,
 			@RequestParam("dance") Integer dance,
@@ -117,6 +132,15 @@ public class AdminTraineeController {
 		TraineeCreateRequest request = new TraineeCreateRequest();
 		request.setName(name);
 		request.setGender(parseGenderRequired(gender));
+		request.setGrade(parseGradeRequired(grade));
+		request.setAge(age);
+		request.setBirthday(birthday);
+		request.setHeight(height);
+		request.setHobby(hobby);
+		request.setInstagram(instagram);
+		Integer normalizedUnlockScore = normalizeUnlockScore(unlockScore);
+		request.setUnlockScore(normalizedUnlockScore);
+		request.setUnlockCondition(normalizedUnlockScore == null ? null : "최종 점수 " + normalizedUnlockScore + "점 이상");
 		request.setVocal(vocal);
 		request.setDance(dance);
 		request.setStar(star);
@@ -138,6 +162,7 @@ public class AdminTraineeController {
 			@RequestParam(name = "height", required = false) Integer height,
 			@RequestParam(name = "hobby", required = false) String hobby,
 			@RequestParam(name = "instagram", required = false) String instagram,
+			@RequestParam(name = "unlockScore", required = false) Integer unlockScore,
 			RedirectAttributes ra) {
 		TraineeUpdateRequest request = new TraineeUpdateRequest();
 		request.setName(name);
@@ -148,6 +173,9 @@ public class AdminTraineeController {
 		request.setHeight(height);
 		request.setHobby(hobby);
 		request.setInstagram(instagram);
+		Integer normalizedUnlockScore = normalizeUnlockScore(unlockScore);
+		request.setUnlockScore(normalizedUnlockScore);
+		request.setUnlockCondition(normalizedUnlockScore == null ? null : "최종 점수 " + normalizedUnlockScore + "점 이상");
 		traineeService.updateTrainee(traineeId, request);
 		ra.addFlashAttribute("success", "기본 정보가 수정되었습니다.");
 		return "redirect:/admin/trainees?traineeId=" + traineeId;
@@ -249,5 +277,12 @@ public class AdminTraineeController {
 		} catch (IOException e) {
 			throw new IllegalStateException("연습생 이미지를 저장하지 못했습니다.", e);
 		}
+	}
+
+	private Integer normalizeUnlockScore(Integer unlockScore) {
+		if (unlockScore == null || unlockScore <= 0) {
+			return null;
+		}
+		return Math.max(0, Math.min(1000, unlockScore));
 	}
 }

@@ -1,0 +1,726 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<c:set var="uri" value="${pageContext.request.requestURI}" />
+
+<style>
+.nav-link--admin {
+    background: linear-gradient(110deg, rgba(232, 164, 184, 0.16), rgba(196, 181, 253, 0.12)) !important;
+    border: 1px solid rgba(232, 164, 184, 0.38) !important;
+    color: var(--text) !important;
+}
+.nav-link--admin:hover {
+    background: linear-gradient(110deg, rgba(232, 164, 184, 0.26), rgba(196, 181, 253, 0.18)) !important;
+    border-color: rgba(232, 164, 184, 0.5) !important;
+    box-shadow: 0 4px 16px rgba(232, 164, 184, 0.15);
+}
+
+.nav-link .nav-txt {
+    position: relative;
+    display: inline-grid;
+    align-items: center;
+}
+.nav-link .nav-txt__en,
+.nav-link .nav-txt__ko {
+    grid-area: 1 / 1;
+    transition: opacity 120ms ease;
+}
+.nav-link .nav-txt__en { opacity: 1; }
+.nav-link .nav-txt__ko { opacity: 0; }
+.nav-link:hover .nav-txt__en { opacity: 0; }
+.nav-link:hover .nav-txt__ko { opacity: 1; }
+
+.nav-global-search {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    width: 36px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(232, 164, 184, 0.24);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 8px 20px rgba(28, 25, 23, 0.08);
+    justify-content: flex-end;
+    overflow: hidden;
+    transition: width .28s ease, padding .28s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.nav-global-search:focus-within {
+    border-color: rgba(232, 164, 184, 0.48);
+    box-shadow: 0 10px 24px rgba(232, 164, 184, 0.16);
+}
+.nav-global-search.is-open {
+    width: 220px;
+    padding: 0 6px 0 10px;
+}
+.nav-global-search__input {
+    width: 0;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(28, 25, 23, 0.88);
+    opacity: 0;
+    transform: translateX(10px);
+    pointer-events: none;
+    transition: width .28s ease, opacity .2s ease, transform .28s ease;
+}
+.nav-global-search.is-open .nav-global-search__input {
+    width: 170px;
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+.nav-global-search__input::placeholder {
+    color: rgba(120, 113, 108, 0.66);
+}
+.nav-global-search__btn {
+    width: 26px;
+    height: 26px;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    color: #fff;
+    background: linear-gradient(135deg, rgba(232, 164, 184, 0.95), rgba(196, 181, 253, 0.95));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .15s ease, box-shadow .2s ease;
+}
+.nav-global-search__btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(232, 164, 184, 0.25);
+}
+.nav-global-search--dock {
+    position: fixed;
+    top: calc((var(--nav-h, 68px) - 36px) / 2);
+    right: 72px;
+    z-index: 10066;
+}
+@media (max-width: 768px) {
+    .nav-global-search--dock {
+        right: 56px;
+    }
+    .nav-global-search.is-open {
+        width: 190px;
+    }
+    .nav-global-search.is-open .nav-global-search__input {
+        width: 140px;
+    }
+}
+
+.fanmap-modal{position:fixed;inset:0;z-index:10070;display:none;align-items:center;justify-content:center;padding:24px;}
+.fanmap-modal.is-open{display:flex;}
+.fanmap-modal__dim{position:absolute;inset:0;background:rgba(28,25,23,.32);backdrop-filter:blur(10px);}
+.fanmap-modal__panel{position:relative;width:min(980px,calc(100vw - 48px));height:min(720px,calc(100vh - 48px));
+  border-radius:18px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,250,252,.92));
+  border:1px solid rgba(232,164,184,.22);
+  box-shadow:0 28px 80px rgba(28,25,23,.12);
+}
+.fanmap-modal__head{position:absolute;left:0;right:0;top:0;z-index:5;
+  display:flex;align-items:center;gap:12px;justify-content:space-between;
+  padding:14px 16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.72));
+  border-bottom:1px solid rgba(232,164,184,.18);
+}
+.fanmap-title{display:flex;align-items:center;gap:10px;font-family:"Orbitron",sans-serif;font-size:11px;letter-spacing:.16em;color:rgba(28,25,23,.9);}
+.fanmap-sub{font-family:"Noto Sans KR",sans-serif;font-size:12px;font-weight:600;color:rgba(68,64,60,.82);letter-spacing:.02em;}
+.fanmap-back{height:34px;padding:0 12px;border-radius:12px;border:1px solid rgba(232,164,184,.22);
+  background:rgba(255,255,255,.9);cursor:pointer;color:rgba(28,25,23,.82);
+  display:none;align-items:center;gap:8px;font-weight:800;font-size:12px;
+}
+.fanmap-back:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(232,164,184,.14);}
+.fanmap-back.is-on{display:inline-flex;}
+.fanmap-close{width:36px;height:36px;border-radius:12px;border:1px solid rgba(232,164,184,.22);
+  background:rgba(255,255,255,.9);cursor:pointer;color:rgba(28,25,23,.8);
+  display:inline-flex;align-items:center;justify-content:center;transition:transform .18s ease, box-shadow .18s ease;
+}
+.fanmap-close:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(232,164,184,.14);}
+.fanmap-canvas{position:absolute;inset:54px 0 0 0;}
+.fanmap-tools{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+.fanmap-tools .chip{height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(232,164,184,.22);
+  background:rgba(255,255,255,.85);cursor:pointer;color:rgba(28,25,23,.82);font-weight:800;font-size:12px;
+}
+.fanmap-tools .chip.is-on{background:linear-gradient(135deg,rgba(232,164,184,.2),rgba(196,181,253,.14));border-color:rgba(232,164,184,.35);}
+.fanmap-tools input,.fanmap-tools select{height:30px;border-radius:999px;border:1px solid rgba(232,164,184,.22);
+  background:rgba(255,255,255,.85);padding:0 12px;font-weight:700;font-size:12px;outline:none;
+}
+.fanmap-split{position:absolute;top:54px;bottom:0;right:0;width:300px;border-left:1px solid rgba(232,164,184,.16);
+  background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(253,242,245,.55));
+}
+.fanmap-canvas{right:300px;}
+.fanmap-side{height:100%;padding:14px 14px 12px;overflow:auto}
+.fanmap-kpi{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+.fanmap-kpi .k{border-radius:16px;border:1px solid rgba(232,164,184,.18);background:rgba(255,255,255,.82);padding:12px}
+.fanmap-kpi .k .t{font-family:"Orbitron",sans-serif;font-size:10px;letter-spacing:.16em;color:rgba(68,64,60,.72)}
+.fanmap-kpi .k .v{margin-top:6px;font-size:20px;font-weight:900;color:rgba(28,25,23,.92)}
+.fanmap-kpi .k .v.num-rise{ animation:fanNumRise .45s cubic-bezier(.23,1.2,.46,.98); }
+@keyframes fanNumRise{ from{opacity:.08;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
+.fanmap-top{margin-top:12px;border-radius:16px;border:1px solid rgba(232,164,184,.18);background:rgba(255,255,255,.82);padding:12px}
+.fanmap-top .row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(232,164,184,.12)}
+.fanmap-top .row:last-child{border-bottom:0}
+.fanmap-top .nm{font-weight:900}
+.fanmap-top .ct{font-family:"Orbitron",sans-serif;font-weight:900}
+@media (max-width: 980px){ .fanmap-split{display:none;} .fanmap-canvas{right:0;} }
+.fan-pin{border-radius:999px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 12px 32px rgba(28,25,23,.08);
+  backdrop-filter:blur(14px) saturate(1.05);
+  -webkit-backdrop-filter:blur(14px) saturate(1.05);
+  color:rgba(28,25,23,.9);
+}
+.fan-pin__name{font-family:"Orbitron",sans-serif;font-size:10px;font-weight:900;letter-spacing:.1em;line-height:1;}
+.fan-pin__count{margin-top:3px;font-family:"Noto Sans KR",sans-serif;font-size:11px;font-weight:800;line-height:1;}
+</style>
+
+<nav class="premium-glass premium-glass--lobby fixed top-0 left-0 right-0 z-50" aria-label="NEXT DEBUT 雅뚯눘??筌롫뗀??>
+    <div class="container mx-auto px-6 flex items-center" style="height: var(--nav-h);">
+
+        <div class="flex items-center shrink-0 mr-8">
+            <a href="${ctx}/main" class="nav-brand" aria-label="NEXT DEBUT ??>
+                <img src="${ctx}/images/nextdebut-logo.png?v=20260421b" alt="NEXT DEBUT" width="1024" height="431" decoding="async" />
+            </a>
+        </div>
+
+        <div class="hidden lg:flex flex-1 justify-center">
+            <ul class="flex items-center gap-5 font-semibold text-sm tracking-wide">
+                <li>
+                    <a href="${ctx}/boards/notice" class="nav-link ${fn:contains(uri, '/boards/notice') ? 'nav-link--active' : ''}">
+                        <i class="fas fa-bullhorn"></i>
+                        <span class="nav-txt"><span class="nav-txt__en">NOTICE</span><span class="nav-txt__ko">?⑤벊?</span></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${ctx}/guide" class="nav-link ${fn:contains(uri, '/guide') ? 'nav-link--active' : ''}">
+                        <i class="fas fa-circle-info"></i>
+                        <span class="nav-txt"><span class="nav-txt__en">GUIDE</span><span class="nav-txt__ko">揶쎛??諭?/span></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${ctx}/trainees" class="nav-link ${fn:contains(uri, '/trainees') ? 'nav-link--active' : ''}">
+                        <i class="fas fa-book-open"></i>
+                        <span class="nav-txt"><span class="nav-txt__en">INDEX</span><span class="nav-txt__ko">?袁㏃빵</span></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${ctx}/boards/free" class="nav-link ${fn:contains(uri, '/boards/free') or fn:contains(uri, '/boards/lounge') or fn:contains(uri, '/boards/guide') ? 'nav-link--active' : ''}">
+                        <i class="fas fa-comments"></i>
+                        <span class="nav-txt"><span class="nav-txt__en">BOARD</span><span class="nav-txt__ko">野껊슣???/span></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${ctx}/boards/fanmeeting" class="nav-link ${fn:contains(uri, '/boards/fanmeeting') ? 'nav-link--active' : ''}">
+                        <i class="fas fa-heart"></i>
+                        <span class="nav-txt"><span class="nav-txt__en">FANMEETING</span><span class="nav-txt__ko">?????/span></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${ctx}/boards/map" class="nav-link ${fn:contains(uri, '/boards/map') ? 'nav-link--active' : ''}">
+                        <i class="fas fa-map-location-dot"></i>
+                        <span class="nav-txt"><span class="nav-txt__en">CASTING</span><span class="nav-txt__ko">疫뀀㈇援끿뵳?筌?Ŋ???/span></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${ctx}/boards/report" class="nav-link ${fn:contains(uri, '/boards/report') ? 'nav-link--active' : ''}">
+                        <i class="fas fa-bug"></i>
+                        <span class="nav-txt"><span class="nav-txt__en">REPORT</span><span class="nav-txt__ko">?醫됲?/span></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${ctx}/market/shop" class="nav-link ${fn:contains(uri, '/market/shop') or fn:contains(uri, '/market/gacha') ? 'nav-link--active' : ''}">
+                        <i class="fas fa-gift"></i>
+                        <span class="nav-txt"><span class="nav-txt__en">SHOP</span><span class="nav-txt__ko">?怨몄젎/筌믩쵌由?/span></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <%-- lg ??곴맒?癒?퐣筌?癰귣똻?좑쭖???뺥닜?깆삩猷멥걟獄쏅뗄??癒?퐣 野껋?肉뺟㎉?獄쏅떽? ??癰귣똻????野껊슣???源녿퓠????湲???뽯뻻 --%>
+        <div class="flex items-center justify-end shrink-0 gap-1 sm:gap-2 md:gap-3 ml-2 sm:ml-4 md:ml-5 min-w-0">
+            <c:choose>
+                <c:when test="${not empty sessionScope.LOGIN_MEMBER}">
+                    <div class="flex items-center gap-3 flex-nowrap">
+                        <div class="nav-user-block<c:if test="${not empty memberRankLabel and not empty memberRankCode}"> member-rank-tier member-rank-tier--<c:out value="${memberRankCode}"/></c:if>">
+                        <a href="${ctx}/mypage" class="mypage-trigger mypage-trigger--stacked" aria-label="마이페이지로 이동">
+                            <div class="mypage-trigger__row">
+                                <span class="mypage-trigger__avatar"><i class="fas fa-user"></i></span>
+                                <c:if test="${not empty memberRankLabel}">
+                                    <span class="member-rank-pill" title="?袁⑹읅 ?源껎닋 野껋?肉뺟㎉?${memberRankExp}"><c:out value="${memberRankLabel}"/></span>
+                                </c:if>
+                                <span class="mypage-trigger__name"><c:out value="${empty sessionScope.LOGIN_MEMBER.nickname ? sessionScope.LOGIN_MEMBER.mname : sessionScope.LOGIN_MEMBER.nickname}"/></span>
+                                <i class="fas fa-chevron-down mypage-trigger__chevron"></i>
+                            </div>
+                            <c:if test="${not empty memberRankLabel}">
+                                <c:choose>
+                                    <c:when test="${navRankGainAnim}">
+                                        <c:set var="barPct" value="${empty navRankBarFromPct ? 0 : navRankBarFromPct}" />
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:set var="barPct" value="${empty memberRankBarPercent ? 0 : memberRankBarPercent}" />
+                                    </c:otherwise>
+                                </c:choose>
+                                <div class="member-rank-expbar-wrap"
+                                     title="?袁⑹읅 ${memberRankExp} EXP<c:if test="${not memberRankMaxTier and not empty memberRankNextLabel}"> 夷???쇱벉 <c:out value="${memberRankNextLabel}"/>繹먮슣? <c:out value="${memberRankExpUntilNext}"/> EXP</c:if>">
+                                    <c:if test="${navRankGainAnim}">
+                                        <div id="navMemberRankExpLine" class="member-rank-exp-line" aria-hidden="true">
+                                            <span id="navMemberRankExpTicker" class="member-rank-exp-line__n">${navRankExpFrom}</span><span class="member-rank-exp-line__s"> EXP</span>
+                                        </div>
+                                    </c:if>
+                                    <div class="member-rank-expbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${barPct}" aria-label="다음 등급까지 경험치">
+                                        <div id="navMemberRankExpFill" class="member-rank-expbar__fill" style="width: ${barPct}%;"></div>
+                                    </div>
+                                    <div class="member-rank-expbar__meta">
+                                        <c:choose>
+                                            <c:when test="${memberRankMaxTier}"><span>MAX</span></c:when>
+                                            <c:otherwise><span class="member-rank-expbar__next">NEXT <c:out value="${memberRankNextLabel}"/></span><span class="member-rank-expbar__gap"><c:out value="${memberRankExpUntilNext}"/> EXP</span></c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </div>
+                            </c:if>
+                        </a>
+                        </div>
+                        <form action="${ctx}/logout" method="post" class="m-0 shrink-0">
+                            <button type="submit" class="nav-link nav-link--compact whitespace-nowrap text-sm">
+                                <i class="fas fa-right-from-bracket"></i>LOG OUT
+                            </button>
+                        </form>
+                        <c:if test="${sessionScope.LOGIN_MEMBER.role eq 'ADMIN'}">
+                            <a href="${ctx}/admin" class="nav-link nav-link--compact nav-link--admin whitespace-nowrap text-sm">
+                                <i class="fas fa-gauge-high"></i>ADMIN
+                            </a>
+                        </c:if>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="flex items-center gap-3 flex-nowrap">
+                        <a href="${ctx}/login" class="nav-link nav-link--compact text-sm ${fn:contains(uri, '/login')  ? 'nav-link--active' : ''}">LOG IN</a>
+                        <a href="${ctx}/signup" class="nav-link nav-link--compact text-sm ${fn:contains(uri, '/signup') ? 'nav-link--active' : ''}">SIGN UP</a>
+                    </div>
+                </c:otherwise>
+            </c:choose>
+
+        </div>
+
+    </div>
+</nav>
+
+<c:if test="${navRankGainAnim}">
+<script>
+window.__NAV_RANK_GAIN__ = {
+  fromPct: ${empty navRankBarFromPct ? 0 : navRankBarFromPct},
+  toPct: ${empty navRankBarToPct ? 0 : navRankBarToPct},
+  fromExp: ${empty navRankExpFrom ? 0 : navRankExpFrom},
+  toExp: ${empty navRankExpTo ? 0 : navRankExpTo},
+  delta: ${empty navRankExpDeltaUi ? 0 : navRankExpDeltaUi}
+};
+</script>
+<script defer src="${ctx}/js/nav-rank-gain.js"></script>
+</c:if>
+
+<%@ include file="/WEB-INF/views/fragments/right-side-nav.jspf" %>
+
+<button type="button" class="game-bgm-toggle" id="gameBgmToggleBtn" aria-label="獄쏄퀗瑗???툢 ??용┛" title="獄쏄퀗瑗???툢"><i class="fas fa-music"></i></button>
+<form method="get" action="${ctx}/boards/search" class="nav-global-search nav-global-search--dock hidden lg:inline-flex" role="search" aria-label="????野꺜??>
+    <input type="hidden" name="scope" value="all" />
+    <input type="search" name="q" class="nav-global-search__input" placeholder="????野꺜?? value="<c:out value='${param.q}'/>" autocomplete="off" />
+    <button type="submit" class="nav-global-search__btn" aria-label="野꺜??>
+        <i class="fas fa-magnifying-glass"></i>
+    </button>
+</form>
+<div id="globalBgmSlot" class="unitx-bgm-dock"></div>
+
+<script>
+(function () {
+    var form = document.querySelector('.nav-global-search');
+    if (!form) return;
+
+    var input = form.querySelector('.nav-global-search__input');
+    var button = form.querySelector('.nav-global-search__btn');
+    if (!input || !button) return;
+    var openedAt = 0;
+
+    function openSearch() {
+        openedAt = Date.now();
+        form.classList.add('is-open');
+        requestAnimationFrame(function () {
+            input.focus();
+            if (input.value) {
+                var len = input.value.length;
+                input.setSelectionRange(len, len);
+            }
+        });
+    }
+
+    function closeSearch() {
+        if ((input.value || '').trim()) return;
+        form.classList.remove('is-open');
+    }
+
+    function isOpen() {
+        return form.classList.contains('is-open');
+    }
+
+    if ((input.value || '').trim()) {
+        form.classList.add('is-open');
+    }
+
+    button.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!isOpen()) {
+            openSearch();
+            return;
+        }
+
+        if (!(input.value || '').trim()) {
+            input.focus();
+            return;
+        }
+
+        form.submit();
+    });
+
+    form.addEventListener('click', function (e) {
+        e.stopPropagation();
+    });
+
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            input.value = '';
+            closeSearch();
+            button.focus();
+            return;
+        }
+
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if ((input.value || '').trim()) {
+                form.submit();
+            }
+        }
+    });
+
+    document.addEventListener('pointerdown', function (e) {
+        if (!isOpen()) return;
+        if (Date.now() - openedAt < 250) return;
+        if (!form.contains(e.target)) {
+            closeSearch();
+        }
+    });
+})();
+</script>
+
+<div class="fanmap-modal" id="fanMapModal" aria-hidden="true">
+    <div class="fanmap-modal__dim" data-close-fan-map></div>
+    <div class="fanmap-modal__panel" role="dialog" aria-modal="true" aria-label="???브쑵猷?筌왖??>
+        <div class="fanmap-modal__head">
+            <div>
+                <div class="fanmap-title"><i class="fas fa-map-location-dot"></i> FAN DISTRIBUTION MAP</div>
+                <div class="fanmap-sub" id="fanMapScopeText">??뽰뒻 ?닌됲?????(???????????브쑵猷?</div>
+                <div class="fanmap-tools">
+                    <button type="button" class="chip is-on" data-range="7">7??/button>
+                    <button type="button" class="chip" data-range="30">30??/button>
+                    <button type="button" class="chip" data-range="0">?袁⑷퍥</button>
+                    <select id="fanMapTopN">
+                        <option value="0">?袁⑷퍥 癰귣떯由?/option>
+                        <option value="10">Top 10</option>
+                        <option value="20">Top 20</option>
+                    </select>
+                    <select id="fanMapHideZero">
+                        <option value="true" selected>0筌????</option>
+                        <option value="false">0筌???釉?/option>
+                    </select>
+                    <input id="fanMapSearch" placeholder="????野꺜?? />
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" class="fanmap-back" id="fanMapBackBtn" onclick="window.__fanMapBackToGu && window.__fanMapBackToGu()">
+                    <i class="fas fa-arrow-left"></i> ??뽰뒻 ?袁⑷퍥
+                </button>
+                <button type="button" class="fanmap-close" aria-label="??る┛" onclick="closeFanMapModal()">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="fanmap-canvas" id="fanMapCanvas" aria-label="筌왖??></div>
+        <div class="fanmap-split" aria-hidden="true">
+            <div class="fanmap-side">
+                <div class="font-orbitron text-[10px] tracking-[0.18em] text-stone-500">DETAIL</div>
+                <div class="mt-1.5 text-sm font-extrabold text-stone-800" id="fanMapDetailTitle">??뽰뒻</div>
+                <div class="fanmap-kpi">
+                    <div class="k">
+                        <div class="t">TOTAL FANS</div>
+                        <div class="v" id="fanMapTotal">-</div>
+                    </div>
+                    <div class="k">
+                        <div class="t">DELTA</div>
+                        <div class="v" id="fanMapDelta">-</div>
+                    </div>
+                </div>
+                <div class="fanmap-top">
+                    <div class="font-orbitron text-[10px] tracking-[0.18em] text-stone-500 mb-1.5">TOP</div>
+                    <div id="fanMapTopList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<c:if test="${not empty sessionScope.LOGIN_MEMBER}">
+<style>
+.mypage-trigger {
+    position: relative;
+    z-index: 10;
+    background: var(--card-strong, rgba(255,255,255,0.94));
+    border: 1px solid var(--card-border, rgba(232,164,184,0.22));
+    cursor: pointer;
+    font-family: "Orbitron", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-mid);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    padding: 6px 12px 6px 7px;
+    border-radius: 999px;
+    transition: color 200ms ease, background 200ms ease, border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+    overflow: hidden;
+    text-decoration: none;
+}
+.mypage-trigger--stacked {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+    padding: 3px 8px 4px 7px;
+    border-radius: 12px;
+    white-space: normal;
+    max-width: min(280px, min(42vw, calc(100vw - 200px)));
+    min-width: 0;
+    /* 疫꿸퀡??.mypage-trigger??overflow:hidden??野껋?肉뺟㎉?餓κ슘?틿XT ?얜㈇?꾤몴???롮뵬 ??됱뵠?袁⑹뜍??繹먥뫁議?癰귣똻??*/
+    overflow: visible;
+}
+.mypage-trigger__row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    min-width: 0;
+}
+.mypage-trigger::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(110deg, rgba(232,164,184,0.12) 0%, rgba(196,181,253,0.08) 100%);
+    opacity: 0;
+    transition: opacity 220ms ease;
+}
+.mypage-trigger:hover {
+    color: var(--text);
+    border-color: rgba(232,164,184,0.4);
+    box-shadow: 0 4px 16px rgba(232,164,184,0.12);
+    transform: translateY(-1px);
+}
+.mypage-trigger:hover::before { opacity: 1; }
+.mypage-trigger--stacked .mypage-trigger__avatar {
+    width: 17px;
+    height: 17px;
+    font-size: 7px;
+}
+.mypage-trigger__avatar {
+    position: relative;
+    z-index: 1;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ux-rose, #e8a4b8), var(--lv, #c4b5fd));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: #fff;
+    flex-shrink: 0;
+}
+.mypage-trigger--stacked .mypage-trigger__name {
+    font-size: 11px;
+    line-height: 1.15;
+}
+.mypage-trigger__name {
+    position: relative;
+    z-index: 1;
+    font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+.mypage-trigger__chevron {
+    position: relative;
+    z-index: 1;
+    font-size: 7px;
+    opacity: 0.5;
+    transition: transform 250ms ease, opacity 200ms ease;
+}
+.mypage-trigger:hover .mypage-trigger__chevron {
+    transform: rotate(180deg);
+    opacity: 0.85;
+}
+.mypage-trigger--stacked .mypage-trigger__chevron {
+    font-size: 6px;
+}
+.mypage-trigger--stacked .member-rank-pill {
+    padding: 1px 6px;
+    font-size: 8px;
+    max-width: 100px;
+    letter-spacing: 0.04em;
+}
+.member-rank-pill {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-family: "Orbitron", sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: rgba(91, 33, 182, 0.95);
+    background: linear-gradient(135deg, rgba(196, 181, 253, 0.45), rgba(232, 164, 184, 0.35));
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    line-height: 1.2;
+}
+.nav-user-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    min-width: 0;
+    max-width: 100%;
+    overflow: visible;
+}
+.member-rank-expbar-wrap {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.member-rank-expbar {
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(139, 92, 246, 0.16);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.45);
+}
+.member-rank-expbar__fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #a78bfa, #c4b5fd 45%, #f0abfc);
+    transition: width 0.35s ease;
+    min-width: 0;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.45), inset 0 0 0 1px rgba(255,255,255,0.22);
+}
+.member-rank-expbar__meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    flex-wrap: nowrap;
+    margin-top: 0;
+    min-width: 0;
+    width: 100%;
+    overflow: hidden;
+    font-family: "Orbitron", sans-serif;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+    color: rgba(91, 33, 182, 0.75);
+}
+.member-rank-expbar__next {
+    opacity: 0.88;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.member-rank-expbar__gap { flex-shrink: 0; color: rgba(68, 64, 60, 0.65); font-weight: 800; white-space: nowrap; }
+.member-rank-exp-line {
+    text-align: right;
+    margin-bottom: 0;
+    font-family: "Orbitron", sans-serif;
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    color: rgba(91, 33, 182, 0.92);
+}
+.member-rank-exp-line__n { font-variant-numeric: tabular-nums; }
+.member-rank-exp-line__s { opacity: 0.75; font-weight: 700; margin-left: 2px; }
+.member-rank-exp-line.flash-out {
+    animation: navExpLineBlink 0.45s ease-in-out 3, navExpLineHide 0.55s ease 1.65s forwards;
+}
+@keyframes navExpLineBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+}
+@keyframes navExpLineHide {
+    to {
+        opacity: 0;
+        max-height: 0;
+        margin-bottom: 0;
+        overflow: hidden;
+    }
+}
+.nav-rank-gain-pop {
+    position: absolute;
+    right: 0;
+    top: -4px;
+    transform: translateY(-100%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    pointer-events: none;
+    z-index: 30;
+    animation: navRankPopIn 0.5s cubic-bezier(.23, 1, .32, 1) both;
+}
+.nav-rank-gain-pop.is-out { animation: navRankPopOut 0.55s ease forwards; }
+.nav-rank-gain-pop__delta {
+    font-family: "Orbitron", sans-serif;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    color: #6d28d9;
+    text-shadow: 0 0 18px rgba(124, 58, 237, 0.45);
+}
+.nav-rank-gain-pop__exp {
+    font-family: "Orbitron", sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: rgba(68, 64, 60, 0.72);
+}
+@keyframes navRankPopIn {
+    from { opacity: 0; transform: translateY(calc(-100% + 8px)) scale(0.96); }
+    to { opacity: 1; transform: translateY(-100%) scale(1); }
+}
+@keyframes navRankPopOut {
+    to { opacity: 0; transform: translateY(calc(-100% - 6px)); }
+}
+</style>
+</c:if>
+
+<script defer src="<c:url value='/js/unitx-effects-toggle.js'/>"></script>
+<script defer src="<c:url value='/js/chat-widget.js?v=20260422b'/>"></script>
+<script defer src="<c:url value='/js/chatroom-widget.js?v=20260422b'/>"></script>

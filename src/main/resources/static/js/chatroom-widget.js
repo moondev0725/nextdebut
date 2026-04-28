@@ -1,8 +1,38 @@
 (function () {
+  /* topnav defer + 페이지 하단 동기 로드가 겹치면 위젯·이벤트가 이중 등록될 수 있음 */
+  if (typeof window !== 'undefined'
+      && window.__UNITX_CHATROOM_WIDGET_INITIALIZED
+      && typeof window.toggleChatroomWidget === 'function'
+      && document.getElementById('cr-box')) return;
+
   const crOpenKey = 'cr_open';
   'use strict';
 
-  const nickname = document.querySelector('.mypage-trigger__name')?.textContent?.trim() || '익명';
+  function ensureGuestNickname() {
+    try {
+      var saved = sessionStorage.getItem('cr_guest_nickname');
+      if (saved && String(saved).trim()) return String(saved).trim();
+    } catch (e0) {}
+    var made = '게스트' + Math.floor(1000 + Math.random() * 9000);
+    try { sessionStorage.setItem('cr_guest_nickname', made); } catch (e1) {}
+    return made;
+  }
+
+  function getCrNickname() {
+    try {
+      if (typeof window !== 'undefined' && window.NDX_GAME_CONFIG && window.NDX_GAME_CONFIG.chatMemberName != null) {
+        var cn = String(window.NDX_GAME_CONFIG.chatMemberName || '').trim();
+        if (cn) return cn;
+      }
+    } catch (e0) {}
+    try {
+      var el = document.querySelector('.mypage-trigger__name');
+      var t = el ? String(el.textContent || '').replace(/\s+/g, ' ').trim() : '';
+      if (t) return t;
+    } catch (e1) {}
+    return ensureGuestNickname();
+  }
+
   const ctxBase = (typeof window !== 'undefined' && window.__UNITX_CTX !== undefined) ? window.__UNITX_CTX : '';
   function unitxLoginUrl() {
     return ctxBase + '/login?redirect=' + encodeURIComponent(location.pathname + location.search);
@@ -114,8 +144,9 @@
   style.textContent = `
     /* ── 외곽 박스 ── */
     #cr-box {
-      position:fixed; z-index:9998;
-      width:580px;
+        position:fixed; z-index:20020;
+        width:min(580px, calc(100vw - 16px));
+        max-height:calc(100vh - 16px);
       background:rgba(15,8,30,0.60);
       backdrop-filter:blur(20px) saturate(1.6);
       -webkit-backdrop-filter:blur(20px) saturate(1.6);
@@ -482,6 +513,7 @@
   let joinPending = false;
   let currentCreatorNickname = '';
   let roomParticipants = [];
+  let lastToggleAt = 0;
   const CR_SECRETS_KEY = 'cr_room_secrets';
   // 방별 메시지 캐시: roomId → innerHTML 문자열 (나가기 안 눌러도 대화내용 유지)
   let roomMessages  = {};
@@ -546,10 +578,20 @@
 
   // ── 토글 버튼 반환 ──
   function getChatroomBtn() {
+    const trayBtn = document.querySelector('.game-floating-chat-tray #chatroom-toggle-btn');
+    if (trayBtn) return trayBtn;
+
+    const localBtn = document.getElementById('chatroom-toggle-btn');
+    if (localBtn) return localBtn;
+
     const sideNavBtn = document.querySelector('.hero-side-nav button[onclick*="toggleChatroomWidget"]');
     if (sideNavBtn) return sideNavBtn;
 
-    return document.getElementById('chatroom-toggle-btn');
+    return null;
+  }
+
+  function isGameChatTrayButton(btn) {
+    return !!(btn && btn.closest && btn.closest('.game-floating-chat-tray'));
   }
 
   /**
@@ -557,9 +599,17 @@
    * position:fixed + getBoundingClientRect() → scrollY 보정 없이 스크롤 무관하게 정확
    * 복원 시에는 반드시 rAF 2중첩 안에서 호출
    */
+  function getChatroomBoxMetrics() {
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
+    return {
+      boxWidth: Math.min(580, Math.max(320, vw - 16)),
+      boxHeight: Math.min(420, Math.max(280, vh - 16))
+    };
+  }
+
   function calcPositionFromBtn() {
-    const boxWidth  = 580;
-    const boxHeight = 420;
+    const { boxWidth, boxHeight } = getChatroomBoxMetrics();
     const gap       = 8;
     const margin    = 8;
     const vw        = document.documentElement.clientWidth;
@@ -568,11 +618,30 @@
     // hero-side-nav: 버튼이 오른쪽 세로 배치 → 모달을 버튼 왼쪽에 붙임
     const btn = getChatroomBtn();
     if (!btn) return null;
+    if (isGameChatTrayButton(btn)) {
+      const rect = btn.getBoundingClientRect();
+      let top = rect.bottom + gap;
+      let left = rect.right - boxWidth;
+      const maxLeft = Math.max(margin, vw - boxWidth - margin);
+      const maxTop = Math.max(margin, vh - boxHeight - margin);
+      if (left < margin) left = margin;
+      if (left > maxLeft) left = maxLeft;
+      if (top < margin) top = margin;
+      if (top > maxTop) top = Math.max(margin, rect.top - boxHeight - gap);
+      return { mode: 'free', top, left };
+    }
     const sideNav = btn.closest('.hero-side-nav');
     if (sideNav) {
       const navRect = sideNav.getBoundingClientRect();
-      const right = Math.max(margin, Math.round(navRect ? (vw - navRect.left + gap) : 68));
-      return { mode: 'side-nav', right };
+      let left = navRect ? (navRect.right + gap) : (vw - boxWidth - 16);
+      let top = navRect ? navRect.top : margin;
+      const maxLeft = Math.max(margin, vw - boxWidth - margin);
+      const maxTop = Math.max(margin, vh - boxHeight - margin);
+      if (left < margin) left = margin;
+      if (left > maxLeft) left = maxLeft;
+      if (top < margin) top = margin;
+      if (top > maxTop) top = maxTop;
+      return { mode: 'free', top, left };
     }
     const rect = btn.getBoundingClientRect();
 
@@ -592,8 +661,7 @@
   }
 
   function clampCrPosition(top, left) {
-    const boxWidth = 580;
-    const boxHeight = 420;
+    const { boxWidth, boxHeight } = getChatroomBoxMetrics();
     const margin = 8;
     const vw = document.documentElement.clientWidth;
     const vh = document.documentElement.clientHeight;
@@ -619,21 +687,13 @@
                   || document.getElementById('chat-toggle-btn-global');
     if (!chatBtn) return false;
 
-    // 비로그인 여부: nickname이 없거나 '익명'이면 로그인 페이지로 이동
-    const isGuest = !nickname || nickname === '익명';
-
     const btn      = document.createElement('button');
     const chatTray = document.querySelector('.game-floating-chat-tray');
     const dayBar   = document.querySelector('.day-bar');
     btn.id = 'chatroom-toggle-btn';
     btn.innerHTML = '<i class="fas fa-message"></i>';
-    btn.title = isGuest ? '채팅방 (로그인 필요)' : '채팅방';
+    btn.title = '채팅방';
     btn.onclick = () => {
-      if (isGuest) {
-        alert('로그인해야 이용이 가능합니다.');
-        location.href = unitxLoginUrl();
-        return;
-      }
       toggleChatroomWidget();
     };
     btn.style.cssText = `
@@ -694,7 +754,7 @@
   function connect() {
     ws = new WebSocket(wsChatroomUrl());
     ws.onopen = () => {
-      ws.send(JSON.stringify({ type: 'INIT', nickname }));
+      ws.send(JSON.stringify({ type: 'INIT', nickname: getCrNickname() }));
       restoreCrState();
     };
     ws.onmessage = (e) => {
@@ -983,7 +1043,7 @@
 
   // ── 메시지 추가 ──
   function appendChatMsg(msg, skipSave) {
-    const isMe = msg.nickname === nickname;
+    const isMe = msg.nickname === getCrNickname();
     const el   = document.createElement('div');
     el.className = `cr-msg ${isMe ? 'me' : 'other'}`;
     el.innerHTML = isMe
@@ -1033,14 +1093,14 @@
       return;
     }
     row.style.display = 'block';
-    const isHost = nickname === currentCreatorNickname;
+    const isHost = getCrNickname() === currentCreatorNickname;
     if (hostBadge) hostBadge.style.display = isHost ? 'inline-block' : 'none';
     if (!roomParticipants.length) {
       list.innerHTML = '';
       return;
     }
     list.innerHTML = roomParticipants.map(p => {
-      const isMe = p === nickname;
+      const isMe = p === getCrNickname();
       const canKick = isHost && !isMe && p !== currentCreatorNickname;
       const kickBtn = canKick
         ? `<button type="button" class="cr-kick" data-kick="${escapeAttr(p)}">추방</button>`
@@ -1090,7 +1150,7 @@
    * 모달 위치는 rAF 2중첩으로 레이아웃 확정 후 계산
    */
   function restoreCrState() {
-    if (!nickname || nickname === '익명') {
+    if (getCrNickname() === '익명') {
       closeChatroomOnLogout();
       return;
     }
@@ -1142,14 +1202,12 @@
 
   // ── 토글 ──
   window.toggleChatroomWidget = function () {
-    // 비로그인이면 alert 후 로그인 페이지로 이동 (메인 hero-side-nav 버튼 포함 모든 진입점 처리)
-    if (!nickname || nickname === '익명') {
-      alert('로그인해야 이용이 가능합니다.');
-      location.href = unitxLoginUrl();
-      return;
-    }
+    const now = Date.now();
+    if (now - lastToggleAt < 260) return;
+    lastToggleAt = now;
 
     const box = document.getElementById('cr-box');
+    if (!box) return;
 
     if (box.style.display === 'flex') {
       box.style.display = 'none';
@@ -1166,9 +1224,21 @@
       sessionStorage.removeItem('chat_pos_left');
     }
 
-    const pos = calcPositionFromBtn();
-    if (!pos) return;
+    let pos = calcPositionFromBtn();
+    if (!pos) {
+      const vw = document.documentElement.clientWidth;
+      const vh = document.documentElement.clientHeight;
+      const boxWidth = 580;
+      const boxHeight = 420;
+      pos = {
+        mode: 'free',
+        top: Math.max(8, vh - boxHeight - 24),
+        left: Math.max(8, vw - boxWidth - 16)
+      };
+    }
 
+    sessionStorage.removeItem('cr_pos_top');
+    sessionStorage.removeItem('cr_pos_left');
     applyBoxPos(pos);
     sessionStorage.setItem(crOpenKey, '1');
     saveCrState();
@@ -1288,7 +1358,7 @@
   function restoreBoxOpen() {
     if (sessionStorage.getItem('chat_open') === '1') return;
     if (sessionStorage.getItem(crOpenKey) !== '1') return;
-    if (!nickname || nickname === '익명') {
+    if (getCrNickname() === '익명') {
       sessionStorage.setItem(crOpenKey, '0');
       const box = document.getElementById('cr-box');
       if (box) box.style.display = 'none';
@@ -1374,7 +1444,11 @@
     applyBoxPos(pos);
   }
 
-  connect();
+  try {
+    connect();
+  } catch (eConn) {
+    try { console.warn('[chatroom-widget] connect bootstrap failed:', eConn); } catch (_) {}
+  }
 
   // ── 초기화 ──
   function init() {
@@ -1400,5 +1474,7 @@
   } else {
     init();
   }
+
+  if (typeof window !== 'undefined') window.__UNITX_CHATROOM_WIDGET_INITIALIZED = true;
 
 })();

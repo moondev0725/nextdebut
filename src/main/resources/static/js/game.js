@@ -327,13 +327,33 @@ function ndxParseTrainingDayFromPhase(phase){
 /** 현재 훈련 일차(페이즈 동기). 채팅으로 페이즈가 바뀐 뒤에도 막대가 맞게 */
 function ndxTrainingDayNumForBars(){
   try{
+    /* 런타임 currentPhase 우선(채팅으로 진행된 일차). 비어 있으면 JSP 서버값 */
     var ph = '';
-    if (typeof currentPhase !== 'undefined' && currentPhase) ph = String(currentPhase);
+    if (typeof currentPhase !== 'undefined' && String(currentPhase).trim()) ph = String(currentPhase);
     else if (typeof NDX_GAME_CONFIG !== 'undefined' && NDX_GAME_CONFIG && NDX_GAME_CONFIG.phase) ph = String(NDX_GAME_CONFIG.phase || '');
     return ndxParseTrainingDayFromPhase(ph);
   }catch(e){
     return 1;
   }
+}
+
+function ndxSyncGameConfigPhaseFromRuntime(){
+  try{
+    if(typeof NDX_GAME_CONFIG !== 'undefined' && NDX_GAME_CONFIG && typeof currentPhase !== 'undefined'){
+      NDX_GAME_CONFIG.phase = String(currentPhase || '');
+    }
+  }catch(e){}
+}
+
+/** 서버 GameController가 내려주는 훈련 캘린더 일차(1~84). JSP·play-state에 trainingCalendarDay. 없을 때만 phase 파싱. */
+function ndxTrainingCalendarDayForPanel(){
+  try{
+    if (typeof NDX_GAME_CONFIG !== 'undefined' && NDX_GAME_CONFIG && NDX_GAME_CONFIG.trainingCalendarDay != null){
+      var t = Number(NDX_GAME_CONFIG.trainingCalendarDay);
+      if (isFinite(t) && t >= 1 && t <= 84) return Math.round(t);
+    }
+  }catch(e){}
+  return ndxTrainingDayNumForBars();
 }
 
 /** 일차 베이스: 1일차 0%, 이후 하루마다 +1%p */
@@ -1558,8 +1578,10 @@ function sendGameChat(){
       });
     });
 
-    // dummy progress: data-pct 기반 (필요 시 서버 값으로 교체 가능)
+    /* AI MONITOR 막대(.ai-cond-meter)는 updateConditionBarsFromRoster / 패널 뷰가 전담.
+       여기서 parseInt로 덮으면 팀워크 소수·집중/컨디션 표시가 깨질 수 있음 */
     root.querySelectorAll('.status-bar[data-pct]').forEach(function(bar){
+      if(bar.classList && bar.classList.contains('ai-cond-meter')) return;
       var pct=parseInt(bar.getAttribute('data-pct'),10);
       if(!isFinite(pct)) pct=0;
       if(pct<0) pct=0; if(pct>100) pct=100;
@@ -1574,11 +1596,19 @@ function sendGameChat(){
 })();
 
 // 초기 로딩 시에도 컨디션 바를 로스터 기준으로 맞춘다
+function ndxApplyInitialConditionBarsFromRoster(){
+  try{
+    if(typeof window.__initialRoster !== 'undefined' && window.__initialRoster && window.__initialRoster.length){
+      updateConditionBarsFromRoster(window.__initialRoster);
+    }
+  }catch(e){}
+}
 try{
-  if(typeof window.__initialRoster !== 'undefined' && window.__initialRoster && window.__initialRoster.length){
-    updateConditionBarsFromRoster(window.__initialRoster);
-  }
+  ndxApplyInitialConditionBarsFromRoster();
 }catch(e){}
+document.addEventListener('DOMContentLoaded', function(){
+  try{ ndxApplyInitialConditionBarsFromRoster(); }catch(e2){}
+});
 
 function escapeChatHtml(s){
   return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -3432,6 +3462,7 @@ function applyAfterChatResponse(data){
     try{ revertGameChatMiniTurnCounter(); }catch(e0){}
     nextPhaseVal=data.nextPhase;
     currentPhase=data.nextPhase || currentPhase;
+    ndxSyncGameConfigPhaseFromRuntime();
     persistResumeState(currentPhase);
     updateRosterStatusMapFromResult(data);
     try{ applyChatRosterHud(data); }catch(e){}
@@ -3478,6 +3509,7 @@ function applyAfterChatResponse(data){
 
   nextPhaseVal=data.nextPhase;
   currentPhase=data.nextPhase || currentPhase;
+  ndxSyncGameConfigPhaseFromRuntime();
   persistResumeState(currentPhase);
   updateRosterStatusMapFromResult(data);
   try{ applyChatRosterHud(data); }catch(e){}
@@ -4351,16 +4383,19 @@ function updateConditionBarsFromRoster(roster){
   var p = computeConditionPcts(roster);
   window.__mapEventBarBonus = window.__mapEventBarBonus || { focus: 0, stress: 0, team: 0, condition: 0 };
   var bonus = window.__mapEventBarBonus;
-  /* 스트레스·팀워크 막대: 훈련 일차 베이스(스트레스 0→하루+1%, 팀워크 100→하루−0.5%) + 이벤트·채팅 보너스. 집중·컨디션은 로스터 기반 */
+  /* 스트레스·팀워크 막대: 훈련 일차 베이스(스트레스 0→하루+1%, 팀워크 100→하루−0.5%) + 이벤트·채팅 보너스. 집중·컨디션은 기본 로스터 기반(1일차는 시작 스냅샷 고정) */
   var stressBase = ndxStressDailyBasePct();
   var teamBase = ndxTeamDailyBasePct();
-  var pCross = { focus: p.focus, stress: stressBase, team: teamBase, condition: p.condition };
+  var calDay = ndxTrainingCalendarDayForPanel();
+  var focusForBar = calDay === 1 ? 50 : p.focus;
+  var conditionForBar = calDay === 1 ? 100 : p.condition;
+  var pCross = { focus: focusForBar, stress: stressBase, team: teamBase, condition: conditionForBar };
   var cross = computeVitalityCrossLayer(pCross, bonus);
   var stress = clampPct(stressBase + (Number(bonus.stress) || 0) + cross.addStress);
 
-  var focus = clampPct(p.focus + (Number(bonus.focus) || 0) + cross.dFocus);
+  var focus = clampPct(focusForBar + (Number(bonus.focus) || 0) + cross.dFocus);
   var team = clampTeamWorkMeterPct(teamBase + (Number(bonus.team) || 0));
-  var condition = clampPct(p.condition + (Number(bonus.condition) || 0) + cross.dCond);
+  var condition = clampPct(conditionForBar + (Number(bonus.condition) || 0) + cross.dCond);
   var progress = 0;
   try{
     if(typeof MONTH_PROGRESS_PCT === 'number'){
@@ -4439,7 +4474,10 @@ function getConditionForGoals(){
   var bonus = window.__mapEventBarBonus || {};
   var stressBase = typeof ndxStressDailyBasePct === 'function' ? ndxStressDailyBasePct() : 0;
   var teamBase = typeof ndxTeamDailyBasePct === 'function' ? ndxTeamDailyBasePct() : 100;
-  var pCross = { focus: p.focus, stress: stressBase, team: teamBase, condition: p.condition };
+  var calDay = typeof ndxTrainingCalendarDayForPanel === 'function' ? ndxTrainingCalendarDayForPanel() : 1;
+  var focusForBar = calDay === 1 ? 50 : p.focus;
+  var conditionForBar = calDay === 1 ? 100 : p.condition;
+  var pCross = { focus: focusForBar, stress: stressBase, team: teamBase, condition: conditionForBar };
   var cross =
     typeof computeVitalityCrossLayer === 'function'
       ? computeVitalityCrossLayer(pCross, bonus)
@@ -4449,8 +4487,8 @@ function getConditionForGoals(){
       ? clampTeamWorkMeterPct(teamBase + (Number(bonus.team) || 0))
       : clampPct(teamBase + (Number(bonus.team) || 0)),
     stress: clampPct(stressBase + (Number(bonus.stress) || 0) + cross.addStress),
-    condition: clampPct(p.condition + (Number(bonus.condition) || 0) + cross.dCond),
-    focus: clampPct(p.focus + (Number(bonus.focus) || 0) + cross.dFocus)
+    condition: clampPct(conditionForBar + (Number(bonus.condition) || 0) + cross.dCond),
+    focus: clampPct(focusForBar + (Number(bonus.focus) || 0) + cross.dFocus)
   };
 }
 
@@ -5042,6 +5080,9 @@ function applyPlayStatePayload(data){
   cfg.teamTotalStat = data.teamTotal;
   cfg.myLiveRank = data.myLiveRank;
   cfg.monthProgressPct = data.monthProgressPct;
+  if (data.trainingCalendarDay != null) {
+    cfg.trainingCalendarDay = Number(data.trainingCalendarDay);
+  }
   cfg.chemistry = data.chemistry || cfg.chemistry;
   cfg.appliedItemCount = data.appliedItemCount != null ? data.appliedItemCount : cfg.appliedItemCount;
   cfg.rosterStats = rosterJsonToUpdateStatsArray(data.roster);
@@ -5058,6 +5099,7 @@ function applyPlayStatePayload(data){
   }catch(eIm){}
 
   currentPhase = String(data.phase || '');
+  ndxSyncGameConfigPhaseFromRuntime();
   nextPhaseVal = currentPhase;
   persistResumeState(currentPhase);
   TEAM_TOTAL_STAT = Number(data.teamTotal) || 0;
@@ -5094,9 +5136,15 @@ function applyPlayStatePayload(data){
     if(data.isDebutEval) dock.setAttribute('data-is-debut', '1');
     else dock.removeAttribute('data-is-debut');
   }
-  var badges = document.querySelectorAll('.game-chat-dock__badge');
-  if(badges[0] && data.planDayReverse != null) badges[0].textContent = 'DAY ' + data.planDayReverse;
-  if(badges[1] && data.myLiveRank != null) badges[1].textContent = '내 랭킹 ' + data.myLiveRank + '위';
+  var progressLabel = document.getElementById('gameChatDockProgressBadge');
+  var progressFill = document.getElementById('gameChatDockProgressFill');
+  if(progressLabel || progressFill){
+    var progressPct = typeof effectiveMonthProgressPct === 'function'
+      ? effectiveMonthProgressPct(Number(data.monthProgressPct) || 0)
+      : Math.max(0, Math.min(100, Number(data.monthProgressPct) || 0));
+    if(progressLabel) progressLabel.textContent = '진행도 ' + progressPct + '%';
+    if(progressFill) progressFill.style.width = progressPct + '%';
+  }
 
   var progBar = document.querySelector('.ai-cond-meter[data-key="progress"]');
   if(progBar){
@@ -5349,6 +5397,10 @@ function refreshProgramProgressDisplay(){
     if(pv) pv.textContent = eff + '%';
     if(pf) pf.style.width = eff + '%';
   }
+  var dockProgressBadge = document.getElementById('gameChatDockProgressBadge');
+  if(dockProgressBadge) dockProgressBadge.textContent = '진행도 ' + eff + '%';
+  var dockProgressFill = document.getElementById('gameChatDockProgressFill');
+  if(dockProgressFill) dockProgressFill.style.width = eff + '%';
   var df = document.getElementById('debutProgressFill');
   var dl = document.getElementById('debutProgressPctLabel');
   if(df) df.style.width = eff + '%';
@@ -5367,6 +5419,41 @@ function refreshProgramProgressDisplay(){
     if(typeof updateGoals === 'function') updateGoals(curTotal, comboCur, typeof currentPhase !== 'undefined' ? currentPhase : null);
   }catch(eG){}
 }
+
+(function bindGameHudChatButtons(){
+  function openWithRetry(globalName, pendingMsg){
+    var fn = window[globalName];
+    if(typeof fn === 'function'){
+      try{ fn(); return true; }catch(e){ return false; }
+    }
+    var retry = 0;
+    var maxRetry = 12;
+    var timer = setInterval(function(){
+      retry++;
+      var f = window[globalName];
+      if(typeof f === 'function'){
+        clearInterval(timer);
+        try{ f(); }catch(e2){}
+        return;
+      }
+      if(retry >= maxRetry){
+        clearInterval(timer);
+        if(typeof window.showToast === 'function'){
+          window.showToast(pendingMsg, 'warn', 2200);
+        }else{
+          alert(pendingMsg);
+        }
+      }
+    }, 180);
+    return true;
+  }
+  window.openAiChatWidget = function(){
+    return openWithRetry('toggleChatWidget', 'AI 챗봇을 아직 불러오는 중입니다. 잠시 후 다시 시도해 주세요.');
+  };
+  window.openRealtimeChatroom = function(){
+    return openWithRetry('toggleChatroomWidget', '실시간 채팅방을 아직 불러오는 중입니다. 잠시 후 다시 시도해 주세요.');
+  };
+})();
 function setStatGrowth2xEnabled(on){
   __ndxStatGrowth2xOn = !!on;
   try{

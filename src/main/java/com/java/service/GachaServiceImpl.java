@@ -44,6 +44,7 @@ public class GachaServiceImpl implements GachaService {
 	private final MarketService marketService;
 	private final MemberRepository memberRepository;
 	private final TraineeGroupService traineeGroupService;
+	private final TraineeUnlockService traineeUnlockService;
 
 	@PersistenceContext
 	private EntityManager em;
@@ -51,7 +52,8 @@ public class GachaServiceImpl implements GachaService {
 	public GachaServiceImpl(TraineeRepository traineeRepository, MyTraineeRepository myTraineeRepository,
 			GachaPullLogRepository gachaPullLogRepository, BoardRepository boardRepository,
 			CastingSpotBuffRepository castingSpotBuffRepository, MarketService marketService,
-			MemberRepository memberRepository, TraineeGroupService traineeGroupService) {
+			MemberRepository memberRepository, TraineeGroupService traineeGroupService,
+			TraineeUnlockService traineeUnlockService) {
 		this.traineeRepository = traineeRepository;
 		this.myTraineeRepository = myTraineeRepository;
 		this.gachaPullLogRepository = gachaPullLogRepository;
@@ -60,6 +62,7 @@ public class GachaServiceImpl implements GachaService {
 		this.marketService = marketService;
 		this.memberRepository = memberRepository;
 		this.traineeGroupService = traineeGroupService;
+		this.traineeUnlockService = traineeUnlockService;
 	}
 
 	@Override
@@ -299,10 +302,12 @@ public class GachaServiceImpl implements GachaService {
 
 	private Map<Grade, List<Trainee>> buildGradePools(Long memberId) {
 		int unlockMask = resolveUnlockMask(memberId);
+		int bestScore = traineeUnlockService.resolveBestScore(memberId);
 		Map<Grade, List<Trainee>> map = new HashMap<>();
 		for (Grade g : Grade.values()) {
 			List<Trainee> list = traineeRepository.findByGrade(g).stream()
 					.filter(t -> traineeGroupService.isUnlocked(unlockMask, traineeGroupService.resolveTraineeGroup(t.getName())))
+					.filter(t -> traineeUnlockService.isUnlocked(t, bestScore))
 					.toList();
 			map.put(g, list == null ? List.of() : list);
 		}

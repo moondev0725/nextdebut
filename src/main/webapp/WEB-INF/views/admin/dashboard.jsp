@@ -927,17 +927,17 @@
           </div>
         </div>
         <div class="ops-card" style="margin-bottom:12px;">
-          <div class="ops-title">채팅 선택 ML 통계</div>
+          <div class="ops-title">채팅 선택 ML 예측 통계</div>
           <div class="ops-metric">
-            <div class="metric"><div class="k">총 샘플</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.total}" pattern="#,##0"/></div></div>
-            <div class="metric"><div class="k">ML 건수</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.ml}" pattern="#,##0"/></div></div>
-            <div class="metric"><div class="k">RULE 건수</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.rule}" pattern="#,##0"/></div></div>
-            <div class="metric"><div class="k">ML 적용률</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.mlRate}" pattern="#,##0.0"/>%</div></div>
-            <div class="metric"><div class="k">Fallback 비율</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.fallbackRate}" pattern="#,##0.0"/>%</div></div>
-            <div class="metric"><div class="k">평균 신뢰도</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.avgConfidence}" pattern="#,##0.000"/></div></div>
+            <div class="metric"><div class="k">총 평가 샘플</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.total}" pattern="#,##0"/></div></div>
+            <div class="metric"><div class="k">ML 예측 건수</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.ml}" pattern="#,##0"/></div></div>
+            <div class="metric"><div class="k">미예측 건수</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.rule}" pattern="#,##0"/></div></div>
+            <div class="metric"><div class="k">ML 예측률</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.mlRate}" pattern="#,##0.0"/>%</div></div>
+            <div class="metric"><div class="k">미예측 비율</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.fallbackRate}" pattern="#,##0.0"/>%</div></div>
+            <div class="metric"><div class="k">평균 예측 신뢰도</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.avgConfidence}" pattern="#,##0.000"/></div></div>
           </div>
           <div class="hint" style="margin-top:8px;">
-            로그 기준: <code>app.ml.training-log-path</code>
+            누적 예측 로그 기준: <code>app.ml.training-log-path</code>
             <a class="btn" style="margin-left:8px;" href="${ctx}/admin/game-stats">상세 보기</a>
           </div>
         </div>

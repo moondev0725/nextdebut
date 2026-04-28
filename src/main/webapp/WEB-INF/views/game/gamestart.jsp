@@ -13,7 +13,7 @@
 <title>NEXT DEBUT — GAME</title>
 <%@ include file="/WEB-INF/views/fragments/head-common.jspf" %>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${ctx}/css/game.css?v=20260421_targeting_modal_totalavg_v1">
+<link rel="stylesheet" href="${ctx}/css/game.css?v=20260427_chat_tray_above_fan_kpi">
 <link rel="stylesheet" href="${ctx}/css/sim-status-presentation.css?v=20260403_sim_ui">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -27,6 +27,12 @@
   <div class="lbar-wrap"><div class="lbar"></div></div>
   <div class="lpct" id="lpct">0%</div>
 </div>
+<script>
+try{
+  var __lov=document.getElementById('lov');
+  if(__lov) __lov.style.pointerEvents='none';
+}catch(e){}
+</script>
 
 <div id="gameToast" class="game-toast" role="status" aria-live="polite"></div>
 
@@ -276,12 +282,9 @@
     <span class="fans-delta-pop" id="fansHudDelta" aria-hidden="true"></span>
   </div>
 
-  <c:if test="${not empty sessionScope.LOGIN_MEMBER}">
-  <div class="game-hud-tools game-floating-chat-tray" role="group" aria-label="AI 챗봇 및 실시간 채팅방">
-    <button type="button" id="chat-toggle-btn" class="game-hud-tool-btn" onclick="toggleChatWidget()" title="AI 챗봇" aria-label="AI 챗봇"><i class="fas fa-robot"></i></button>
-    <button type="button" id="chatroom-toggle-btn" class="game-hud-tool-btn" onclick="toggleChatroomWidget()" title="실시간 채팅방" aria-label="실시간 채팅방"><i class="fas fa-message"></i></button>
+  <div class="game-hud-tools game-floating-chat-tray" role="group" aria-label="실시간 채팅방">
+    <button type="button" id="chatroom-toggle-btn" class="game-hud-tool-btn" data-chat-action="room" title="실시간 채팅방" aria-label="실시간 채팅방" onclick="return window.openRealtimeChatroom ? window.openRealtimeChatroom() : (window.toggleChatroomWidget ? (window.toggleChatroomWidget(), false) : false);"><i class="fas fa-message"></i></button>
   </div>
-  </c:if>
 </div>
 
 <div class="game-fs-event" id="gameFullscreenEvent" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="gameFsEventTitle">
@@ -554,27 +557,12 @@
                       <c:otherwise>${scheduleDatePretty} · ${weekDayName} ${scheduleTimeLabel}</c:otherwise>
                     </c:choose>
                   </span>
-                  <span class="game-chat-dock__badge">DAY ${planDayReverse}</span>
-                  <span class="game-chat-dock__badge game-chat-dock__badge--rank">내 랭킹 ${myLiveRank}위</span>
-                  <c:if test="${not empty sessionScope.LOGIN_MEMBER and not empty memberRankLabel}">
-                  <span class="game-chat-dock__badge game-chat-dock__badge--exp" title="계정 누적 등급 경험치 · ${memberRankLabel}">
-                    EXP <strong>${memberRankExp}</strong>
-                  </span>
-                  </c:if>
                   <div class="game-chat-dock__actions day-save-actions">
-                    <button type="button" class="game-chat-dock__iconbtn" onclick="openGoalModal()" title="목표 보기" aria-label="목표 보기">
-                      목표보기
-                    </button>
                     <button type="button" class="game-chat-dock__iconbtn" onclick="openChemModal()" title="케미스트리 보기" aria-label="케미스트리 보기">
                       케미스트리보기
                     </button>
-                    <button type="button" class="save-btn save-btn--dock-secondary save-btn--schedule"
-                      onclick="openScheduleModal('${ctx}/game/run/${result.runId}/replay'); return false;"
-                      title="스케줄" aria-label="스케줄 열기" data-btn-bounce="true">
-                      <i class="fas fa-calendar-alt"></i><span>스케줄</span>
-                    </button>
                     <button type="button" class="save-btn save-btn--dock-secondary save-btn--debut"
-                      onclick="startPageTransition('${ctx}/game/run/${result.runId}/ending'); return false;"
+                      onclick="window.location.href='${ctx}/game/run/${result.runId}/ending'; return false;"
                       title="데뷔" aria-label="데뷔 화면으로" data-btn-bounce="true">
                       <i class="fas fa-gem"></i><span>데뷔</span>
                     </button>
@@ -586,25 +574,13 @@
                       <i class="fas fa-gear" aria-hidden="true"></i>
                     </button>
                   </div>
-                </div>
-                <div class="phone-topbar" aria-label="상단 상태 바">
-                  <button type="button" class="chat-bg-btn" id="chatBgPickBtn" aria-label="채팅 배경 사진 선택">
-                    <i class="fas fa-image"></i>
-                  </button>
-                  <button type="button" class="chat-bg-clear-btn" id="chatBgClearBtn" aria-label="채팅 배경 제거">
-                    <i class="fas fa-xmark"></i>
-                  </button>
-                  <div class="phone-status" aria-label="휴대폰 상태 표시">
-                    <span class="phone-status__time" id="phoneTime">00:00</span>
-                    <span class="phone-battery" aria-label="배터리 100%">
-                      <span class="phone-battery__pct">100%</span>
-                      <span class="phone-battery__icon" aria-hidden="true"><span class="phone-battery__fill"></span></span>
-                    </span>
-                  </div>
+                  <span class="game-chat-dock__progress game-chat-dock__progress--right" id="gameChatDockProgressWrap" aria-label="프로그램 진행도">
+                    <span class="game-chat-dock__progress-label" id="gameChatDockProgressBadge">진행도 ${monthProgressPct}%</span>
+                    <span class="game-chat-dock__progress-track"><span class="game-chat-dock__progress-fill" id="gameChatDockProgressFill" style="width:${monthProgressPct}%"></span></span>
+                  </span>
                 </div>
               </div>
             </div>
-            <input type="file" id="chatBgFileInput" accept="image/*" style="display:none" />
         <div class="game-chat-log" id="gameChatLog">
           <c:choose>
             <c:when test="${not empty scene && not empty introDialogue}">
@@ -746,16 +722,16 @@
               <div id="ndxSimStatusLogLines"></div>
             </div>
 
-            <div class="status-bar ai-cond-meter" data-key="focus" data-pct="0" data-tone="safe">
+            <div class="status-bar ai-cond-meter" data-key="focus" data-pct="50" data-tone="safe">
               <div class="status-bar__row ai-cond-meter__row">
                 <div class="ai-cond-meter__headline">
                   <span class="ai-cond-meter__title"><span class="ai-cond-meter__ko">집중도</span> <span class="ai-cond-meter__en">Focus</span></span>
                   <button type="button" class="ai-cond-meter__help" data-cond-help="focus" aria-label="집중도 쉬운 설명" title="쉬운 설명"><i class="fas fa-circle-question" aria-hidden="true"></i></button>
                 </div>
-                <strong class="status-bar__val">0%</strong>
+                <strong class="status-bar__val">50%</strong>
                 <span class="ai-cond-meter__badge">[—]</span>
               </div>
-              <div class="status-bar__track"><span class="status-fill" style="width:0%"></span></div>
+              <div class="status-bar__track"><span class="status-fill" style="width:50%"></span></div>
               <p class="ai-cond-meter__comment" aria-live="polite"></p>
             </div>
             <div class="status-bar ai-cond-meter" data-key="stress" data-pct="0" data-tone="safe">
@@ -770,16 +746,16 @@
               <div class="status-bar__track"><span class="status-fill" style="width:0%"></span></div>
               <p class="ai-cond-meter__comment" aria-live="polite"></p>
             </div>
-            <div class="status-bar ai-cond-meter" data-key="condition" data-pct="72" data-tone="safe">
+            <div class="status-bar ai-cond-meter" data-key="condition" data-pct="100" data-tone="safe">
               <div class="status-bar__row ai-cond-meter__row">
                 <div class="ai-cond-meter__headline">
                   <span class="ai-cond-meter__title"><span class="ai-cond-meter__ko">컨디션</span> <span class="ai-cond-meter__en">Condition</span></span>
                   <button type="button" class="ai-cond-meter__help" data-cond-help="condition" aria-label="컨디션 쉬운 설명" title="쉬운 설명"><i class="fas fa-circle-question" aria-hidden="true"></i></button>
                 </div>
-                <strong class="status-bar__val">72%</strong>
+                <strong class="status-bar__val">100%</strong>
                 <span class="ai-cond-meter__badge">[—]</span>
               </div>
-              <div class="status-bar__track"><span class="status-fill" style="width:72%"></span></div>
+              <div class="status-bar__track"><span class="status-fill" style="width:100%"></span></div>
               <p class="ai-cond-meter__comment" aria-live="polite"></p>
             </div>
             <div class="status-bar ai-cond-meter" data-key="team" data-pct="100" data-tone="safe" data-team-warn="30" data-team-instability="20" aria-description="팀 분위기 막대예요. 30% 이하면 나쁜 편, 20% 이하면 스트레스가 더 잘 올라가요. 탈락은 컨디션 막대로만 정해져요.">
@@ -998,6 +974,7 @@ window.NDX_GAME_CONFIG = {
   teamTotalStat: ${teamTotal},
   myLiveRank: ${myLiveRank != null ? myLiveRank : 999},
   monthProgressPct: ${monthProgressPct},
+  trainingCalendarDay: ${trainingCalendarDay},
   phase: '${result.phase}',
   maxAppliedItemCount: 6,
   chemistry: {
@@ -1022,8 +999,45 @@ window.NDX_GAME_CONFIG = {
   /** ms: 턴 스탯 플래시·결과 확인 후 AI 상황·대사를 채팅에 붙이기까지 추가 대기 */
   geminiDialogueDelayMs: 120,
   miniGameQuizPool: ${empty miniGameQuizPoolJson ? '[]' : miniGameQuizPoolJson},
-  sceneId: <c:choose><c:when test="${not empty scene && scene.sceneId != null}">${scene.sceneId}</c:when><c:otherwise>null</c:otherwise></c:choose>
+  sceneId: <c:choose><c:when test="${not empty scene && scene.sceneId != null}">${scene.sceneId}</c:when><c:otherwise>null</c:otherwise></c:choose>,
+  chatMemberName: "<c:out value="${empty sessionScope.LOGIN_MEMBER ? '' : (empty sessionScope.LOGIN_MEMBER.nickname ? sessionScope.LOGIN_MEMBER.mname : sessionScope.LOGIN_MEMBER.nickname)}"/>"
 };
+</script>
+<script>
+function ndxTryOpenChat(toggleName, failMsg){
+  try{
+    var t = window[toggleName];
+    if(typeof t === 'function'){
+      t();
+      return false;
+    }
+  }catch(e1){}
+  var n = 0;
+  var max = 50;
+  var tick = function(){
+    try{
+      var t2 = window[toggleName];
+      if(typeof t2 === 'function'){
+        t2();
+        return;
+      }
+    }catch(e2){}
+    n++;
+    if(n < max){
+      setTimeout(tick, 40);
+      return;
+    }
+    alert(failMsg);
+  };
+  tick();
+  return false;
+}
+function openAiChatWidget(){
+  return ndxTryOpenChat('toggleChatWidget', 'AI 챗봇을 불러오지 못했습니다. Ctrl+F5로 새로고침 후 다시 시도해 주세요.');
+}
+function openRealtimeChatroom(){
+  return ndxTryOpenChat('toggleChatroomWidget', '실시간 채팅방을 불러오지 못했습니다. Ctrl+F5로 새로고침 후 다시 시도해 주세요.');
+}
 </script>
 <script>
 /* 훈련 일차 기준 스트레스·팀워크 첫 표시(로딩 중 깜빡임 완화). game.js와 동일 규칙 */
@@ -1047,12 +1061,33 @@ window.NDX_GAME_CONFIG = {
     if (n > 100) return 100;
     return n;
   }
-  var d = parseDay(window.NDX_GAME_CONFIG && window.NDX_GAME_CONFIG.phase);
+  var d = (window.NDX_GAME_CONFIG && window.NDX_GAME_CONFIG.trainingCalendarDay != null)
+    ? Math.max(1, Math.min(84, Math.round(Number(window.NDX_GAME_CONFIG.trainingCalendarDay) || 1)))
+    : parseDay(window.NDX_GAME_CONFIG && window.NDX_GAME_CONFIG.phase);
   var stress = clampPct((d - 1) * 1);
   var teamRaw = 100 - (d - 1) * 0.5;
   if (teamRaw < 0) teamRaw = 0;
   if (teamRaw > 100) teamRaw = 100;
   var team = Math.round(teamRaw * 2) / 2;
+  /* 훈련 1일차: 집중·컨디션도 로딩 직후 서버와 동일하게( game.js의 updateConditionBarsFromRoster와 맞춤 ) */
+  if (d === 1) {
+    var barF = document.querySelector('.ai-cond-meter[data-key="focus"]');
+    if (barF) {
+      barF.setAttribute('data-pct', '50');
+      var vf = barF.querySelector('.status-bar__val');
+      var ff = barF.querySelector('.status-fill');
+      if (vf) vf.textContent = '50%';
+      if (ff) ff.style.width = '50%';
+    }
+    var barC = document.querySelector('.ai-cond-meter[data-key="condition"]');
+    if (barC) {
+      barC.setAttribute('data-pct', '100');
+      var vc = barC.querySelector('.status-bar__val');
+      var fc = barC.querySelector('.status-fill');
+      if (vc) vc.textContent = '100%';
+      if (fc) fc.style.width = '100%';
+    }
+  }
   var barS = document.querySelector('.ai-cond-meter[data-key="stress"]');
   if (barS) {
     barS.setAttribute('data-pct', String(stress));
@@ -1102,7 +1137,114 @@ window.NDX_GAME_CONFIG = {
 <script src="${ctx}/js/condition-panel-ui.js?v=20260404_daily_bars"></script>
 <script src="${ctx}/js/chat-simulation-logic.js?v=20260404_intent_chat"></script>
 <script src="${ctx}/js/sim-status-presentation.js?v=20260404_daily_bars"></script>
-<script src="${ctx}/js/game.js?v=20260421_targeting_modal_totalavg_v1"></script>
+<%-- HUD: topnav defer와 중복되어도 위젯 내부에서 단일 초기화. 여기서 동기 로드해 게임 전용 버튼이 즉시 동작하도록 함 --%>
+<script src="${ctx}/js/chat-widget.js?v=20260427_chat_widget_anchor_fix_v8"></script>
+<script src="${ctx}/js/chatroom-widget.js?v=20260427_chat_tray_anchor_fix_v4"></script>
+<script src="${ctx}/js/game.js?v=20260427_chat_click_route_fix_v2"></script>
+<script>
+(function bindHudChatActionsStable(){
+  var CHATROOM_SCRIPT_URL = '${ctx}/js/chatroom-widget.js?v=20260427_chat_tray_anchor_fix_v4';
+  var chatroomScriptReloading = false;
+
+  function forceOpenChatroomBox(){
+    var box = document.getElementById('cr-box');
+    if(!box) return false;
+    var vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    var vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    var width = 580;
+    var height = 420;
+    var top = Math.max(8, vh - height - 24);
+    var left = Math.max(8, vw - width - 16);
+    box.style.display = 'flex';
+    box.style.position = 'fixed';
+    box.style.zIndex = '20020';
+    box.style.top = top + 'px';
+    box.style.left = left + 'px';
+    box.style.right = 'auto';
+    box.style.transform = 'none';
+    box.style.flexDirection = 'column';
+    try{ sessionStorage.setItem('cr_open', '1'); }catch(e){}
+    return true;
+  }
+
+  function reloadChatroomScriptAndRetry(failMsg){
+    if(chatroomScriptReloading) return;
+    chatroomScriptReloading = true;
+    try{
+      var old = document.getElementById('ndx-chatroom-script-runtime');
+      if(old && old.parentNode) old.parentNode.removeChild(old);
+    }catch(e0){}
+    var s = document.createElement('script');
+    s.id = 'ndx-chatroom-script-runtime';
+    s.src = CHATROOM_SCRIPT_URL + '&rt=' + Date.now();
+    s.onload = function(){
+      chatroomScriptReloading = false;
+      try{
+        if(typeof window.toggleChatroomWidget === 'function'){
+          window.toggleChatroomWidget();
+          return;
+        }
+      }catch(e1){}
+      if(forceOpenChatroomBox()) return;
+      if(typeof window.showToast === 'function') window.showToast(failMsg, 'warn', 2600);
+      else alert(failMsg);
+    };
+    s.onerror = function(){
+      chatroomScriptReloading = false;
+      if(typeof window.showToast === 'function') window.showToast(failMsg, 'warn', 2600);
+      else alert(failMsg);
+    };
+    document.head.appendChild(s);
+  }
+
+  function openChat(toggleName, failMsg){
+    var fn = window[toggleName];
+    if(typeof fn === 'function'){
+      try{ fn(); return; }catch(e){}
+    }
+    if(toggleName === 'toggleChatroomWidget' && forceOpenChatroomBox()) return;
+    if(toggleName === 'toggleChatroomWidget'){
+      reloadChatroomScriptAndRetry(failMsg);
+    }
+    var tries = 0;
+    var maxTries = 50;
+    var timer = setInterval(function(){
+      tries++;
+      var delayedFn = window[toggleName];
+      if(typeof delayedFn === 'function'){
+        clearInterval(timer);
+        try{ delayedFn(); }catch(e2){}
+        return;
+      }
+      if(toggleName === 'toggleChatroomWidget' && forceOpenChatroomBox()){
+        clearInterval(timer);
+        return;
+      }
+      if(tries >= maxTries){
+        clearInterval(timer);
+        if(typeof window.showToast === 'function') window.showToast(failMsg, 'warn', 2600);
+        else alert(failMsg);
+      }
+    }, 40);
+  }
+
+  function bindOne(id, toggleName, failMsg){
+    var btn = document.getElementById(id);
+    if(!btn || btn.dataset.chatBound === '1') return;
+    btn.dataset.chatBound = '1';
+    btn.addEventListener('click', function(ev){
+      if(ev) ev.preventDefault();
+      openChat(toggleName, failMsg);
+    });
+  }
+
+  function run(){
+    bindOne('chatroom-toggle-btn', 'toggleChatroomWidget', '실시간 채팅방을 불러오지 못했습니다. Ctrl+F5 후 다시 시도해 주세요.');
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+})();
+</script>
 <script>
 (function(){
   if(typeof window.toggleStatGrowth2x !== 'function'){

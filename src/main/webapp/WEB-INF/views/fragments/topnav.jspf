@@ -722,5 +722,7 @@ window.__NAV_RANK_GAIN__ = {
 </c:if>
 
 <script defer src="<c:url value='/js/unitx-effects-toggle.js'/>"></script>
-<script defer src="<c:url value='/js/chat-widget.js?v=20260422b'/>"></script>
-<script defer src="<c:url value='/js/chatroom-widget.js?v=20260422b'/>"></script>
+<c:if test="${not fn:contains(uri, '/game')}">
+<script defer src="<c:url value='/js/chat-widget.js?v=20260427_chat_widget_anchor_fix_v8'/>"></script>
+<script defer src="<c:url value='/js/chatroom-widget.js?v=20260427_chat_tray_anchor_fix_v4'/>"></script>
+</c:if>

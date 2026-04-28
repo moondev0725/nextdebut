@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -76,7 +77,12 @@ public class SecurityConfig {
                         })
                         .failureHandler((request, response, exception) -> {
                             exception.printStackTrace();
-                            String message = exception.getMessage() == null ? "oauth_login_failed" : exception.getMessage();
+                            String message = Optional.ofNullable(exception.getCause())
+                                    .map(Throwable::getMessage)
+                                    .filter(m -> m != null && !m.isBlank())
+                                    .orElseGet(() -> exception.getMessage() == null
+                                            ? "oauth_login_failed"
+                                            : exception.getMessage());
                             String encoded = URLEncoder.encode(message, StandardCharsets.UTF_8);
                             response.sendRedirect(request.getContextPath() + "/login?error=oauth&message=" + encoded);
                         }))

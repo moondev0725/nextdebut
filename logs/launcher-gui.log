@@ -152,3 +152,504 @@
 [2026-04-24 09:43:07] Manual mode started
 [2026-04-24 09:44:55] servers stopped (pid: 10460, 12264, 14216, 16100)
 [2026-04-24 09:44:56] launcher closed - servers stopped
+[2026-04-24 14:29:39] launcher open
+[2026-04-24 14:29:43] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-24 14:29:55] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-24 14:29:55] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-24 14:29:55] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-24 14:29:55] python scripts path ready: C:\python\Scripts
+[2026-04-24 14:29:55] python scripts path ready: C:\python\Scripts
+[2026-04-24 14:30:02] python scripts path ready: C:\python\Scripts
+[2026-04-24 14:30:02] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-24 14:30:02] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-24 14:30:50] Manual mode started
+[2026-04-24 14:56:55] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-24 14:57:06] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-24 14:57:06] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-24 14:57:06] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-24 14:57:06] python scripts path ready: C:\python\Scripts
+[2026-04-24 14:57:06] python scripts path ready: C:\python\Scripts
+[2026-04-24 14:57:08] python scripts path ready: C:\python\Scripts
+[2026-04-24 14:57:08] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-24 14:57:08] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-24 14:57:35] Manual mode started
+[2026-04-24 15:20:38] servers stopped (pid: 3212, 12372, 14924, 17836)
+[2026-04-24 15:20:40] launcher closed - servers stopped
+[2026-04-27 09:31:40] launcher open
+[2026-04-27 09:31:45] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 09:31:56] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 09:31:56] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 09:31:56] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 09:31:57] python scripts path ready: C:\python\Scripts
+[2026-04-27 09:31:58] python scripts path ready: C:\python\Scripts
+[2026-04-27 09:32:07] python scripts path ready: C:\python\Scripts
+[2026-04-27 09:32:07] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 09:32:07] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 09:32:44] Manual mode started
+[2026-04-27 10:06:43] servers stopped (pid: 6056, 13848, 14284, 17548, 17680)
+[2026-04-27 10:06:45] launcher closed - servers stopped
+[2026-04-27 10:19:10] launcher open
+[2026-04-27 10:19:14] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 10:19:25] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 10:19:25] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 10:19:25] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 10:19:25] python scripts path ready: C:\python\Scripts
+[2026-04-27 10:19:26] python scripts path ready: C:\python\Scripts
+[2026-04-27 10:19:32] python scripts path ready: C:\python\Scripts
+[2026-04-27 10:19:32] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 10:19:32] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 10:20:06] Manual mode started
+[2026-04-27 10:37:34] servers stopped (pid: 5804, 12012, 17352, 18132, 21080)
+[2026-04-27 10:37:41] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 10:37:52] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 10:37:52] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 10:37:52] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 10:37:52] python scripts path ready: C:\python\Scripts
+[2026-04-27 10:37:53] python scripts path ready: C:\python\Scripts
+[2026-04-27 10:37:54] python scripts path ready: C:\python\Scripts
+[2026-04-27 10:37:55] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 10:37:55] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 10:38:22] Manual mode started
+[2026-04-27 10:59:15] servers stopped (pid: 10432, 17296, 18540, 19520, 20368)
+[2026-04-27 10:59:20] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 10:59:31] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 10:59:31] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 10:59:31] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 10:59:31] python scripts path ready: C:\python\Scripts
+[2026-04-27 10:59:32] python scripts path ready: C:\python\Scripts
+[2026-04-27 10:59:33] python scripts path ready: C:\python\Scripts
+[2026-04-27 10:59:33] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 10:59:33] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 11:00:01] Manual mode started
+[2026-04-27 11:02:31] servers stopped (pid: 5008, 10324, 11380, 14812, 18680, 21756)
+[2026-04-27 11:02:35] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 11:02:47] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 11:02:47] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 11:02:47] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 11:02:47] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:02:48] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:02:49] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:02:49] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 11:02:49] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 11:03:20] Manual mode started
+[2026-04-27 11:09:35] servers stopped (pid: 2452, 8648, 14248, 20868, 21420)
+[2026-04-27 11:09:40] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 11:09:51] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 11:09:51] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 11:09:51] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 11:09:51] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:09:51] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:09:53] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:09:53] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 11:09:53] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 11:10:24] Manual mode started
+[2026-04-27 11:10:33] servers stopped (pid: 9852, 14292, 19680, 19924, 22028)
+[2026-04-27 11:10:36] launcher closed - servers stopped
+[2026-04-27 11:11:20] launcher open
+[2026-04-27 11:11:23] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 11:11:35] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 11:11:35] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 11:11:35] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 11:11:36] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:11:36] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:11:38] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:11:38] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 11:11:38] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 11:12:05] Manual mode started
+[2026-04-27 11:14:16] servers stopped (pid: 10984, 12224, 16468, 20976, 21900)
+[2026-04-27 11:14:50] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 11:15:01] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 11:15:01] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 11:15:01] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 11:15:02] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:15:02] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:15:04] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:15:04] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 11:15:04] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 11:15:33] Manual mode started
+[2026-04-27 11:19:43] servers stopped (pid: 3972, 7040, 20116, 20372, 22120)
+[2026-04-27 11:20:27] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 11:20:39] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 11:20:39] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 11:20:39] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 11:20:39] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:20:39] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:20:41] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:20:41] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 11:20:41] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 11:21:10] Manual mode started
+[2026-04-27 11:32:07] launcher open
+[2026-04-27 11:32:11] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 11:32:22] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 11:32:22] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 11:32:22] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 11:32:22] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:32:23] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:32:24] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:32:25] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 11:32:25] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 11:32:52] Manual mode started
+[2026-04-27 11:33:06] servers stopped (pid: 3448, 11328, 11616, 12000, 21772)
+[2026-04-27 11:38:33] servers stopped (pid: 15268)
+[2026-04-27 11:38:37] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 11:38:49] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 11:38:49] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 11:38:49] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 11:38:49] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:38:49] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:38:51] python scripts path ready: C:\python\Scripts
+[2026-04-27 11:38:51] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 11:38:51] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 11:39:18] Manual mode started
+[2026-04-27 12:05:59] servers stopped (pid: 6372, 19156, 20548, 20704)
+[2026-04-27 12:06:03] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 12:06:14] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 12:06:14] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 12:06:14] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 12:06:14] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:06:15] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:06:16] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:06:17] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 12:06:17] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 12:06:47] Manual mode started
+[2026-04-27 12:09:48] servers stopped (pid: 12848, 17224, 20540, 21800)
+[2026-04-27 12:09:51] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 12:10:03] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 12:10:03] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 12:10:03] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 12:10:03] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:10:04] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:10:05] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:10:06] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 12:10:06] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 12:10:35] Manual mode started
+[2026-04-27 12:12:34] launcher open
+[2026-04-27 12:12:39] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 12:12:50] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 12:12:50] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 12:12:50] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 12:12:50] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:12:51] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:12:52] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:12:52] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 12:12:52] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 12:13:19] Manual mode started
+[2026-04-27 12:35:45] servers stopped (pid: 14932, 17588, 19624, 19932)
+[2026-04-27 12:36:20] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 12:36:33] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 12:36:33] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 12:36:33] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 12:36:33] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:36:33] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:36:35] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:36:35] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 12:36:35] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 12:37:02] Manual mode started
+[2026-04-27 12:48:08] servers stopped (pid: 5696, 9972, 15052, 17316, 17956)
+[2026-04-27 12:48:15] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 12:48:25] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 12:48:25] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 12:48:25] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 12:48:26] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:48:26] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:48:28] python scripts path ready: C:\python\Scripts
+[2026-04-27 12:48:28] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 12:48:28] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 12:48:58] Manual mode started
+[2026-04-27 13:01:09] servers stopped (pid: 1416, 10752, 13376, 13852, 16800)
+[2026-04-27 13:01:14] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 13:01:25] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 13:01:25] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 13:01:25] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 13:01:25] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:01:25] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:01:27] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:01:27] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 13:01:27] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 13:01:54] Manual mode started
+[2026-04-27 13:14:45] servers stopped (pid: 6012, 11172, 12272, 14268, 19468)
+[2026-04-27 13:14:51] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 13:15:02] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 13:15:02] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 13:15:02] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 13:15:02] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:15:03] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:15:05] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:15:05] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 13:15:05] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 13:15:32] Manual mode started
+[2026-04-27 13:17:39] servers stopped (pid: 12660, 15012, 15356, 19404, 19544)
+[2026-04-27 13:17:45] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 13:17:56] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 13:17:56] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 13:17:56] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 13:17:56] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:17:57] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:17:58] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:17:58] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 13:17:58] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 13:18:25] Manual mode started
+[2026-04-27 13:19:19] servers stopped (pid: 2788, 13788, 20384, 21592)
+[2026-04-27 13:19:22] launcher closed - servers stopped
+[2026-04-27 13:57:27] launcher open
+[2026-04-27 13:58:24] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 13:58:35] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 13:58:35] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 13:58:35] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 13:58:35] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:58:35] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:58:37] python scripts path ready: C:\python\Scripts
+[2026-04-27 13:58:37] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 13:58:37] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 13:59:07] Manual mode started
+[2026-04-27 14:01:45] launcher open
+[2026-04-27 14:01:49] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:02:00] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:02:00] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:02:00] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:02:00] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:02:01] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:02:02] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:02:03] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:02:03] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:02:30] Manual mode started
+[2026-04-27 14:03:08] servers stopped (pid: 6352, 9356, 17392, 20848)
+[2026-04-27 14:03:09] launcher closed - servers stopped
+[2026-04-27 14:03:49] launcher open
+[2026-04-27 14:04:05] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:04:16] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:04:16] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:04:16] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:04:16] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:04:17] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:04:18] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:04:19] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:04:19] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:04:46] Manual mode started
+[2026-04-27 14:10:12] servers stopped (pid: 5692, 10124, 20036, 21828, 22344)
+[2026-04-27 14:10:17] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:10:28] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:10:28] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:10:28] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:10:28] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:10:28] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:10:30] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:10:30] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:10:30] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:11:00] Manual mode started
+[2026-04-27 14:15:05] servers stopped (pid: 8632, 12004, 12884, 17304, 20248)
+[2026-04-27 14:15:19] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:15:29] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:15:29] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:15:29] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:15:29] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:15:30] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:15:31] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:15:32] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:15:32] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:16:02] Manual mode started
+[2026-04-27 14:18:04] servers stopped (pid: 5432, 6056, 9448, 19776, 21116)
+[2026-04-27 14:19:34] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:19:46] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:19:46] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:19:46] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:19:46] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:19:47] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:19:48] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:19:48] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:19:48] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:20:22] Manual mode started
+[2026-04-27 14:23:44] servers stopped (pid: 2852, 12124, 13640, 20260)
+[2026-04-27 14:23:48] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:23:59] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:23:59] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:23:59] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:23:59] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:24:00] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:24:01] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:24:02] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:24:02] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:24:32] Manual mode started
+[2026-04-27 14:26:04] servers stopped (pid: 5276, 7172, 11768, 17812)
+[2026-04-27 14:26:07] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:26:18] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:26:18] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:26:18] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:26:18] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:26:19] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:26:20] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:26:20] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:26:20] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:26:47] Manual mode started
+[2026-04-27 14:28:05] servers stopped (pid: 4512, 14160, 16784, 19504, 20724)
+[2026-04-27 14:28:09] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:28:20] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:28:20] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:28:20] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:28:20] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:28:20] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:28:22] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:28:22] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:28:22] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:28:53] Manual mode started
+[2026-04-27 14:30:36] servers stopped (pid: 6244, 8868, 9132, 18232, 20108)
+[2026-04-27 14:32:13] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:32:24] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:32:24] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:32:24] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:32:24] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:32:25] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:32:26] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:32:27] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:32:27] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:32:54] Manual mode started
+[2026-04-27 14:33:15] servers stopped (pid: 7784, 14764, 19472, 21900)
+[2026-04-27 14:35:38] launcher closed - servers stopped
+[2026-04-27 14:35:47] launcher open
+[2026-04-27 14:36:06] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:36:31] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:36:31] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:36:31] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:36:32] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:36:32] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:36:34] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:36:34] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:36:34] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:37:01] Manual mode started
+[2026-04-27 14:38:41] servers stopped (pid: 2896, 2916, 5128, 9872, 20372)
+[2026-04-27 14:39:08] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:39:19] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:39:19] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:39:19] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:39:19] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:39:19] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:39:21] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:39:21] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:39:21] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:39:48] Manual mode started
+[2026-04-27 14:41:22] servers stopped (pid: 3400, 14292, 15340, 15648, 17852)
+[2026-04-27 14:55:25] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 14:55:41] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 14:55:41] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 14:55:41] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 14:55:41] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:55:42] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:55:44] python scripts path ready: C:\python\Scripts
+[2026-04-27 14:55:44] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 14:55:44] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 14:56:25] Manual mode started
+[2026-04-27 14:57:36] servers stopped (pid: 9244, 9748, 15132, 15580, 22040)
+[2026-04-27 14:57:38] launcher closed - servers stopped
+[2026-04-27 15:05:59] launcher open
+[2026-04-27 15:06:04] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 15:06:19] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 15:06:19] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 15:06:19] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 15:06:20] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:06:20] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:06:22] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:06:23] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 15:06:23] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 15:07:00] Manual mode started
+[2026-04-27 15:27:54] servers stopped (pid: 4164, 9500, 16272, 17332, 21616)
+[2026-04-27 15:27:58] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 15:28:09] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 15:28:09] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 15:28:09] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 15:28:09] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:28:10] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:28:11] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:28:11] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 15:28:11] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 15:28:45] Manual mode started
+[2026-04-27 15:31:30] servers stopped (pid: 7444, 9920, 17172, 19968)
+[2026-04-27 15:31:34] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 15:31:45] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 15:31:45] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 15:31:45] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 15:31:45] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:31:46] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:31:48] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:31:48] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 15:31:48] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 15:32:21] Manual mode started
+[2026-04-27 15:33:32] servers stopped (pid: 7600, 12192, 18260, 19464, 20420)
+[2026-04-27 15:36:10] Manual mode opened (fast path)
+[2026-04-27 15:42:03] servers stopped (pid: 1352, 8524)
+[2026-04-27 15:42:23] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 15:42:35] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 15:42:35] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 15:42:35] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 15:42:35] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:42:35] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:42:37] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:42:37] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 15:42:38] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 15:43:15] Manual mode started
+[2026-04-27 15:47:54] servers stopped (pid: 7996, 9556, 14376, 18192, 22288)
+[2026-04-27 15:47:58] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 15:48:10] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 15:48:10] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 15:48:10] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 15:48:10] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:48:10] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:48:12] python scripts path ready: C:\python\Scripts
+[2026-04-27 15:48:12] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 15:48:12] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 15:48:43] Manual mode started
+[2026-04-27 16:01:50] servers stopped (pid: 8892, 11948, 19944, 21872)
+[2026-04-27 16:01:54] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 16:02:06] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 16:02:06] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 16:02:06] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 16:02:06] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:02:07] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:02:08] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:02:09] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 16:02:09] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 16:02:39] Manual mode started
+[2026-04-27 16:34:04] servers stopped (pid: 3188, 4848, 14204, 15224)
+[2026-04-27 16:34:08] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 16:34:19] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 16:34:19] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 16:34:19] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 16:34:20] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:34:20] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:34:22] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:34:22] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 16:34:22] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 16:34:49] Manual mode started
+[2026-04-27 16:36:51] servers stopped (pid: 10352, 10704, 11972, 17020, 19548, 21624)
+[2026-04-27 16:49:14] launcher open
+[2026-04-27 16:49:21] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 16:49:33] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 16:49:33] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 16:49:33] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 16:49:34] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:49:34] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:49:36] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:50:03] Manual mode started
+[2026-04-27 16:50:29] servers stopped (pid: 45920)
+[2026-04-27 16:53:40] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 16:53:51] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 16:53:51] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 16:53:51] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 16:53:51] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:53:51] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:53:53] python scripts path ready: C:\python\Scripts
+[2026-04-27 16:53:53] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\generated
+[2026-04-27 16:53:53] removed stale Gradle output: C:\Users\KOSMO\Desktop\NEXTDEBUT\build\tmp\compileJava
+[2026-04-27 16:54:20] Manual mode started
+[2026-04-27 16:54:42] servers stopped (pid: 24996)
+[2026-04-27 16:54:43] launcher closed - servers stopped
+[2026-04-27 16:59:49] launcher open
+[2026-04-27 16:59:53] portable runtime missing: Python=False Java21=True, running ensure_runtime.ps1
+[2026-04-27 17:00:05] [NEXTDEBUT] Downloading: https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+[2026-04-27 17:00:05] [NEXTDEBUT] Installing portable Python runtime...
+[2026-04-27 17:00:05] [NEXTDEBUT] Portable Python missing after bootstrap: runtime\python\python.exe
+[2026-04-27 17:00:05] python scripts path ready: C:\python\Scripts
+[2026-04-27 17:00:06] python scripts path ready: C:\python\Scripts
+[2026-04-27 17:00:07] python scripts path ready: C:\python\Scripts
+[2026-04-27 17:00:38] Manual mode started
+[2026-04-27 17:01:15] servers stopped (pid: 24704)
+[2026-04-27 17:01:17] launcher closed - servers stopped

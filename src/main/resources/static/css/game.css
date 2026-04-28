@@ -52,6 +52,8 @@ body::after{content:"";position:fixed;inset:0;z-index:9990;pointer-events:none;o
 /* ══ 로딩 (뷰포트 고정, 스크롤 없음) ══ */
 #lov{
   position:fixed;inset:0;z-index:9999;
+  /* 클릭은 아래 UI로 통과 — 그렇지 않으면 z-index 9999가 전체 화면을 덮어 HUD·채팅 버튼이 영구 무반응처럼 보임 */
+  pointer-events:none;
   background:linear-gradient(165deg, var(--ds-bg) 0%, #ffffff 48%, #fff5f8 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
 }
@@ -491,7 +493,7 @@ button.game-hud-item{
 /* HUD 우측 툴 버튼 */
 .game-hud{padding-right:120px;}
 .game-hud-tools.game-floating-chat-tray{
-  position:absolute;right:16px;top:8px;z-index:110;
+  position:absolute;right:16px;top:8px;z-index:10050;
   display:flex;align-items:center;gap:8px;width:auto;height:auto;pointer-events:auto;
 }
 .game-hud-tool-btn{
@@ -1271,7 +1273,6 @@ button.game-hud-item{
 }
 .game-chat-dock__meta{
   display:flex;align-items:center;gap:6px;flex-wrap:nowrap;min-width:0;flex:1;
-  overflow:hidden;
 }
 .game-chat-dock__date{
   font-family:"Orbitron",sans-serif;font-weight:800;font-size:clamp(11px,1.4vw,13px);
@@ -1282,6 +1283,23 @@ button.game-hud-item{
 .game-chat-dock__badge{
   padding:2px 8px;border-radius:999px;font-family:"Orbitron",sans-serif;font-size:7px;font-weight:700;letter-spacing:.1em;
   background:rgba(241,245,249,.92);border:1px solid rgba(148,163,184,.35);color:#475569;
+}
+.game-chat-dock__progress{
+  display:flex;align-items:center;gap:6px;min-width:170px;max-width:200px;flex:0 0 190px;
+}
+.game-chat-dock__progress--right{margin-left:auto;}
+.game-chat-dock__progress-label{
+  flex-shrink:0;padding:2px 8px;border-radius:999px;font-family:"Orbitron",sans-serif;font-size:8px;font-weight:800;letter-spacing:.05em;
+  background:rgba(224,231,255,.58);border:1px solid rgba(129,140,248,.35);color:#4338ca;
+}
+.game-chat-dock__progress-track{
+  position:relative;display:block;flex:1;height:10px;border-radius:999px;overflow:hidden;
+  background:rgba(203,213,225,.95);border:1px solid rgba(100,116,139,.45);
+}
+.game-chat-dock__progress-fill{
+  display:block;height:100%;width:0;border-radius:999px;
+  background:linear-gradient(90deg,#8b5cf6 0%, #ec4899 55%, #f59e0b 100%);
+  box-shadow:0 0 10px rgba(139,92,246,.35);
 }
 .game-chat-dock__badge--rank{
   background:rgba(224,231,255,.58);
@@ -4130,3 +4148,10 @@ body{
 .card.card-glow-r{ box-shadow:0 0 22px rgba(139,92,246,0.35),0 16px 40px rgba(99,102,241,.08)!important; }
 .card.card-glow-sr{ box-shadow:0 0 22px rgba(148,163,184,0.45),0 16px 40px rgba(99,102,241,.08)!important; }
 .card.card-glow-ssr{ box-shadow:0 0 24px rgba(251,191,36,0.4),0 16px 40px rgba(245,158,11,.12)!important; }
+
+/* ==== 2026-04-27 HUD 채팅 트레이 — 중앙 팬 KPI(.game-hud-center-fans z-index:2)보다 위로
+   (이전 핫픽스에서 트레이를 z-index:1로 두면 팬 칩이 위에 겹쳐 채팅 버튼이 무반응처럼 보임) ==== */
+body.is-gameplay-screen .game-hud .game-hud-tools.game-floating-chat-tray{
+  z-index: 60 !important;
+  position: relative !important;
+}

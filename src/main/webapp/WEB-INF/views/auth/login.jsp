@@ -56,13 +56,6 @@
       <div class="login-social">
         <div class="login-social__divider">또는 소셜 계정으로 로그인</div>
         <div class="signup-select-list login-social__list">
-          <a href="<c:url value='/oauth2/authorization/kakao'/>" class="signup-select-btn signup-select-btn--kakao">
-            <span class="signup-select-btn__icon">K</span>
-            <span class="signup-select-btn__body">
-              <span class="signup-select-btn__main">카카오로 로그인</span>
-              <span class="signup-select-btn__sub">카카오 계정으로 바로 로그인합니다</span>
-            </span>
-          </a>
           <a href="<c:url value='/oauth2/authorization/google'/>" class="signup-select-btn signup-select-btn--google">
             <span class="signup-select-btn__icon">G</span>
             <span class="signup-select-btn__body">
@@ -75,6 +68,13 @@
             <span class="signup-select-btn__body">
               <span class="signup-select-btn__main">네이버로 로그인</span>
               <span class="signup-select-btn__sub">네이버 계정으로 바로 로그인합니다</span>
+            </span>
+          </a>
+          <a href="<c:url value='/oauth2/authorization/kakao'/>" class="signup-select-btn signup-select-btn--kakao">
+            <span class="signup-select-btn__icon">K</span>
+            <span class="signup-select-btn__body">
+              <span class="signup-select-btn__main">카카오로 로그인</span>
+              <span class="signup-select-btn__sub">카카오 계정으로 바로 로그인합니다</span>
             </span>
           </a>
         </div>

@@ -25,6 +25,7 @@ import com.java.repository.BoardRepository;
 @Service
 public class BoardService {
 	public static final String HANDLED_COMMENT_PREFIX = "[처리]";
+	public static final String BLINDED_TITLE = "블라인드 처리 된 글";
 
 	private static final int PLACE_NAME_MAX = 200;
 	private static final int ADDRESS_MAX = 255;
@@ -74,9 +75,7 @@ public class BoardService {
 
 	public List<Map<String, Object>> getRecentReports(int limit) {
 		int safeLimit = Math.max(1, limit);
-		List<BoardReport> reports = boardReportRepository.findAllByOrderByCreatedAtDesc().stream()
-				.limit(safeLimit)
-				.collect(Collectors.toList());
+		List<BoardReport> reports = boardReportRepository.findAllByOrderByCreatedAtDesc();
 		Map<Long, Board> boardById = boardRepository.findAllById(reports.stream()
 				.filter(r -> "board".equalsIgnoreCase(r.getTargetType()))
 				.map(BoardReport::getTargetId)
@@ -103,9 +102,7 @@ public class BoardService {
 			row.put("visible", target == null || target.isVisible());
 			boolean handled = target != null && isReportHandled(target);
 			String workflowStatus = "pending";
-			if (handled) {
-				workflowStatus = "completed";
-			} else if ("resolved".equalsIgnoreCase(report.getStatus())) {
+			if (handled || "resolved".equalsIgnoreCase(report.getStatus())) {
 				workflowStatus = "completed";
 			} else if ("processing".equalsIgnoreCase(report.getStatus())) {
 				workflowStatus = "processing";
@@ -113,23 +110,22 @@ public class BoardService {
 			row.put("workflowStatus", workflowStatus);
 			rows.add(row);
 		}
-		if (rows.size() < safeLimit) {
-			List<Board> reportBoards = boardRepository.findByBoardTypeOrderByCreatedAtDesc("report").stream()
-					.limit(safeLimit - rows.size())
-					.collect(Collectors.toList());
+		{
+			List<Board> reportBoards = boardRepository.findByBoardTypeOrderByCreatedAtDesc("report");
 			for (Board reportBoard : reportBoards) {
+				boolean handled = isReportHandled(reportBoard);
 				Map<String, Object> row = new LinkedHashMap<>();
 				row.put("id", reportBoard.getId());
 				row.put("reportedAt", reportBoard.getCreatedAtStr());
 				row.put("reason", "신고 게시판 접수");
-				row.put("status", "pending");
+				row.put("status", handled ? "resolved" : "pending");
 				row.put("boardId", reportBoard.getId());
 				row.put("boardTitle", reportBoard.getTitle());
 				row.put("authorNick", reportBoard.getAuthorNick());
 				row.put("detailPath", "/boards/report/" + reportBoard.getId());
 				row.put("reportCount", 1L);
 				row.put("visible", reportBoard.isVisible());
-				row.put("workflowStatus", isReportHandled(reportBoard) ? "completed" : "pending");
+				row.put("workflowStatus", handled ? "completed" : "pending");
 				rows.add(row);
 			}
 		}
@@ -215,9 +211,17 @@ public class BoardService {
 				boolean nextVisible = !board.isVisible();
 				board.setVisible(nextVisible);
 				boardRepository.save(board);
-				if (report != null && !nextVisible) {
-					report.setStatus("resolved");
+				if (report != null) {
+					report.setStatus(nextVisible ? "pending" : "resolved");
 					boardReportRepository.save(report);
+					syncSiblingBoardReports(report, nextVisible ? "pending" : "resolved");
+				}
+				if (report == null) {
+					if (nextVisible) {
+						clearAutoHandledMarker(board);
+					} else {
+						markReportBoardHandled(board);
+					}
 				}
 				return nextVisible ? "게시글 블라인드를 해제했습니다." : "신고 대상 게시글을 블라인드 처리했습니다.";
 			}
@@ -231,6 +235,10 @@ public class BoardService {
 			if (report != null) {
 				report.setStatus("resolved");
 				boardReportRepository.save(report);
+				syncSiblingBoardReports(report, "resolved");
+			}
+			if (report == null && board != null) {
+				clearAutoHandledMarker(board);
 			}
 			return "신고 대상 게시글을 블라인드 처리했습니다.";
 		}
@@ -240,8 +248,12 @@ public class BoardService {
 				boardRepository.save(board);
 			}
 			if (report != null) {
-				report.setStatus("resolved");
+				report.setStatus("pending");
 				boardReportRepository.save(report);
+				syncSiblingBoardReports(report, "pending");
+			}
+			if (report == null && board != null) {
+				markReportBoardHandled(board);
 			}
 			return "블라인드 게시글을 다시 노출했습니다.";
 		}
@@ -264,6 +276,17 @@ public class BoardService {
 		}
 	}
 
+	private void syncSiblingBoardReports(BoardReport anchor, String status) {
+		if (anchor == null || !StringUtils.hasText(status) || anchor.getTargetId() == null
+				|| !StringUtils.hasText(anchor.getTargetType())) {
+			return;
+		}
+		boardReportRepository.findByTargetTypeAndTargetIdOrderByCreatedAtDesc(anchor.getTargetType(), anchor.getTargetId())
+				.stream()
+				.filter(sibling -> sibling.getId() != null && !sibling.getId().equals(anchor.getId()))
+				.forEach(sibling -> sibling.setStatus(status));
+	}
+
 	/**
 	 * 관리자 신고 게시판에서 글 삭제 — 댓글·좋아요·해당 게시글로 접수된 신고(BoardReport) 정리 후 삭제합니다.
 	 */
@@ -283,9 +306,47 @@ public class BoardService {
 		return "신고 게시글을 삭제했습니다.";
 	}
 
+	public String maskedBoardTitle(Board board, boolean handled) {
+		if (board == null) {
+			return "(삭제되었거나 확인 불가)";
+		}
+		if (!board.isVisible() || handled) {
+			return BLINDED_TITLE;
+		}
+		return board.getTitle();
+	}
+
+	private void markReportBoardHandled(Board board) {
+		if (board == null || !"report".equalsIgnoreCase(board.getBoardType())) {
+			return;
+		}
+		boolean alreadyHandled = boardCommentRepository.findByBoardIdOrderByCreatedAtAsc(board.getId()).stream()
+				.anyMatch(comment -> {
+					String content = comment.getContent() == null ? "" : comment.getContent().trim();
+					return content.startsWith(HANDLED_COMMENT_PREFIX);
+				});
+		if (alreadyHandled) {
+			return;
+		}
+		boardCommentRepository.save(new BoardComment(board, HANDLED_COMMENT_PREFIX + " 블라인드 처리", "관리자", null));
+	}
+
 	/**
 	 * 신고 게시판 글에 [처리] 댓글을 남겨 사용자 목록에서 처리완료로 표시합니다.
 	 */
+	private void clearAutoHandledMarker(Board board) {
+		if (board == null || !"report".equalsIgnoreCase(board.getBoardType())) {
+			return;
+		}
+		boardCommentRepository.findByBoardIdOrderByCreatedAtAsc(board.getId()).stream()
+				.filter(comment -> comment.getAuthorMno() == null)
+				.filter(comment -> {
+					String content = comment.getContent() == null ? "" : comment.getContent().trim();
+					return content.startsWith(HANDLED_COMMENT_PREFIX);
+				})
+				.forEach(boardCommentRepository::delete);
+	}
+
 	public String completeReportBoardByAdmin(Long reportBoardId, String adminNick, Long adminMno) {
 		if (reportBoardId == null) {
 			return null;

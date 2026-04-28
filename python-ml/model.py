@@ -105,7 +105,7 @@ class ChoicePredictModel:
         heuristic_scores = self._heuristic_scores(user_text, choices)
         model_scores = self._model_scores(user_text, choices, phase, scene_id)
         blended = _blend_scores(heuristic_scores, model_scores, alpha=0.7 if model_scores else 0.0)
-        score_by_key = _softmax(blended)
+        score_by_key = _confidence_distribution(blended)
         predicted_key = max(score_by_key, key=score_by_key.get)
         confidence = score_by_key.get(predicted_key, 0.0)
         # top1-top2 격차가 너무 작으면 모호한 입력으로 간주해 RULE fallback 유도
@@ -197,10 +197,46 @@ def _load_samples(path: Path) -> List[dict]:
             try:
                 row = json.loads(raw)
             except json.JSONDecodeError:
-                continue
+                row = _recover_training_row(raw)
             if isinstance(row, dict):
                 samples.append(row)
     return samples
+
+
+def _recover_training_row(raw: str) -> dict | None:
+    """
+    Older augmented rows may contain unescaped quotes in choice text.  The admin
+    page can still count those lines with simple extraction, so keep the Python
+    learner in sync by recovering the top-level training fields.
+    """
+    label = _extract_json_string(raw, "resolvedKey").strip().upper()
+    user_text = _extract_json_string(raw, "userText")
+    if not label or not user_text:
+        return None
+    phase = _extract_json_string(raw, "phase")
+    scene_id = _extract_json_number(raw, "sceneId")
+    return {
+        "resolvedKey": label,
+        "userText": user_text,
+        "phase": phase,
+        "sceneId": scene_id,
+        "choices": [],
+    }
+
+
+def _extract_json_string(raw: str, key: str) -> str:
+    match = re.search(r'"' + re.escape(key) + r'"\s*:\s*"([^"]*)"', raw)
+    return match.group(1) if match else ""
+
+
+def _extract_json_number(raw: str, key: str) -> int | None:
+    match = re.search(r'"' + re.escape(key) + r'"\s*:\s*(-?\d+)', raw)
+    if not match:
+        return None
+    try:
+        return int(match.group(1))
+    except ValueError:
+        return None
 
 
 def _count_lines(path: Path) -> int:
@@ -277,6 +313,31 @@ def _softmax(scores: Dict[str, float]) -> Dict[str, float]:
         n = len(scores)
         return {k: 1.0 / n for k in scores}
     return {k: round(v / total, 6) for k, v in exps.items()}
+
+
+def _confidence_distribution(scores: Dict[str, float]) -> Dict[str, float]:
+    if not scores:
+        return {}
+    positives = {k: max(0.0, float(v)) for k, v in scores.items()}
+    total = sum(positives.values())
+    if total <= 0.0:
+        n = len(positives)
+        return {k: round(1.0 / n, 6) for k in positives}
+
+    normalized = {k: v / total for k, v in positives.items()}
+    return _sharpen_distribution(normalized, power=1.35)
+
+
+def _sharpen_distribution(scores: Dict[str, float], power: float) -> Dict[str, float]:
+    if not scores:
+        return {}
+    power = max(1.0, float(power))
+    sharpened = {k: math.pow(max(0.0, v), power) for k, v in scores.items()}
+    total = sum(sharpened.values())
+    if total <= 0.0:
+        n = len(scores)
+        return {k: round(1.0 / n, 6) for k in scores}
+    return {k: round(v / total, 6) for k, v in sharpened.items()}
 
 
 def _top_two_gap(scores: Dict[str, float]) -> float:

@@ -73,6 +73,12 @@ public class Trainee {
 	@Column(name = "INSTAGRAM")
 	private String instagram; // 인스타그램 아이디
 
+	@Column(name = "UNLOCK_CONDITION", length = 500)
+	private String unlockCondition;
+
+	@Column(name = "UNLOCK_SCORE")
+	private Integer unlockScore;
+
 	/* ── 게임 대사 톤용 성격 코드 ── */
 	@Column(name = "PERSONALITY_CODE", length = 32)
 	private String personalityCode;
@@ -166,6 +172,14 @@ public class Trainee {
 
 	public String getInstagram() {
 		return instagram;
+	}
+
+	public String getUnlockCondition() {
+		return unlockCondition;
+	}
+
+	public Integer getUnlockScore() {
+		return unlockScore;
 	}
 
 	public String getPersonalityCode() {
@@ -269,6 +283,14 @@ public class Trainee {
 
 	public void setInstagram(String instagram) {
 		this.instagram = instagram;
+	}
+
+	public void setUnlockCondition(String unlockCondition) {
+		this.unlockCondition = unlockCondition;
+	}
+
+	public void setUnlockScore(Integer unlockScore) {
+		this.unlockScore = unlockScore;
 	}
 
 	public void setPersonalityCode(String personalityCode) {

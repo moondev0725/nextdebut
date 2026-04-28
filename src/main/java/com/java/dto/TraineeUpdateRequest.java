@@ -14,6 +14,8 @@ public class TraineeUpdateRequest {
 	private Grade grade;
 	private String hobby;
 	private String instagram;
+	private String unlockCondition;
+	private Integer unlockScore;
 
 	public String getName() {
 		return name;
@@ -77,5 +79,21 @@ public class TraineeUpdateRequest {
 
 	public void setInstagram(String instagram) {
 		this.instagram = instagram;
+	}
+
+	public String getUnlockCondition() {
+		return unlockCondition;
+	}
+
+	public void setUnlockCondition(String unlockCondition) {
+		this.unlockCondition = unlockCondition;
+	}
+
+	public Integer getUnlockScore() {
+		return unlockScore;
+	}
+
+	public void setUnlockScore(Integer unlockScore) {
+		this.unlockScore = unlockScore;
 	}
 }

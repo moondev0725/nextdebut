@@ -21,7 +21,8 @@
     .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
     .pill{padding:8px 12px;border-radius:999px;border:1px solid var(--line);text-decoration:none;color:#8f1b58;font-size:12px;font-weight:700;background:#fff;}
     .pill.on{background:linear-gradient(135deg,#fbcfe8,#f472b6);color:#831843;}
-    .input,.select{border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:13px;}
+    .input,.select,.hint-box{border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:13px;}
+    .hint-box{background:#fff8fc;color:#7f6e81;font-size:12px;line-height:1.6;}
     .btn{border:1px solid var(--line);border-radius:10px;background:#fff;padding:9px 12px;font-size:12px;font-weight:700;color:#8f1b58;cursor:pointer;}
     .btn.primary{background:linear-gradient(135deg,#f9a8d4,#f472b6);color:#fff;}
     .layout{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;}
@@ -57,22 +58,9 @@
     <div class="head">
       <div>
         <h1 class="title">TRAINEE OPS</h1>
-        <div class="muted">연습생 검색/추가/능력치/이미지/포토카드 운영</div>
+        <div class="muted">연습생 검색/상세 수정/능력치/이미지/포토카드 운영</div>
       </div>
-      <form method="post" action="${ctx}/admin/trainee" enctype="multipart/form-data" class="row">
-        <input class="input" type="text" name="name" placeholder="이름" required>
-        <select class="select" name="gender" required>
-          <option value="MALE">남성</option>
-          <option value="FEMALE">여성</option>
-        </select>
-        <input class="input" type="number" min="0" max="20" name="vocal" placeholder="보컬" required>
-        <input class="input" type="number" min="0" max="20" name="dance" placeholder="댄스" required>
-        <input class="input" type="number" min="0" max="20" name="star" placeholder="스타성" required>
-        <input class="input" type="number" min="0" max="20" name="mental" placeholder="멘탈" required>
-        <input class="input" type="number" min="0" max="20" name="teamwork" placeholder="팀워크" required>
-        <input class="input" type="file" name="image" accept="image/*">
-        <button class="btn primary" type="submit">연습생 추가</button>
-      </form>
+      <a href="${ctx}/admin/trainees/new" class="btn primary">연습생 추가</a>
     </div>
     <div class="filters">
       <form method="get" action="${ctx}/admin/trainees" class="row">
@@ -187,7 +175,7 @@
                 </div>
                 <div class="field">
                   <label>나이</label>
-                  <input class="input" type="number" min="1" max="99" name="age" value="${selectedTrainee.age}" placeholder="나이">
+                  <input class="input" type="number" min="1" name="age" value="${selectedTrainee.age}" placeholder="나이">
                 </div>
                 <div class="field">
                   <label>생일</label>
@@ -204,6 +192,14 @@
                 <div class="field full">
                   <label>인스타그램 아이디</label>
                   <input class="input full" name="instagram" value="${selectedTrainee.instagram}" placeholder="인스타그램 아이디">
+                </div>
+                <div class="field">
+                  <label>해금 최소 점수</label>
+                  <input class="input" type="number" min="0" max="1000" name="unlockScore" value="${selectedTrainee.unlockScore}" placeholder="예: 500">
+                </div>
+                <div class="field full">
+                  <label>적용 기준</label>
+                  <div class="hint-box">게임 최종 점수 1000점 만점 기준입니다. 예를 들어 500을 입력하면, 해당 회원의 최고 점수가 500점 이상일 때만 이 연습생이 해금됩니다.</div>
                 </div>
                 <button class="btn primary full" type="submit">기본 정보 저장</button>
               </form>
@@ -225,23 +221,23 @@
               <form method="post" action="${ctx}/admin/trainees/${selectedTrainee.id}/stats" class="form-grid" id="statsForm">
                 <div class="field">
                   <label>보컬</label>
-                  <input class="input stat-input" type="number" min="0" max="20" name="vocal" value="${selectedTrainee.vocal}" required data-label="보컬">
+                  <input class="input stat-input" type="number" min="0" max="100" name="vocal" value="${selectedTrainee.vocal}" required data-label="보컬">
                 </div>
                 <div class="field">
                   <label>댄스</label>
-                  <input class="input stat-input" type="number" min="0" max="20" name="dance" value="${selectedTrainee.dance}" required data-label="댄스">
+                  <input class="input stat-input" type="number" min="0" max="100" name="dance" value="${selectedTrainee.dance}" required data-label="댄스">
                 </div>
                 <div class="field">
                   <label>스타성</label>
-                  <input class="input stat-input" type="number" min="0" max="20" name="star" value="${selectedTrainee.star}" required data-label="스타성">
+                  <input class="input stat-input" type="number" min="0" max="100" name="star" value="${selectedTrainee.star}" required data-label="스타성">
                 </div>
                 <div class="field">
                   <label>멘탈</label>
-                  <input class="input stat-input" type="number" min="0" max="20" name="mental" value="${selectedTrainee.mental}" required data-label="멘탈">
+                  <input class="input stat-input" type="number" min="0" max="100" name="mental" value="${selectedTrainee.mental}" required data-label="멘탈">
                 </div>
                 <div class="field full">
                   <label>팀워크</label>
-                  <input class="input stat-input full" type="number" min="0" max="20" name="teamwork" value="${selectedTrainee.teamwork}" required data-label="팀워크">
+                  <input class="input stat-input full" type="number" min="0" max="100" name="teamwork" value="${selectedTrainee.teamwork}" required data-label="팀워크">
                 </div>
                 <div class="full stat-preview" id="statPreview"></div>
                 <button class="btn primary full" type="submit">능력치 저장</button>

@@ -1,4 +1,8 @@
 (function () {
+  /* 게임 페이지 등에서 defer + 동기 로드가 겹치면 중복 DOM·예외 발생 → 한 번만 초기화 */
+  if (typeof window !== 'undefined' && window.__UNITX_CHAT_WIDGET_INITIALIZED) return;
+  if (typeof window !== 'undefined') window.__UNITX_CHAT_WIDGET_INITIALIZED = true;
+
   const chatOpenKey = 'chat_open';
 
   // ── 위젯 HTML ──
@@ -20,13 +24,45 @@
       </div>
     </div>
   `;
+  widget.innerHTML = `
+    <div id="chat-box" style="display:none;">
+      <div id="chat-header">
+        <span>AI 어시스턴트</span>
+        <div>
+          <button id="chat-clear" title="대화 초기화">🗑</button>
+          <button id="chat-close" title="닫기">✕</button>
+        </div>
+      </div>
+      <div id="chat-messages"></div>
+      <div id="chat-input-row">
+        <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." autocomplete="off"/>
+        <button id="chat-send">전송</button>
+      </div>
+    </div>
+  `;
+  widget.innerHTML = `
+    <div id="chat-box" style="display:none;">
+      <div id="chat-header">
+        <span>AI 어시스턴트</span>
+        <div>
+          <button id="chat-clear" title="대화 초기화">🗑</button>
+          <button id="chat-close" title="닫기">✕</button>
+        </div>
+      </div>
+      <div id="chat-messages"></div>
+      <div id="chat-input-row">
+        <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." autocomplete="off"/>
+        <button id="chat-send">전송</button>
+      </div>
+    </div>
+  `;
   document.body.appendChild(widget);
 
   const style = document.createElement('style');
   style.textContent = `
-    #chat-widget { position:fixed; z-index:9999; font-family:'Orbitron',sans-serif; }
+    #chat-widget { position:fixed; z-index:20018; font-family:'Orbitron',sans-serif; }
     #chat-box {
-      position:fixed; width:320px;
+      position:fixed; z-index:20019; width:min(320px, calc(100vw - 16px)); max-height:calc(100vh - 16px);
       background: rgba(15, 8, 30, 0.55);
       backdrop-filter: blur(20px) saturate(1.6);
       -webkit-backdrop-filter: blur(20px) saturate(1.6);
@@ -202,6 +238,9 @@
   }
 
   function getToggleBtn() {
+    const trayBtn = document.querySelector('.game-floating-chat-tray #chat-toggle-btn');
+    if (trayBtn) return trayBtn;
+
     const localBtn = document.getElementById('chat-toggle-btn');
     if (localBtn) return localBtn;
 
@@ -211,9 +250,21 @@
     return document.getElementById('chat-toggle-btn-global');
   }
 
+  function isGameChatTrayButton(btn) {
+    return !!(btn && btn.closest && btn.closest('.game-floating-chat-tray'));
+  }
+
+  function getChatBoxMetrics() {
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
+    return {
+      boxWidth: Math.min(320, Math.max(280, vw - 16)),
+      boxHeight: Math.min(420, Math.max(260, vh - 16))
+    };
+  }
+
   function calcPositionFromBtn() {
-    const boxWidth  = 320;
-    const boxHeight = 420;
+    const { boxWidth, boxHeight } = getChatBoxMetrics();
     const gap       = 8;
     const margin    = 8;
     const vw        = document.documentElement.clientWidth;
@@ -221,11 +272,27 @@
 
     const btn = getToggleBtn();
     if (!btn) return null;
+    if (isGameChatTrayButton(btn)) {
+      const rect = btn.getBoundingClientRect();
+      let top = rect.bottom + gap;
+      let right = Math.max(margin, vw - rect.right);
+      const maxTop = Math.max(margin, vh - boxHeight - margin);
+      if (top < margin) top = margin;
+      if (top > maxTop) top = Math.max(margin, rect.top - boxHeight - gap);
+      return { mode: 'game-tray', top, right };
+    }
     const sideNav = btn.closest('.hero-side-nav');
     if (sideNav) {
       const navRect = sideNav.getBoundingClientRect();
-      const right = Math.max(margin, Math.round(navRect ? (vw - navRect.left + gap) : 68));
-      return { mode: 'side-nav', right };
+      let left = navRect ? (navRect.right + gap) : (vw - boxWidth - 16);
+      let top = navRect ? navRect.top : margin;
+      const maxLeft = Math.max(margin, vw - boxWidth - margin);
+      const maxTop = Math.max(margin, vh - boxHeight - margin);
+      if (left < margin) left = margin;
+      if (left > maxLeft) left = maxLeft;
+      if (top < margin) top = margin;
+      if (top > maxTop) top = maxTop;
+      return { mode: 'free', top, left };
     }
     const rect = btn.getBoundingClientRect();
 
@@ -245,8 +312,7 @@
   }
 
   function clampPosition(top, left) {
-    const boxWidth = 320;
-    const boxHeight = 420;
+    const { boxWidth, boxHeight } = getChatBoxMetrics();
     const margin = 8;
     const vw = document.documentElement.clientWidth;
     const vh = document.documentElement.clientHeight;
@@ -276,6 +342,18 @@
         box.style.transform = 'translateY(-50%)';
         box.style.display = 'flex';
         saveBoxState(true, '50%', 'auto');
+        return;
+      }
+
+      if (topOrPos.mode === 'game-tray') {
+        const top = Math.max(8, Number(topOrPos.top) || 8);
+        const right = Math.max(8, Number(topOrPos.right) || 8);
+        box.style.top = top + 'px';
+        box.style.left = 'auto';
+        box.style.right = right + 'px';
+        box.style.transform = 'none';
+        box.style.display = 'flex';
+        saveBoxState(true, top, 'auto');
         return;
       }
 
@@ -433,9 +511,15 @@
       sessionStorage.setItem('cr_open', '0');
     }
 
-    const pos = calcPositionFromBtn();
-    if (!pos) return;
+    let pos = calcPositionFromBtn();
+    if (!pos) {
+      const vw = document.documentElement.clientWidth;
+      const boxWidth = 320;
+      pos = { mode: 'free', top: 96, left: Math.max(8, vw - boxWidth - 16) };
+    }
 
+    sessionStorage.removeItem('chat_pos_top');
+    sessionStorage.removeItem('chat_pos_left');
     applyBoxPosition(pos);
     document.getElementById('chat-input').focus();
   };

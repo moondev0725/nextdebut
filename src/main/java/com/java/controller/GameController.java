@@ -120,7 +120,7 @@ public String continueLatestRun(@RequestParam(name = "runId", required = false) 
     if (requestedRunId != null) {
         GameRun requested = gameRunRepository.findById(requestedRunId).orElse(null);
         if (requested != null && canAccessRun(requested, lm)) {
-            if ("FINISHED".equals(requested.getPhase())) {
+            if (isEndedPhase(requested.getPhase())) {
                 return "redirect:/main?openGameModal=1&noContinue=1";
             }
             return redirectToRunProgress(requested, true);
@@ -130,6 +130,33 @@ public String continueLatestRun(@RequestParam(name = "runId", required = false) 
     if (lm != null && lm.mno() != null) {
         try {
             List<GameRun> myRuns = gameRunRepository.findByPlayerMnoOrderByCreatedAtDesc(lm.mno());
+            boolean hasEndedRun = myRuns.stream()
+                    .anyMatch(r -> r != null && isEndedPhase(r.getPhase()));
+            if (hasEndedRun) {
+                return "redirect:/main?openGameModal=1&noContinue=1";
+            }
+            if (!myRuns.isEmpty()) {
+                GameRun latestRun = myRuns.stream()
+                        .filter(r -> r != null)
+                        .max((a, b) -> {
+                            LocalDateTime ar = a.getFinishedAt() != null ? a.getFinishedAt() : a.getCreatedAt();
+                            LocalDateTime br = b.getFinishedAt() != null ? b.getFinishedAt() : b.getCreatedAt();
+                            if (ar == null && br == null) {
+                                return 0;
+                            }
+                            if (ar == null) {
+                                return -1;
+                            }
+                            if (br == null) {
+                                return 1;
+                            }
+                            return ar.compareTo(br);
+                        })
+                        .orElse(null);
+                if (latestRun != null && isEndedPhase(latestRun.getPhase())) {
+                    return "redirect:/main?openGameModal=1&noContinue=1";
+                }
+            }
             GameRun candidate = pickBestContinueRun(myRuns);
             if (candidate != null) {
                 return redirectToRunProgress(candidate, false);
@@ -734,6 +761,9 @@ public String continueLatestRun(@RequestParam(name = "runId", required = false) 
         if (dayNum < 1) dayNum = 1;
         if (dayNum > 84) dayNum = 84;
 
+        /* game.js 컨디션 패널: 클라 phase 파싱과 무관하게 서버 일차로 시작 스냅샷(집중50·컨디션100 등) */
+        model.addAttribute("trainingCalendarDay", dayNum);
+
         int monthNum = ((dayNum - 1) / 28) + 1;
         int monthProgressPct = ((dayNum - 1) * 100) / 83;
         int dayInMonth = ((dayNum - 1) % 28) + 1;
@@ -981,6 +1011,7 @@ public String continueLatestRun(@RequestParam(name = "runId", required = false) 
         out.put("lightFans", run != null ? run.getLightFans() : 0);
         out.put("monthNum", monthNum);
         out.put("monthProgressPct", monthProgressPct);
+        out.put("trainingCalendarDay", dayNum);
         out.put("weekNum", weekNum);
         out.put("dayInMonth", dayInMonth);
         out.put("weekInMonth", weekInMonth);
@@ -1255,19 +1286,23 @@ private GameRun pickBestContinueRun(List<GameRun> runs) {
     if (runs == null || runs.isEmpty()) return null;
 
     for (GameRun run : runs) {
-        if (run == null || "FINISHED".equals(run.getPhase())) continue;
+        if (run == null || isEndedPhase(run.getPhase())) continue;
         if (run.isConfirmed()) return run;
     }
     for (GameRun run : runs) {
-        if (run == null || "FINISHED".equals(run.getPhase())) continue;
+        if (run == null || isEndedPhase(run.getPhase())) continue;
         String phase = run.getPhase();
         if (phase != null && !"DAY1_MORNING".equals(phase)) return run;
     }
     for (GameRun run : runs) {
-        if (run == null || "FINISHED".equals(run.getPhase())) continue;
+        if (run == null || isEndedPhase(run.getPhase())) continue;
         return run;
     }
     return null;
+}
+
+private boolean isEndedPhase(String phase) {
+    return "FINISHED".equals(phase) || "DEBUT_EVAL".equals(phase);
 }
 
 private void putRerollTiming(Map<String, Object> body, Long runId, LoginMember lm) {

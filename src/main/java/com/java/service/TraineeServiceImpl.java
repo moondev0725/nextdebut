@@ -58,13 +58,20 @@ public class TraineeServiceImpl implements TraineeService {
 		Trainee trainee = new Trainee(
 				request.getName().trim(),
 				request.getGender(),
-				Grade.N,
+				request.getGrade() == null ? Grade.N : request.getGrade(),
 				clamp(request.getVocal()),
 				clamp(request.getDance()),
 				clamp(request.getStar()),
 				clamp(request.getMental()),
 				clamp(request.getTeamwork()),
 				request.getImagePath());
+		trainee.setAge(request.getAge());
+		trainee.setBirthday(request.getBirthday());
+		trainee.setHeight(request.getHeight());
+		trainee.setHobby(trimToNull(request.getHobby()));
+		trainee.setInstagram(trimToNull(request.getInstagram()));
+		trainee.setUnlockCondition(trimToNull(request.getUnlockCondition()));
+		trainee.setUnlockScore(normalizeUnlockScore(request.getUnlockScore()));
 		return traineeRepository.save(trainee);
 	}
 
@@ -87,6 +94,8 @@ public class TraineeServiceImpl implements TraineeService {
 			trainee.setHeight(request.getHeight());
 			trainee.setHobby(trimToNull(request.getHobby()));
 			trainee.setInstagram(trimToNull(request.getInstagram()));
+			trainee.setUnlockCondition(trimToNull(request.getUnlockCondition()));
+			trainee.setUnlockScore(normalizeUnlockScore(request.getUnlockScore()));
 		}
 		return trainee;
 	}
@@ -137,7 +146,13 @@ public class TraineeServiceImpl implements TraineeService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Trainee> searchForAdmin(String keyword, Gender gender, Grade grade, String sort) {
-		List<Trainee> rows = traineeRepository.searchForAdmin(keyword == null ? "" : keyword.trim(), gender, grade);
+		List<Trainee> rows = traineeRepository.searchForAdmin("", gender, grade);
+		String normalizedKeyword = normalizeSearchText(keyword);
+		if (StringUtils.hasText(normalizedKeyword)) {
+			rows = rows.stream()
+					.filter(t -> normalizeSearchText(t.getName()).contains(normalizedKeyword))
+					.toList();
+		}
 		String sortKey = (sort == null ? "name" : sort.trim().toLowerCase());
 		if ("ability".equals(sortKey)) {
 			return rows.stream()
@@ -165,5 +180,19 @@ public class TraineeServiceImpl implements TraineeService {
 			return null;
 		}
 		return value.trim();
+	}
+
+	private String normalizeSearchText(String value) {
+		if (!StringUtils.hasText(value)) {
+			return "";
+		}
+		return value.trim().replace(" ", "").toLowerCase(java.util.Locale.ROOT);
+	}
+
+	private Integer normalizeUnlockScore(Integer value) {
+		if (value == null) {
+			return null;
+		}
+		return Math.max(0, Math.min(1000, value));
 	}
 }

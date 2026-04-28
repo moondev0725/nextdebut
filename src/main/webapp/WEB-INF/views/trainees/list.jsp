@@ -499,10 +499,30 @@
             pointer-events: none;
             background: linear-gradient(180deg, rgba(12, 14, 22, 0.10), rgba(12, 14, 22, 0.22));
         }
+        .card-lock__content {
+            display: grid;
+            justify-items: center;
+            gap: 8px;
+            text-align: center;
+            padding: 18px 20px;
+            color: #fff;
+        }
         .card-lock i {
             font-size: 53px;
             color: #fff;
             opacity: 0.8;
+            text-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+        }
+        .card-lock strong {
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            text-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+        }
+        .card-lock span {
+            font-size: 12px;
+            font-weight: 700;
+            opacity: 0.92;
             text-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
         }
         .card-placeholder {
@@ -1476,6 +1496,11 @@
                     </c:choose>
                     현재 <strong>${totalCount}명</strong>이 등록되어 있습니다.
                 </p>
+                <c:if test="${loggedIn}">
+                    <p class="hero-sub" style="margin-top:10px;">
+                        현재 회원 최고 점수는 <strong>${memberBestScore}점</strong>이며, 해금 점수가 있는 연습생은 이 최고 점수를 기준으로 도감 공개와 가챠 대상 여부가 결정됩니다.
+                    </p>
+                </c:if>
 
                 <div class="summary-grid">
                     <div class="summary-item summary-item--lavender">
@@ -1619,6 +1644,7 @@
                                     <div class="trainee-grid">
                         <c:forEach var="t" items="${groupEntry.value}" varStatus="status">
                             <c:set var="isHiddenMask" value="${not empty t.grade and t.grade.name() == 'HIDDEN'}"/>
+                            <c:set var="isScoreLocked" value="${lockedTraineeIds.contains(t.id)}"/>
                             <c:set var="maskedName" value="${isHiddenMask ? 'HIDDEN' : t.name}"/>
                             <c:set var="total" value="${t.vocal + t.dance + t.star + t.mental + t.teamwork}"/>
                             <c:set var="pcs" value="${photoCardSummaries[t.id]}"/>
@@ -1672,6 +1698,8 @@
                                 data-instagram="${isHiddenMask ? '' : t.instagram}"
                                 data-image-path="${isHiddenMask ? '' : t.imagePath}"
                                 data-hidden="${isHiddenMask ? 'true' : 'false'}"
+                                data-unlock-score="${t.unlockScore != null ? t.unlockScore : 0}"
+                                data-score-locked="${isScoreLocked ? 'true' : 'false'}"
                                 data-owned="${ownStr}"
                                 data-owned-qty="${ownedTraineeQtyMap[t.id]}"
                                 data-enhance-level="${ownedEnhanceLevelMap[t.id] != null ? ownedEnhanceLevelMap[t.id] : 0}"
@@ -1685,7 +1713,16 @@
                                 data-pc-bonus="${pcs != null ? pcs.equippedBonusPercent : 0}"
                                 onclick="handleTraineeCardClick(this)">
                                 <div class="card-media">
-                                    <c:if test="${loggedIn and not ownedTraineeIds.contains(t.id)}">
+                                    <c:if test="${isScoreLocked}">
+                                        <div class="card-lock" aria-hidden="true">
+                                            <div class="card-lock__content">
+                                                <i class="fas fa-lock"></i>
+                                                <strong>점수 해금 필요</strong>
+                                                <span>최고 점수 ${t.unlockScore}점 이상</span>
+                                            </div>
+                                        </div>
+                                    </c:if>
+                                    <c:if test="${loggedIn and not ownedTraineeIds.contains(t.id) and not isScoreLocked}">
                                         <div class="card-lock" aria-hidden="true">
                                             <i class="fas fa-lock"></i>
                                         </div>
@@ -1700,8 +1737,8 @@
                                           ))))}">${empty t.grade ? '—' : t.grade.name()}</span>
                                         <c:choose>
                                             <c:when test="${loggedIn}">
-                                                <span class="ownership-badge ${ownedTraineeIds.contains(t.id) ? 'ownership-badge--owned' : 'ownership-badge--missing'}" title="${ownedTraineeIds.contains(t.id) ? '보유 중' : '미보유'}">
-                                                    ${ownedTraineeIds.contains(t.id) ? '보유중' : '미보유'}
+                                                <span class="ownership-badge ${isScoreLocked ? 'ownership-badge--missing' : (ownedTraineeIds.contains(t.id) ? 'ownership-badge--owned' : 'ownership-badge--missing')}" title="${isScoreLocked ? '점수 해금 필요' : (ownedTraineeIds.contains(t.id) ? '보유 중' : '미보유')}">
+                                                    ${isScoreLocked ? '점수잠금' : (ownedTraineeIds.contains(t.id) ? '보유중' : '미보유')}
                                                 </span>
                                             </c:when>
                                             <c:otherwise>
@@ -1750,9 +1787,13 @@
                                     <div class="tag-row">
                                         <c:choose>
                                             <c:when test="${loggedIn}">
-                                                <span class="tag-chip ${ownedTraineeIds.contains(t.id) ? 'tag-chip--lavender' : 'tag-chip--dim'}">
-                                                    <i class="fas ${ownedTraineeIds.contains(t.id) ? 'fa-check-circle' : 'fa-lock'}"></i>
-                                                    ${ownedTraineeIds.contains(t.id) ? '보유 중' : '미보유'}
+                                                <span class="tag-chip ${isScoreLocked ? 'tag-chip--dim' : (ownedTraineeIds.contains(t.id) ? 'tag-chip--lavender' : 'tag-chip--dim')}">
+                                                    <i class="fas ${isScoreLocked ? 'fa-trophy' : (ownedTraineeIds.contains(t.id) ? 'fa-check-circle' : 'fa-lock')}"></i>
+                                                    <c:choose>
+                                                        <c:when test="${isScoreLocked}">해금 ${t.unlockScore}점 필요</c:when>
+                                                        <c:when test="${ownedTraineeIds.contains(t.id)}">보유 중</c:when>
+                                                        <c:otherwise>미보유</c:otherwise>
+                                                    </c:choose>
                                                 </span>
                                             </c:when>
                                             <c:otherwise>

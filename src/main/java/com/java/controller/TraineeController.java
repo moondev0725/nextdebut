@@ -41,6 +41,7 @@ import com.java.photocard.service.PhotoCardService;
 import com.java.photocard.entity.PhotoCardGrade;
 import com.java.dto.TraineePhotoCardSummaryDto;
 import com.java.service.TraineeGroupService;
+import com.java.service.TraineeUnlockService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -54,16 +55,19 @@ public class TraineeController {
 	private final GameRunRepository gameRunRepository;
 	private final PhotoCardService photoCardService;
 	private final TraineeGroupService traineeGroupService;
+	private final TraineeUnlockService traineeUnlockService;
 
 	public TraineeController(TraineeRepository traineeRepository, MyTraineeRepository myTraineeRepository,
 			TraineeLikeService traineeLikeService, GameRunRepository gameRunRepository,
-			PhotoCardService photoCardService, TraineeGroupService traineeGroupService) {
+			PhotoCardService photoCardService, TraineeGroupService traineeGroupService,
+			TraineeUnlockService traineeUnlockService) {
 		this.traineeRepository = traineeRepository;
 		this.myTraineeRepository = myTraineeRepository;
 		this.traineeLikeService = traineeLikeService;
 		this.gameRunRepository = gameRunRepository;
 		this.photoCardService = photoCardService;
 		this.traineeGroupService = traineeGroupService;
+		this.traineeUnlockService = traineeUnlockService;
 	}
 
 	/**
@@ -100,6 +104,7 @@ public class TraineeController {
 
 		LoginMember loginMember = (LoginMember) session.getAttribute(SessionConst.LOGIN_MEMBER);
 		boolean loggedIn = loginMember != null;
+		int bestScore = loggedIn ? traineeUnlockService.resolveBestScore(loginMember.mno()) : 0;
 		Set<Long> ownedTraineeIds = Collections.emptySet();
 		Map<Long, Integer> ownedTraineeQtyMap = Collections.emptyMap();
 		Map<Long, Integer> ownedEnhanceLevelMap = Collections.emptyMap();
@@ -108,6 +113,10 @@ public class TraineeController {
 			ownedTraineeQtyMap = loadOwnedQuantityMap(loginMember.mno());
 			ownedEnhanceLevelMap = loadOwnedEnhanceLevelMap(loginMember.mno());
 		}
+		Set<Long> finalOwnedTraineeIds = ownedTraineeIds;
+		Set<Long> lockedTraineeIds = traineeUnlockService.resolveLockedTraineeIds(trainees, bestScore).stream()
+				.filter(id -> !finalOwnedTraineeIds.contains(id))
+				.collect(Collectors.toCollection(HashSet::new));
 
 		model.addAttribute("trainees", trainees);
 		model.addAttribute("selectedGender", gender.toUpperCase(Locale.ROOT));
@@ -119,6 +128,8 @@ public class TraineeController {
 		model.addAttribute("ownedTraineeIds", ownedTraineeIds);
 		model.addAttribute("ownedTraineeQtyMap", ownedTraineeQtyMap);
 		model.addAttribute("ownedEnhanceLevelMap", ownedEnhanceLevelMap);
+		model.addAttribute("memberBestScore", bestScore);
+		model.addAttribute("lockedTraineeIds", lockedTraineeIds);
 		Map<Long, String> traineeGroups = new HashMap<>();
 		for (Trainee t : trainees) {
 			traineeGroups.put(t.getId(), traineeGroupService.resolveTraineeGroup(t.getName()));

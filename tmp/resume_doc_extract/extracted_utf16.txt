@@ -1,0 +1,87 @@
+ SHAPE \* MERGEFORMAT 
+1994.07.25
+010-4441-5442
+ HYPERLINK "mailto:m48995442@gmail.com"
+moondev0725@gmail.com
+경기도 남양주시 오남읍 진건오남로 631 (진주아파트), 801동 511호
+https://po-henna.vercel.app/
+ 직무역량[Backend]- Spring Boot, Django 기반 웹 애플리케이션 개발- MVC / MTV 아키텍처 기반 계층 분리 및 서비스 레이어 설계- JPA, Django ORM을 활용한 데이터 모델링 및 트랜잭션 처리- WebSocket 기반 실시간 양방향 통신 시스템 구현 (동접 처리 및 메시지 구조 설계)- 외부 API(KakaoPay) 연동 및 결제 흐름 설계 (중복 요청 방지, 실패 처리 및 롤백 대응)- 인증 및 권한 처리 구현 (세션 기반 로그인, 접근 제어)- 게시판 및 댓글 시스템 설계 (페이징, 검색, N+1 문제 개선 및 데이터 무결성 고려)- Spring Security / OAuth2 기반 소셜 로그인 및 인증 흐름 구현- Python ML(FastAPI, scikit-learn) 연동을 통한 예측 기능 적용 경험- 관리자 페이지, 운영 지표, 배포 스크립트 등 서비스 운영 기능 구현 경험[Architecture & Problem Solving]- 사용자 행동 기반 서비스 흐름 및 상태 관리 로직 설계- 예외 상황 및 실패 케이스를 고려한 안정적인 처리 구조 설계- 트랜잭션 경계 설정 및 데이터 정합성 유지 전략 적용- 비동기 처리 및 실시간 통신 구조(WebSocket)에 대한 설계 및 적용- 중복 로직 최소화 및 계층 간 역할 분리를 통한 유지보수성 개선
+2010.03~2013.02
+2013.03~07
+2025.10~2026.04
+KOSMO (한국소프트웨어인재개발원)
+풀스택 웹 개발자 과정- Python 및 Django 기반 웹 서비스 개발- Java, Spring Boot 기반 웹 애플리케이션 개발- JSP / JSTL 기반 서버 사이드 렌더링 구현- JPA 및 데이터베이스 설계 (Oracle)- Django ORM을 활용한 데이터 처리- WebSocket 기반 실시간 채팅 기능 구현- KakaoPay API 연동 결제 기능 개발- 팀 프로젝트를 통한 서비스 설계 및 구현 경험
+2024.05.02.
+2종 보통
+2016.05 ~ 2023.01
+2023.01 ~ 2024.01
+2024.03 ~ 2024.12 
+2025.08 ~ 2025.09 
+2014.07~2016.04
+ 기술핵심역량(Skill Stack)구분
+Skill
+Programing Languages
+Java, Python, JavaScript, HTML5, CSS3
+Framework/ Library
+Spring
+REST API 설계, MVC 패턴 이해, 웹 서비스 개발 경험,OAuth2 인증, WebSocket 실시간 통신, 결제 연동, 서비스 흐름 설계 경험
+서비스 기획부터 구조 설계까지 수행하는 백엔드 개발자가 되고자 지원했습니다.웹 서비스를 구현하는 과정에서 단순 기능 개발보다 사용자가 어떤 흐름으로 서비스를 이용하는지를 설계하는 과정에 더 큰 흥미를 느꼈습니다.프로젝트를 진행하며 기능 구현을 넘어 서비스 아이디어를 직접 구체화하고 흐름을 설계하는 경험을 했고,이를 통해 백엔드 개발자로 성장하고자 하는 방향을 확립하게 되었습니다.첫 번째 프로젝트에서는 Django 기반 게시판 기능에서 나아가 실시간 채팅과 결제 기능까지 확장하며 실제 서비스 형태로 발전시켰습니다.두 번째 프로젝트에서는 사용자 선택에 따라 상태가 변화하는 게임 로직을 직접 설계했을 뿐 아니라,가챠, 결제, 실시간 채팅, 팬미팅, 관리자 기능까지 확장하며 하나의 서비스 흐름 전체를 만드는 경험을 쌓았습니다.이러한 경험을 바탕으로 기획부터 구조 설계까지 수행하는 개발자가 되고자 지원했습니다.
+2026.03~2026.04
+NEXTDEBUT | 아이돌 육성 시뮬레이션 웹 서비스 개발
+Backend: Java 21, Spring Boot 4, Spring MVC, Spring Data JPA, Spring SecurityFrontend: JSP, JSTL, JavaScript, jQuery, CSS, Database: H2Etc: OAuth2, WebSocket, KakaoPay API, Python(FastAPI, scikit-learn), PowerShell
+ 결과로 이어지는 게임 진행  구조 설계 및 구현- 로스터 선정, 리롤, 능력치 변화, 팬 수 반영, 엔딩 분기 등 핵심  게임 로직 구현- 가챠, 포토카드, 인벤토리, 코인 시스템 설계 및 구현- KakaoPay API 연동을 통한 코인 충전 기능 구현- Spring Security 및 OAuth2 기반 카카오·구글·네이버 소셜 로그인 구현- WebSocket 기반 실시간 채팅방, 채팅 이력 저장, 금칙어  모더레이션 기능 구현- 팬미팅 게시판, 지도 기반 위치 기능, 일정 관리, 참가 신청 및  추첨 기능 개발- 관리자 페이지 구현- Python ML 서버와 연동하여 사용자 입력을 게임 선택지로  해석하는 기능 구현- Windows 포터블 실행 번들 및 런처 스크립트 제작
+- 서비스 기획부터 구현, 운영 기능 고도화까지 전 과정 수행 경험- 상태 기반 게임 로직 및 복잡한 흐름 제어 구조 설계 역량- 인증/인가, 결제, 실시간 채팅, 관리자 기능을 포함한 서비스형 웹  구조 구현 경험- Java 서버와 Python ML 기능 연동 경험- WebSocket 기반 실시간 통신 및 데이터 저장 구조 구현 경험- JPA 기반 데이터 모델링 및 서비스 계층 설계 역량- 배포 편의성을 고려한 런처 및 포터블 실행 환경 구성 경험
+- 사용자 선택에 따라 상태와 결과가 변화하는 아이돌 육성  시뮬레이션 웹 서비스 구현- 가챠, 포토카드, 상점, 결제, 팬미팅, 실시간 채팅, 관리자 기능까지 포함한 서비스 완성- 자연어 입력 기반 선택 해석을 위한 Python ML 연동 기능 적용
+2025.12~2026.01
+지역 기반 커뮤니티 웹 서비스 (MomsLog)
+Backend: Python, Django, Django ORM, Django ChannelsFrontend: HTML, CSS, JavaScriptDatabase: SQLite
+- 서비스 구조 기획 및 사용자 간 실시간 소통 흐름 설계- Django 기반 게시판 및 댓글 CRUD 기능 구현- Django ORM을 활용한 데이터 모델링 및 관리- WebSocket(Django Channels)을 활용한 실시간 채팅 기능 구현- 사용자 인증 및 세션 기반 로그인 처리 및 회원가입 구현서버 사이드 렌더링 기반 페이지 구성 및 사용자 흐름 최적화
+- Django 프레임워크 기반 웹 서비스 구조 이해- ORM을 활용한 데이터 처리 경험WebSocket 기반 실시간 통신 구조 이해 및 구현- 프론트엔드와 백엔드를 연결한 서비스 구현 경험- 사용자 중심 흐름 설계 및 기능 통합 경험
+- 게시판, 댓글, 실시간 채팅 기능이 포함된 커뮤니티 웹 서비스 구현- 사용자 간 실시간 소통이 가능한 WebSocket 기반 채팅 시스템 구축
+Normal
+Default Paragraph Font
+Table Normal
+No List
+Header
+Header Char
+Footer
+Footer Char
+	Hyperlink
+Footnote Reference
+Endnote Reference
+개요 1
+개요 2
+개요 3
+개요 4
+개요 5
+개요 6
+개요 7
+MS바탕글
+바탕글 사본1
+바탕글 사본3
+xl70
+xl67
+xl66
+"picture 2
+그림입니다. 원본 그림의 이름: KakaoTalk_20230904_135306798.png 원본 그림의 크기: 가로 163pixel, 세로 51pixel
+mailto:m48995442@gmail.com
+Root Entry
+Data
+1Table
+WordDocument
+SummaryInformation
+DocumentSummaryInformation
+CompObj
+"picture 1
+그림입니다. 원본 그림의 이름: ChatGPT Image 2026년 4월 6일 오후 04_34_11.png 원본 그림의 크기: 가로 1024pixel, 세로 1536pixel
+Unknown
+Times New Roman
+Symbol
+Arial
+Malgun Gothic
+Arial Unicode MS
+Yu Gothic
+Gulim
+Cambria Math
+Administrator
+cloudconvert_7

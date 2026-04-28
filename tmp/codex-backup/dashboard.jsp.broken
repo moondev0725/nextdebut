@@ -1,0 +1,2879 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"  prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>愿由ъ옄 ??쒕낫??쨌 NEXT DEBUT</title>
+  <%@ include file="/WEB-INF/views/fragments/head-common.jspf" %>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root{
+      --ad-bg:#fff8fc;
+      --ad-card:#ffffff;
+      --ad-border:rgba(244,114,182,.20);
+      --ad-text:#332b30;
+      --ad-muted:#8b7180;
+      --ad-pink:#f472b6;
+      --ad-pink-soft:#fbcfe8;
+      --ad-shadow:0 14px 34px rgba(236,72,153,.10);
+      --ad-r:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:var(--ad-text);
+      background:
+        radial-gradient(1200px 500px at 0% -20%, rgba(251,207,232,.5), transparent 56%),
+        radial-gradient(900px 480px at 100% -10%, rgba(253,242,248,.9), transparent 58%),
+        var(--ad-bg);
+    }
+    .ad-wrap{
+      max-width:1360px;
+      margin:0 auto;
+      padding:calc(var(--nav-h,68px) + 22px) 20px 42px;
+      display:grid;
+      gap:14px;
+    }
+    .card{
+      background:var(--ad-card);
+      border:1px solid var(--ad-border);
+      border-radius:var(--ad-r);
+      box-shadow:var(--ad-shadow);
+    }
+    .hero{
+      padding:18px;
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-end;
+      flex-wrap:wrap;
+    }
+    .hero h1{
+      margin:0;
+      font-family:"Orbitron",sans-serif;
+      font-size:clamp(22px,4vw,34px);
+      letter-spacing:.08em;
+      background:linear-gradient(100deg,#2f2a2c,#e656a0,#f8a5cb);
+      -webkit-background-clip:text;
+      background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+    .hero p{margin:8px 0 0; color:var(--ad-muted); font-size:13px}
+    .hero .status{
+      margin-top:10px;
+      display:inline-flex; align-items:center; gap:8px;
+      border-radius:999px; border:1px solid rgba(244,114,182,.28);
+      background:rgba(253,242,248,.78); color:#a51866; padding:6px 10px; font-size:12px;
+    }
+    .quick{
+      display:flex; flex-wrap:wrap; gap:8px;
+    }
+    .quick a{
+      text-decoration:none;
+      border:1px solid rgba(244,114,182,.24);
+      border-radius:999px;
+      padding:8px 12px;
+      color:#9d1b5f; font-weight:700; font-size:12px;
+      background:#fff;
+    }
+    .quick a:hover{background:rgba(253,242,248,.85)}
+    .alert{
+      padding:11px 14px; border-radius:14px; font-size:13px;
+      border:1px solid rgba(134,239,172,.32);
+      background:rgba(220,252,231,.65); color:#166534;
+    }
+    .kpis{
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      gap:10px;
+    }
+    @media(max-width:1180px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr));}}
+    @media(max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr));}}
+    .kpi{
+      padding:14px;
+      border-radius:16px;
+      background:#fff;
+      border:1px solid rgba(244,114,182,.16);
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .kpi:hover{transform:translateY(-2px); box-shadow:0 12px 26px rgba(236,72,153,.13);}
+    .kpi .k{font-size:11px; color:#9a7185; letter-spacing:.12em; font-family:"Orbitron",sans-serif;}
+    .kpi .v{margin-top:6px; font-size:28px; font-weight:900; line-height:1;}
+    .kpi .s{margin-top:6px; font-size:11px; color:#8f6f7f;}
+
+    .grid-4{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      align-items:stretch;
+    }
+    .grid-4 > .card{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+    }
+    .grid-4 > .card .section-body{
+      flex:1;
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+    }
+    .grid-4 .list-scroll{
+      flex:1;
+      min-height:0;
+      max-height:280px;
+      overflow-y:auto;
+      overflow-x:hidden;
+      padding-right:6px;
+    }
+    .grid-4 .list-scroll .row{min-width:0;}
+    .grid-4 .list-scroll .t{overflow:hidden;text-overflow:ellipsis;}
+    @media(max-width:1200px){.grid-4{grid-template-columns:repeat(2,minmax(0,1fr));}}
+    @media(max-width:760px){.grid-4{grid-template-columns:1fr;}}
+    .section-head{
+      padding:13px 15px 9px;
+      border-bottom:1px solid rgba(244,114,182,.12);
+      font-size:11px; letter-spacing:.18em; color:#a33674;
+      font-family:"Orbitron",sans-serif;
+    }
+    .section-body{padding:12px 14px 14px}
+    .list{display:grid; gap:8px;}
+    .row{
+      border:1px solid rgba(244,114,182,.14); border-radius:12px;
+      padding:10px; background:#fff;
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+    }
+    .row .t{font-size:13px; font-weight:800;}
+    .row .m{margin-top:4px; font-size:11px; color:#8e6f7f;}
+    .chip{font-size:10px; padding:5px 8px; border-radius:999px; border:1px solid rgba(244,114,182,.24); background:rgba(253,242,248,.8); color:#9d1b5f; white-space:nowrap;}
+    .empty{
+      border:1px dashed rgba(244,114,182,.28); border-radius:12px;
+      background:rgba(253,242,248,.5); padding:20px 12px; text-align:center; color:#9b7b8b; font-size:13px;
+    }
+
+    .layout-main{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+    .tools{display:flex; gap:8px; flex-wrap:wrap;}
+    .btn{
+      border:1px solid rgba(244,114,182,.24);
+      border-radius:10px; background:#fff; color:#8f1b58;
+      padding:7px 10px; font-size:12px; font-weight:700; cursor:pointer;
+      text-decoration:none;
+    }
+    .btn:hover{background:rgba(253,242,248,.85)}
+    .btn.danger{border-color:rgba(251,113,133,.35); color:#be123c; background:rgba(255,241,242,.8);}
+
+    .members-search{
+      display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; align-items:center;
+    }
+    .input{
+      border:1px solid rgba(244,114,182,.24);
+      border-radius:10px;
+      padding:9px 10px;
+      background:#fff;
+      color:#332b30;
+      font-size:13px;
+    }
+    .members-pager{
+      display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;
+      margin-top:12px; padding-top:12px; border-top:1px solid rgba(244,114,182,.12);
+    }
+    .members-pager .info{font-size:12px; color:#8b6a79;}
+    .members-pager .nav{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+    .members-pager .nav .btn.page-on{
+      background:linear-gradient(135deg,#fbcfe8,#f472b6);
+      border-color:rgba(244,114,182,.5);
+      color:#831843;
+    }
+    .members-table-wrap{overflow:auto; border:1px solid rgba(244,114,182,.12); border-radius:14px;}
+    .members-table{width:100%; border-collapse:separate; border-spacing:0; min-width:840px;}
+    .members-table th{
+      background:rgba(253,242,248,.7); color:#8f5870;
+      font-size:11px; letter-spacing:.08em; text-align:left; padding:11px 10px; border-bottom:1px solid rgba(244,114,182,.14);
+    }
+    .members-table td{padding:11px 10px; border-bottom:1px solid rgba(244,114,182,.10); font-size:13px;}
+    .members-table tbody tr:hover{background:rgba(253,242,248,.35);}
+    .avatar{
+      width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+      background:linear-gradient(130deg,#f9a8d4,#f472b6); color:#fff; font-size:11px; font-weight:900; margin-right:7px;
+    }
+
+    .trainee-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:10px;
+    }
+    .trainee-compact-row{
+      appearance:none;
+      color:inherit;
+      font-family:inherit;
+      border:1px solid rgba(244,114,182,.14); border-radius:14px; background:#fff; padding:12px 14px;
+      cursor:pointer; transition:transform .12s ease, box-shadow .12s ease;
+      text-align:left; width:100%;
+    }
+    .trainee-compact-thumb{
+      width:100%;
+      height:110px;
+      border-radius:10px;
+      overflow:hidden;
+      background:rgba(244,114,182,.08);
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#b48ca3;
+      font-size:26px;
+    }
+    .trainee-compact-thumb img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      object-position:center;
+      display:block;
+    }
+    .trainee-compact-row:hover{
+      transform:translateY(-1px);
+      box-shadow:0 8px 20px rgba(196,181,253,.22);
+    }
+    .trainee-compact-row:focus-visible{ outline:2px solid #a855f7; outline-offset:2px; }
+    .trainee-compact-name{font-size:14px; font-weight:900; color:#1F2937;}
+    .trainee-compact-meta{margin-top:4px; font-size:12px; color:#8b6a79;}
+    .trainee-card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;}
+    .trainee-card-tags .chip{font-size:10px;padding:4px 7px;}
+    .trainee-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+    .trainee-toolbar .input{min-width:160px;}
+    .trainee-add-form{display:none;margin-bottom:10px;border:1px solid rgba(244,114,182,.14);border-radius:12px;padding:10px;background:rgba(253,242,248,.5);}
+    .trainee-add-form.on{display:block;}
+    .trainee-pager{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .trainee-pager .btn{
+      padding:6px 10px;
+      font-size:11px;
+    }
+    .trainee-pager .btn.page-on{
+      background:linear-gradient(135deg,#fbcfe8,#f472b6);
+      border-color:rgba(244,114,182,.5);
+      color:#831843;
+      cursor:default;
+    }
+    .trainee-detail-hero{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px;}
+    .trainee{
+      border:1px solid rgba(244,114,182,.14); border-radius:14px; background:#fff; padding:11px;
+    }
+    .trainee-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
+    .trainee-name{font-size:14px; font-weight:900;}
+    .badge{font-size:10px; border-radius:999px; padding:4px 7px; border:1px solid rgba(244,114,182,.24); color:#9d1b5f; background:rgba(253,242,248,.8);}
+    .score{font-family:"Orbitron",sans-serif; font-weight:900; color:#e11d8d;}
+    .stat{margin-top:7px;}
+    .stat-head{display:flex; justify-content:space-between; font-size:11px; color:#8b6a79; margin-bottom:3px;}
+    .bar{height:7px; border-radius:999px; background:#fce7f3; overflow:hidden;}
+    .bar > span{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#f472b6,#f9a8d4);}
+
+    .ops-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+    @media(max-width:980px){.ops-grid{grid-template-columns:1fr;}}
+    .ops-card{
+      border:1px solid rgba(244,114,182,.14); border-radius:14px; background:#fff; padding:12px;
+    }
+    .ops-title{font-size:11px; letter-spacing:.12em; color:#8d5f74; font-family:"Orbitron",sans-serif; margin-bottom:9px;}
+    .admin-report-filterbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+    .report-filter-btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:7px 14px;border-radius:999px;
+      border:1px solid rgba(244,114,182,.30);
+      background:#fff;color:#9d174d;
+      font-size:12px;font-weight:700;cursor:pointer;
+    }
+    .report-filter-btn.is-active{
+      background:linear-gradient(135deg,#f472b6,#e879f9);
+      color:#fff;border-color:transparent;
+    }
+    .badge-status{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800;
+      border:1px solid rgba(203,213,225,.8);background:#fff;color:#475569;
+      margin-right:4px;
+    }
+    .badge-status.open{background:rgba(251,207,232,.45);border-color:rgba(244,114,182,.35);color:#9d174d;}
+    .badge-status.done{background:rgba(226,232,240,.7);border-color:rgba(148,163,184,.35);color:#475569;}
+    .badge-status.blind{background:rgba(15,23,42,.88);border-color:rgba(15,23,42,.9);color:#fff;}
+    .ops-metric{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
+    .ops-metric--charge{grid-template-columns:repeat(3,minmax(0,1fr));}
+    @media(max-width:760px){.ops-metric--charge{grid-template-columns:1fr;}}
+    .metric{padding:10px; border-radius:12px; border:1px solid rgba(244,114,182,.12); background:rgba(253,242,248,.45);}
+    .metric .k{font-size:10px; color:#8f6f7f;}
+    .metric .v{font-size:20px; font-weight:900;}
+    .metric .s{margin-top:6px;font-size:11px;color:#9ca3af;line-height:1.35;}
+
+    .ad-modal-overlay{position:fixed; inset:0; background:rgba(30,12,24,.40); z-index:1010; display:none; align-items:center; justify-content:center; padding:16px;}
+    .ad-modal{
+      width:min(640px, 96vw);
+      background:#fff;
+      border:1px solid rgba(244,114,182,.22);
+      border-radius:18px;
+      box-shadow:0 22px 48px rgba(30,12,24,.22);
+      overflow:hidden;
+    }
+    .ad-modal__bar{height:3px;background:linear-gradient(90deg,#f472b6,#fbcfe8);}
+    .ad-modal__body{padding:16px;}
+
+    /* semantic rule: pink=accent, lavender=system */
+    :root{
+      --ad-system:#C4B5FD;
+      --ad-system-soft:#F5F3FF;
+      --ad-system-line:rgba(196,181,253,.55);
+      --ad-accent:#FF8FAB;
+    }
+    body{
+      background:
+        radial-gradient(1200px 500px at 0% -20%, rgba(205,185,255,.30), transparent 56%),
+        radial-gradient(900px 480px at 100% -10%, rgba(232,221,255,.72), transparent 58%),
+        #F5F3FF;
+    }
+    .card,
+    .kpi,
+    .ops-card,
+    .trainee,
+    .trainee-compact-row,
+    .metric,
+    .ad-modal{
+      border-color:var(--ad-system-line) !important;
+    }
+    .section-head{
+      border-bottom:1px solid var(--ad-system-line);
+      color:#7f62a3;
+    }
+    .hero .status,
+    .badge{
+      border-color:var(--ad-system-line);
+      background:rgba(232,221,255,.52);
+    }
+    .quick a{
+      border-color:var(--ad-system-line);
+      color:#8a4ea2;
+    }
+    .quick a:hover{
+      background:rgba(232,221,255,.52);
+    }
+    .score{
+      color:var(--ad-accent);
+    }
+    .bar{
+      background:#f1e9ff;
+    }
+    .bar > span{
+      background:linear-gradient(90deg,#e9b0d9,#f4c7e9);
+    }
+    .ad-modal__bar{
+      background:linear-gradient(90deg,#e9b0d9,#cdb9ff);
+    }
+    .hero h1,.kpi .v,.trainee-name,.score{color:#1F2937;}
+    .hero p,.kpi .k,.kpi .s,.stat-head{color:#6B7280;}
+
+    .game-section{margin-top:4px}
+    .charts-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+    }
+    @media(max-width:1100px){.charts-grid{grid-template-columns:1fr;}}
+    .chart-panel{
+      border:1px solid var(--ad-system-line);
+      border-radius:14px;
+      background:#fff;
+      padding:12px 14px 16px;
+      min-height:280px;
+      display:flex;
+      flex-direction:column;
+    }
+    .chart-panel--wide{grid-column:span 2;}
+    @media(max-width:1100px){.chart-panel--wide{grid-column:auto;}}
+    .chart-title{
+      font-size:11px; letter-spacing:.12em; color:#7f62a3;
+      font-family:"Orbitron",sans-serif; margin-bottom:10px;
+    }
+    .chart-tab-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    .chart-tabs{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+    .chart-tab{
+      border:1px solid var(--ad-system-line);
+      background:#fff;
+      color:#7f62a3;
+      border-radius:999px;
+      padding:5px 10px;
+      font-size:11px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .chart-tab.is-on{
+      background:linear-gradient(135deg,#fbcfe8,#e9b0d9);
+      border-color:#d8b4fe;
+      color:#6b21a8;
+    }
+    .chart-canvas-wrap{position:relative; flex:1; min-height:220px;}
+    .chart-canvas-wrap canvas{max-height:260px;}
+    .shop-admin-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    @media(max-width:1180px){.shop-admin-panels{grid-template-columns:1fr 1fr;}}
+    @media(max-width:900px){.shop-admin-panels{grid-template-columns:1fr;}}
+
+    .chart-placeholder{
+      flex:1; min-height:200px;
+      border:1px dashed rgba(196,181,253,.55);
+      border-radius:12px;
+      background:rgba(245,243,255,.65);
+      display:flex; align-items:center; justify-content:center;
+      text-align:center; padding:16px;
+      font-size:12px; color:#8b7aad; line-height:1.6;
+    }
+    .coin-kpi-grid{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+    }
+    @media(max-width:1100px){.coin-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+    @media(max-width:640px){.coin-kpi-grid{grid-template-columns:1fr;}}
+    .coin-kpi .k{font-size:11px;color:#8f6f7f;letter-spacing:.06em;}
+    .coin-kpi .v{font-size:24px;font-weight:900;margin-top:6px;}
+    .coin-kpi .s{font-size:11px;color:#9ca3af;margin-top:6px;line-height:1.35;}
+    .coin-grid{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:12px;
+    }
+    @media(max-width:1100px){.coin-grid{grid-template-columns:1fr;}}
+    .coin-log-wrap{
+      margin-top:12px;
+      border:1px solid var(--ad-system-line);
+      border-radius:14px;
+      overflow:auto;
+      background:#fff;
+    }
+    .coin-log-table{width:100%;border-collapse:separate;border-spacing:0;min-width:760px;}
+    .coin-log-table th{
+      background:rgba(245,243,255,.8);
+      color:#7f62a3;
+      font-size:11px;
+      letter-spacing:.06em;
+      text-align:left;
+      padding:10px;
+      border-bottom:1px solid var(--ad-system-line);
+      white-space:nowrap;
+    }
+    .coin-log-table td{
+      padding:10px;
+      font-size:12px;
+      border-bottom:1px solid rgba(196,181,253,.35);
+      vertical-align:top;
+    }
+    .coin-log-table tbody tr:hover{background:rgba(245,243,255,.55);}
+    .coin-head-tools{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .coin-head-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+      padding-bottom:10px;
+      border-bottom:1px solid var(--ad-system-line);
+      flex-wrap:wrap;
+    }
+    .coin-head-row .chart-title{
+      margin-bottom:0;
+    }
+  </style>
+</head>
+<body>
+<%@ include file="/WEB-INF/views/fragments/topnav.jspf" %>
+
+<c:set var="todayJoin" value="${(not empty joinByDayVals and fn:length(joinByDayVals) > 0) ? joinByDayVals[fn:length(joinByDayVals)-1] : 0}" />
+
+<main class="ad-wrap">
+  <section class="hero card">
+    <div>
+      <h1>ADMIN OPERATIONS DASHBOARD</h1>
+      <p>寃뚯엫/?뚯썝/寃뚯떆???댁쁺 ?꾪솴怨?愿由?湲곕뒫?????붾㈃?먯꽌 ?뺤씤?⑸땲??</p>
+      <div class="status">
+        <i class="fas fa-heartbeat"></i>
+        ?ㅻ뒛 ?댁쁺 ?곹깭: ?뚯썝 ${totalMembers}紐?쨌 ?뚮젅??${totalGames}??쨌 ?꾨즺??${finishRatePct}% 쨌 ?곸젏 肄붿씤 ?⑷퀎 ${shopTotalCoins}
+      </div>
+    </div>
+    <div class="quick"></div>
+  </section>
+
+  <c:if test="${not empty success}">
+    <div class="alert"><i class="fas fa-check-circle"></i> ${success}</div>
+  </c:if>
+
+  <section class="kpis">
+    <article class="kpi card"><div class="k">珥??뚯썝 ??</div><div class="v">${totalMembers}</div><div class="s">?꾩쟻 媛??</div></article>
+    <article class="kpi card"><div class="k">珥?寃뚯떆湲 ??</div><div class="v">${totalPosts}</div><div class="s">怨듭?/?먯쑀/由ы룷??</div></article>
+    <article class="kpi card"><div class="k">珥??곗뒿????</div><div class="v">${totalTrainees}</div><div class="s">愿由????移대뱶</div></article>
+    <article class="kpi card"><div class="k">珥?寃뚯엫 ?뚮젅??</div><div class="v">${totalGames}</div><div class="s">?꾩껜 寃뚯엫 ??</div></article>
+    <article class="kpi card"><div class="k">?ㅻ뒛 媛????</div><div class="v">${todayJoin}</div><div class="s">理쒓렐 7??湲곗?</div></article>
+    <article class="kpi card"><div class="k">?꾨즺 寃뚯엫 ??</div><div class="v">${finishedGames}</div><div class="s">?꾨즺??${finishRatePct}%</div></article>
+  </section>
+
+  <section class="card game-section" id="game-charts">
+    <div class="section-head">寃뚯엫 ?댁쁺 쨌 洹몃옒??</div>
+    <div class="section-body">
+      <p style="margin:0 0 12px;font-size:13px;color:#6B7280;">
+        理쒓렐 ?뚮젅??異붿씠? ?섏씠利??④퀎) 遺꾪룷, 異붽? ?댁쁺 吏?쒕? ???붾㈃?먯꽌 ?뺤씤?⑸땲??
+      </p>
+      <div class="charts-grid">
+        <div class="chart-panel chart-panel--wide">
+          <div class="chart-tab-row">
+            <div class="chart-title" style="margin-bottom:0;">理쒓렐 寃뚯엫 ?뚮젅??</div>
+            <div class="chart-tabs" data-chart-tabs="game-play">
+              <button type="button" class="chart-tab is-on" data-period="daily">?쇨컙</button>
+              <button type="button" class="chart-tab" data-period="weekly">二쇨컙</button>
+              <button type="button" class="chart-tab" data-period="monthly">?붽컙</button>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="chartGameDaily" aria-label="?쇰퀎 寃뚯엫 ?뚮젅??李⑦듃"></canvas>
+          </div>
+        </div>
+        <div class="chart-panel">
+          <div class="chart-tab-row">
+            <div class="chart-title" style="margin-bottom:0;">?섏씠利?遺꾪룷 (?곸쐞 10)</div>
+            <div class="chart-tabs" data-chart-tabs="phase">
+              <button type="button" class="chart-tab is-on" data-period="daily">?쇨컙</button>
+              <button type="button" class="chart-tab" data-period="weekly">二쇨컙</button>
+              <button type="button" class="chart-tab" data-period="monthly">?붽컙</button>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="chartGamePhase" aria-label="?섏씠利?遺꾪룷 李⑦듃"></canvas>
+          </div>
+        </div>
+        <div class="chart-panel" style="grid-column:1 / -1;">
+          <div class="chart-tab-row">
+            <div class="chart-title" style="margin-bottom:0;">?뚮젅??異붿씠</div>
+            <div class="chart-tabs" data-chart-tabs="extra">
+              <button type="button" class="chart-tab is-on" data-period="daily">?쇨컙</button>
+              <button type="button" class="chart-tab" data-period="weekly">二쇨컙</button>
+              <button type="button" class="chart-tab" data-period="monthly">?붽컙</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:220px;">
+            <div class="chart-canvas-wrap">
+              <div class="chart-title" style="margin-bottom:6px;">?쒓컙?蹂??뚮젅??</div>
+              <canvas id="chartHourlyPlay" aria-label="?쒓컙?蹂??뚮젅??李⑦듃"></canvas>
+            </div>
+            <div class="chart-canvas-wrap">
+              <div class="chart-title" style="margin-bottom:6px;">?댄깉 援ш컙</div>
+              <canvas id="chartDropOff" aria-label="?댄깉 援ш컙 李⑦듃"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-panel" style="margin-top:12px;" id="coin-ops">
+        <div class="coin-head-row">
+          <div class="chart-title">肄붿씤 ?댁쁺</div>
+          <div class="coin-head-tools">
+            <a class="btn" href="${ctx}/admin/analytics/usage"><i class="fas fa-coins"></i> 肄붿씤 ?ъ슜 ?듦퀎</a>
+          </div>
+        </div>
+        <div class="coin-kpi-grid">
+          <div class="metric coin-kpi">
+            <div class="k">?ㅻ뒛 異⑹쟾 肄붿씤</div>
+            <div class="v"><fmt:formatNumber value="${coinKpi.todayChargeCoins}" pattern="#,##0"/></div>
+            <div class="s">MarketTxn 湲곗?</div>
+          </div>
+          <div class="metric coin-kpi">
+            <div class="k">?ㅻ뒛 ?ъ슜 肄붿씤</div>
+            <div class="v"><fmt:formatNumber value="${coinKpi.todayUsedCoins}" pattern="#,##0"/></div>
+            <div class="s">異⑹쟾/援щℓ ?⑹궛</div>
+          </div>
+          <div class="metric coin-kpi">
+            <div class="k">?꾩옱 珥??좏넻 肄붿씤</div>
+            <div class="v"><fmt:formatNumber value="${coinKpi.totalCirculatingCoins}" pattern="#,##0"/></div>
+            <div class="s">?뚯썝 蹂댁쑀 肄붿씤 珥앺빀</div>
+          </div>
+          <div class="metric coin-kpi">
+            <div class="k">?쒖쬆媛??</div>
+            <div class="v"><fmt:formatNumber value="${coinKpi.todayNetIncrease}" pattern="#,##0"/></div>
+            <div class="s">異⑹쟾 - ?ъ슜</div>
+          </div>
+        </div>
+
+        <div class="coin-grid">
+          <div class="chart-panel">
+            <div class="chart-tab-row">
+              <div class="chart-title" style="margin-bottom:0;">肄붿씤 ?먮쫫</div>
+              <div class="chart-tabs" data-chart-tabs="coin-flow">
+                <button type="button" class="chart-tab is-on" data-period="daily">?쇨컙</button>
+                <button type="button" class="chart-tab" data-period="weekly">二쇨컙</button>
+                <button type="button" class="chart-tab" data-period="monthly">?붽컙</button>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="chartCoinFlow" aria-label="肄붿씤 ?먮쫫 李⑦듃"></canvas>
+            </div>
+          </div>
+          <div class="chart-panel">
+            <div class="chart-tab-row">
+              <div class="chart-title" style="margin-bottom:0;">?뚯썝 肄붿씤 遺꾪룷</div>
+              <div class="chart-tabs" data-chart-tabs="coin-distribution">
+                <button type="button" class="chart-tab is-on" data-period="daily">?쇨컙</button>
+                <button type="button" class="chart-tab" data-period="weekly">二쇨컙</button>
+                <button type="button" class="chart-tab" data-period="monthly">?붽컙</button>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="chartCoinDistribution" aria-label="?뚯썝 肄붿씤 遺꾪룷 李⑦듃"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-title" style="margin-top:12px;">理쒓렐 肄붿씤 嫄곕옒 (理쒓렐 1媛쒖썡)</div>
+        <div class="coin-log-wrap">
+          <table class="coin-log-table">
+            <thead>
+            <tr>
+              <th>?쒓컖</th>
+              <th>?뚯썝</th>
+              <th>?좏삎</th>
+              <th>肄붿씤 蹂?붾웾</th>
+              <th>鍮꾧퀬</th>
+            </tr>
+            </thead>
+            <tbody>
+            <c:choose>
+              <c:when test="${empty coinRecentLogs}">
+                <tr><td colspan="5"><div class="empty">理쒓렐 肄붿씤 嫄곕옒 ?곗씠?곌? ?놁뒿?덈떎.</div></td></tr>
+              </c:when>
+              <c:otherwise>
+                <c:forEach var="tx" items="${coinRecentLogs}">
+                  <tr>
+                    <td><c:out value="${tx.createdAtStr}"/></td>
+                    <td>#${tx.memberId} <c:out value="${empty tx.memberNickname ? '(?됱뾾??' : tx.memberNickname}"/></td>
+                    <td><span class="chip"><c:out value="${tx.txnType}"/></span></td>
+                    <td>
+                      <c:choose>
+                        <c:when test="${tx.coinDelta >= 0}">
+                          +<fmt:formatNumber value="${tx.coinDelta}" pattern="#,##0"/>
+                        </c:when>
+                        <c:otherwise>
+                          <fmt:formatNumber value="${tx.coinDelta}" pattern="#,##0"/>
+                        </c:otherwise>
+                      </c:choose>
+                    </td>
+                    <td><c:out value="${empty tx.note ? '-' : tx.note}"/></td>
+                  </tr>
+                </c:forEach>
+              </c:otherwise>
+            </c:choose>
+            </tbody>
+          </table>
+        </div>
+        <c:if test="${coinLogTotal > 0}">
+          <div class="members-pager">
+            <div class="info">
+              <c:choose>
+                <c:when test="${coinLogTotalPages > 1}">
+                  ${coinLogRowFrom}??{coinLogRowTo}踰덉㎏ ?쒖떆 쨌 ?꾩껜 ${coinLogTotal}嫄?쨌 ?섏씠吏 ${coinLogPage} / ${coinLogTotalPages}
+                </c:when>
+                <c:otherwise>
+                  ?꾩껜 ${coinLogTotal}嫄?                </c:otherwise>
+              </c:choose>
+            </div>
+            <c:if test="${coinLogTotalPages > 1}">
+              <div class="nav">
+                <c:if test="${coinLogPage > 1}">
+                  <c:url var="coinPageFirst" value="/admin">
+                    <c:param name="q" value="${coinQueryForPager}"/>
+                    <c:param name="page" value="${coinMemberPageForPager}"/>
+                    <c:param name="coinPage" value="1"/>
+                  </c:url>
+                  <a class="btn" href="${coinPageFirst}#coin-ops" title="泥??섏씠吏">짬 泥섏쓬</a>
+                  <c:url var="coinPagePrev" value="/admin">
+                    <c:param name="q" value="${coinQueryForPager}"/>
+                    <c:param name="page" value="${coinMemberPageForPager}"/>
+                    <c:param name="coinPage" value="${coinLogPage - 1}"/>
+                  </c:url>
+                  <a class="btn" href="${coinPagePrev}#coin-ops"><i class="fas fa-chevron-left"></i> ?댁쟾</a>
+                </c:if>
+                <c:set var="coinPageStart" value="${coinLogPage - 4}"/>
+                <c:set var="coinPageEnd" value="${coinLogPage + 5}"/>
+                <c:if test="${coinPageStart < 1}">
+                  <c:set var="coinPageStart" value="1"/>
+                  <c:set var="coinPageEnd" value="${coinLogTotalPages < 10 ? coinLogTotalPages : 10}"/>
+                </c:if>
+                <c:if test="${coinPageEnd > coinLogTotalPages}">
+                  <c:set var="coinPageEnd" value="${coinLogTotalPages}"/>
+                  <c:set var="coinPageStart" value="${coinPageEnd - 9}"/>
+                  <c:if test="${coinPageStart < 1}">
+                    <c:set var="coinPageStart" value="1"/>
+                  </c:if>
+                </c:if>
+                <c:forEach begin="${coinPageStart}" end="${coinPageEnd}" var="cp">
+                  <c:choose>
+                    <c:when test="${cp == coinLogPage}">
+                      <span class="btn page-on" aria-current="page">${cp}</span>
+                    </c:when>
+                    <c:otherwise>
+                      <c:url var="coinPageUrl" value="/admin">
+                        <c:param name="q" value="${coinQueryForPager}"/>
+                        <c:param name="page" value="${coinMemberPageForPager}"/>
+                        <c:param name="coinPage" value="${cp}"/>
+                      </c:url>
+                      <a class="btn" href="${coinPageUrl}#coin-ops">${cp}</a>
+                    </c:otherwise>
+                  </c:choose>
+                </c:forEach>
+                <c:if test="${coinLogPage < coinLogTotalPages}">
+                  <c:url var="coinPageNext" value="/admin">
+                    <c:param name="q" value="${coinQueryForPager}"/>
+                    <c:param name="page" value="${coinMemberPageForPager}"/>
+                    <c:param name="coinPage" value="${coinLogPage + 1}"/>
+                  </c:url>
+                  <a class="btn" href="${coinPageNext}#coin-ops">?ㅼ쓬 <i class="fas fa-chevron-right"></i></a>
+                  <c:url var="coinPageLast" value="/admin">
+                    <c:param name="q" value="${coinQueryForPager}"/>
+                    <c:param name="page" value="${coinMemberPageForPager}"/>
+                    <c:param name="coinPage" value="${coinLogTotalPages}"/>
+                  </c:url>
+                  <a class="btn" href="${coinPageLast}#coin-ops" title="留덉?留??섏씠吏">留덉?留?쨩</a>
+                </c:if>
+              </div>
+            </c:if>
+          </div>
+        </c:if>
+      </div>
+    </div>
+  </section>
+
+  <div id="chatroomDetailModal" class="ad-modal-overlay" style="display:none;" aria-hidden="true" onclick="if(event.target===this)document.getElementById('chatroomDetailModal').style.display='none'">
+    <div class="ad-modal" style="max-width:520px;" onclick="event.stopPropagation()">
+      <div class="ad-modal__bar"></div>
+      <div class="ad-modal__body" id="chatroomDetailBody" style="max-height:70vh;overflow:auto;"></div>
+      <div style="padding:12px 16px;border-top:1px solid rgba(244,114,182,.12);display:flex;justify-content:flex-end;">
+        <button type="button" class="btn" onclick="document.getElementById('chatroomDetailModal').style.display='none'">?リ린</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="chatKeywordModal" class="ad-modal-overlay" style="display:none;" aria-hidden="true" onclick="if(event.target===this)closeChatKeywordModal()">
+    <div class="ad-modal" style="max-width:520px;" onclick="event.stopPropagation()">
+      <div class="ad-modal__bar"></div>
+      <div class="ad-modal__body" id="chatKeywordModalBody" style="max-height:70vh;overflow:auto;"></div>
+      <div style="padding:12px 16px;border-top:1px solid rgba(244,114,182,.12);display:flex;justify-content:flex-end;gap:8px;">
+        <button type="button" class="btn" onclick="closeChatKeywordModal()">?リ린</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="layout-main">
+    <article class="card" id="members">
+      <div class="section-head">?뚯썝 愿由?</div>
+      <div class="section-body">
+        <div class="chart-panel" style="margin-bottom:10px;">
+          <div class="chart-title">?곕졊蹂??뚯썝 遺꾪룷</div>
+          <div class="chart-canvas-wrap" style="min-height:190px;">
+            <canvas id="chartMemberAge" aria-label="?곕졊蹂??뚯썝 遺꾪룷 李⑦듃"></canvas>
+          </div>
+        </div>
+        <form method="get" action="${ctx}/admin" class="members-search">
+          <input type="hidden" name="page" value="1"/>
+          <input class="input" type="text" name="q" value="${q}" placeholder="아이디 / 이름 / 닉네임 / 이메일 검색" style="flex:1;min-width:220px;">
+          <button class="btn" type="submit">寃??</button>
+          <a class="btn" href="${ctx}/admin">珥덇린??</a>
+          <span class="chip">${filteredMembersTotal} / ${allMembersTotal}</span>
+        </form>
+        <div class="members-table-wrap">
+          <table class="members-table">
+            <thead>
+            <tr>
+              <th>#</th><th>?뚯썝</th><th>ID</th><th>?대찓??</th><th>媛?낆씪</th><th>肄붿씤</th><th>?곗뒿??</th><th>?ы넗移대뱶</th><th>?곹깭</th><th>愿由?</th>
+            </tr>
+            </thead>
+            <tbody>
+            <c:choose>
+              <c:when test="${empty allMembers}">
+                <tr><td colspan="10"><div class="empty">寃??寃곌낵媛 ?놁뒿?덈떎.</div></td></tr>
+              </c:when>
+              <c:otherwise>
+                <c:forEach var="m" items="${allMembers}" varStatus="vs">
+                  <tr>
+                    <td>${(memberPage - 1) * memberPageSize + vs.count}</td>
+                    <td><span class="avatar">${fn:substring(empty m.nickname ? m.mname : m.nickname, 0, 1)}</span><c:out value="${empty m.nickname ? m.mname : m.nickname}"/></td>
+                    <td><c:out value="${m.mid}"/></td>
+                    <td><c:out value="${m.email}"/></td>
+                    <td><c:out value="${m.createdAtStr}"/></td>
+                    <td><fmt:formatNumber value="${memberOpsSummaryByMno[m.mno].coin}" pattern="#,##0"/></td>
+                    <td><fmt:formatNumber value="${memberOpsSummaryByMno[m.mno].traineeCount}" pattern="#,##0"/>紐?</td>
+                    <td><fmt:formatNumber value="${memberOpsSummaryByMno[m.mno].photoCardCount}" pattern="#,##0"/>??</td>
+                    <td><span class="chip">${m.suspendedNow ? m.suspendRemainingDays : "?쒖꽦"}${m.suspendedNow ? "???뺤?" : ""}</span></td>
+                    <td>
+                      <div class="tools">
+                        <button type="button" class="btn" onclick="openMemberDetail(${m.mno})">?곸꽭</button>
+                        <button type="button" class="btn danger js-open-suspend" data-target="suspendForm-${m.mno}">?뺤?</button>
+                        <form method="post" action="${ctx}/admin/members/${m.mno}/delete" style="margin:0;" onsubmit="return confirm('媛뺤젣 ?덊눜 泥섎━?좉퉴??');">
+                          <button type="submit" class="btn danger">媛뺤젣 ?덊눜</button>
+                        </form>
+                      </div>
+                      <form id="suspendForm-${m.mno}" method="post" action="${ctx}/admin/members/${m.mno}/suspend" style="display:none;margin-top:8px;gap:6px;align-items:center;flex-wrap:wrap;">
+                        <input class="input" type="number" name="days" min="1" max="365" value="7" style="width:90px;">
+                        <input class="input" type="text" name="reason" maxlength="255" placeholder="?뺤? ?ъ쑀(?좏깮)" style="min-width:160px;flex:1;">
+                        <button type="submit" class="btn" style="font-size:12px;padding:7px 10px;">?곸슜</button>
+                      </form>
+                    </td>
+                  </tr>
+                </c:forEach>
+              </c:otherwise>
+            </c:choose>
+            </tbody>
+          </table>
+        </div>
+        <c:if test="${filteredMembersTotal > 0}">
+          <div class="members-pager">
+            <div class="info">
+              <c:choose>
+                <c:when test="${memberPageTotalPages > 1}">
+                  ${memberPageRowFrom}??{memberPageRowTo}踰덉㎏ ?쒖떆 쨌 ?꾩껜 ${filteredMembersTotal}紐?쨌 ?섏씠吏 ${memberPage} / ${memberPageTotalPages}
+                </c:when>
+                <c:otherwise>
+                  ?꾩껜 ${filteredMembersTotal}紐?                </c:otherwise>
+              </c:choose>
+            </div>
+            <c:if test="${memberPageTotalPages > 1}">
+              <div class="nav">
+                <c:if test="${memberPage > 1}">
+                  <c:url var="memberPageFirst" value="/admin"><c:param name="q" value="${q}"/><c:param name="page" value="1"/></c:url>
+                  <a class="btn" href="${memberPageFirst}#members" title="泥??섏씠吏">짬 泥섏쓬</a>
+                  <c:url var="memberPagePrev" value="/admin">
+                    <c:param name="q" value="${q}"/>
+                    <c:param name="page" value="${memberPage - 1}"/>
+                  </c:url>
+                  <a class="btn" href="${memberPagePrev}#members"><i class="fas fa-chevron-left"></i> ?댁쟾</a>
+                </c:if>
+                <c:forEach var="pi" items="${memberPageNumbers}">
+                  <c:url var="memberPageUrl" value="/admin"><c:param name="q" value="${q}"/><c:param name="page" value="${pi}"/></c:url>
+                  <c:choose>
+                    <c:when test="${pi == memberPage}">
+                      <span class="btn page-on" aria-current="page">${pi}</span>
+                    </c:when>
+                    <c:otherwise>
+                      <a class="btn" href="${memberPageUrl}#members">${pi}</a>
+                    </c:otherwise>
+                  </c:choose>
+                </c:forEach>
+                <c:if test="${memberPage < memberPageTotalPages}">
+                  <c:url var="memberPageNext" value="/admin">
+                    <c:param name="q" value="${q}"/>
+                    <c:param name="page" value="${memberPage + 1}"/>
+                  </c:url>
+                  <a class="btn" href="${memberPageNext}#members">?ㅼ쓬 <i class="fas fa-chevron-right"></i></a>
+                  <c:url var="memberPageLast" value="/admin"><c:param name="q" value="${q}"/><c:param name="page" value="${memberPageTotalPages}"/></c:url>
+                  <a class="btn" href="${memberPageLast}#members" title="留덉?留??섏씠吏">留덉?留?쨩</a>
+                </c:if>
+              </div>
+            </c:if>
+          </div>
+        </c:if>
+      </div>
+    </article>
+
+    <article class="card" id="game-admin">
+      <div class="section-head">寃뚯엫 愿由?</div>
+      <div class="section-body">
+        <div class="ops-card" style="margin-bottom:12px;">
+          <div class="ops-title">寃뚯엫 ?곗씠???붿빟</div>
+          <div class="ops-metric">
+            <div class="metric"><div class="k">珥?吏臾???</div><div class="v">${totalGameScenes}</div></div>
+            <div class="metric"><div class="k">吏臾?phase ??</div><div class="v">${distinctScenePhases}</div></div>
+            <div class="metric"><div class="k">珥??좏깮吏 ??</div><div class="v">${totalGameChoices}</div></div>
+            <div class="metric"><div class="k">?좏깮吏 phase ??</div><div class="v">${distinctChoicePhases}</div></div>
+            <div class="metric"><div class="k">?대깽??臾몄젣 ??</div><div class="v">${totalGameMiniQuizzes}</div></div>
+            <div class="metric"><div class="k">?쒖꽦 ?대깽????</div><div class="v">${activeGameMiniQuizzes}</div></div>
+          </div>
+        </div>
+        <div class="ops-card" style="margin-bottom:12px;">
+          <div class="ops-title">梨꾪똿 ?좏깮 ML ?듦퀎</div>
+          <div class="ops-metric">
+            <div class="metric"><div class="k">珥??섑뵆</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.total}" pattern="#,##0"/></div></div>
+            <div class="metric"><div class="k">ML ?곸슜瑜?</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.mlRate}" pattern="#,##0.0"/>%</div></div>
+            <div class="metric"><div class="k">Fallback 鍮꾩쑉</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.fallbackRate}" pattern="#,##0.0"/>%</div></div>
+            <div class="metric"><div class="k">?됯퇏 ?좊ː??</div><div class="v"><fmt:formatNumber value="${mlChoiceStats.avgConfidence}" pattern="#,##0.000"/></div></div>
+          </div>
+        </div>
+        <div class="ops-card">
+          <div class="ops-title">愿由??숈꽑</div>
+          <div style="display:grid;gap:10px;">
+            <div class="row">
+              <div>
+                <div class="t">?곹솴 吏臾?愿由?</div>
+                <div class="m">寃뚯엫 ?대깽??吏臾?異붽?, 誘몃━蹂닿린, ?섏젙, ??젣瑜??꾩슜 ?붾㈃?먯꽌 泥섎━?⑸땲??</div>
+              </div>
+              <a class="btn" href="${ctx}/admin/game-scenes">?곹솴 吏臾?愿由??닿린</a>
+            </div>
+            <div class="row">
+              <div>
+                <div class="t">梨꾪똿 留ㅽ븨 洹쒖튃 愿由?</div>
+                <div class="m">phase蹂??좏깮吏 臾멸뎄, ?ㅽ꺈 ??? ?뺣젹 ?쒖꽌瑜??꾩슜 ?붾㈃?먯꽌 愿由ы빀?덈떎.</div>
+              </div>
+              <a class="btn" href="${ctx}/admin/game-choices">梨꾪똿 留ㅽ븨 洹쒖튃 愿由??닿린</a>
+            </div>
+            <div class="row">
+              <div>
+                <div class="t">?대깽??愿由?</div>
+                <div class="m">?멸쾶???대깽???꾩씠???대쫫 留욎텛湲? ?뚰듃/?뺣떟 臾몄젣 ????꾩슜 ?붾㈃?먯꽌 愿由ы빀?덈떎.</div>
+              </div>
+              <a class="btn" href="${ctx}/admin/game-events">?대깽??愿由??닿린</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="trainees">
+      <div class="section-head">?곗뒿??愿由?</div>
+      <div class="section-body">
+        <div class="trainee-toolbar">
+          <input type="search" id="traineeLocalSearch" class="input" placeholder="이름 검색">
+          <select id="traineeGenderFilter" class="input">
+            <option value="ALL">?깅퀎 ?꾩껜</option>
+            <option value="MALE">?⑥꽦</option>
+            <option value="FEMALE">?ъ꽦</option>
+          </select>
+          <select id="traineeGradeFilter" class="input">
+            <option value="ALL">?깃툒 ?꾩껜</option>
+            <option value="N">N</option>
+            <option value="R">R</option>
+            <option value="SR">SR</option>
+            <option value="SSR">SSR</option>
+          </select>
+          <select id="traineeSortFilter" class="input">
+            <option value="default">湲곕낯??</option>
+            <option value="name">?대쫫??</option>
+            <option value="avg">?됯퇏 ?λ젰移섏닚</option>
+          </select>
+          <a class="btn" href="${ctx}/admin/trainees">?댁쁺 愿由??붾㈃</a>
+        </div>
+        <form method="post" action="${ctx}/admin/trainee" enctype="multipart/form-data" id="traineeAddFormInDashboard" class="trainee-add-form">
+          <div style="font-size:11px;color:#8f6f7f;margin-bottom:8px;">
+            ?λ젰移??낅젰 踰붿쐞: <strong>1~100</strong>
+          </div>
+          <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1fr 1fr;gap:8px;">
+            <input class="input" type="text" name="name" placeholder="?대쫫" required>
+            <select class="input" name="gender" required>
+              <option value="MALE">?⑥꽦</option>
+              <option value="FEMALE">?ъ꽦</option>
+            </select>
+            <input class="input" type="number" min="0" max="20" name="vocal" placeholder="蹂댁뺄 (1~100)" required>
+            <input class="input" type="number" min="0" max="20" name="dance" placeholder="?꾩뒪 (1~100)" required>
+            <input class="input" type="number" min="0" max="20" name="star" placeholder="?ㅽ???(1~100)" required>
+            <input class="input" type="number" min="0" max="20" name="mental" placeholder="硫섑깉 (1~100)" required>
+            <input class="input" type="number" min="0" max="20" name="teamwork" placeholder="??뚰겕 (1~100)" required>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;">
+            <input class="input" type="file" name="image" accept="image/*">
+            <button type="submit" class="btn">異붽? ???</button>
+          </div>
+        </form>
+        <c:choose>
+          <c:when test="${empty allTrainees}">
+            <div class="empty">?깅줉???곗뒿?앹씠 ?놁뒿?덈떎.</div>
+          </c:when>
+          <c:otherwise>
+            <div class="trainee-grid">
+              <c:forEach var="t" items="${allTrainees}">
+                <c:set var="sum" value="${t.vocal + t.dance + t.star + t.mental + t.teamwork}" />
+                <button type="button" class="trainee-compact-row js-trainee-open"
+                        data-id="${t.id}"
+                        data-name="<c:out value='${t.name}' />"
+                        data-avg="${sum div 5.0}"
+                        data-grade="${empty t.grade ? '' : t.grade.name()}"
+                        data-gender="${t.gender}"
+                        data-image="${empty t.imagePath ? '' : t.imagePath}"
+                        data-vocal="${t.vocal}" data-dance="${t.dance}" data-star="${t.star}"
+                        data-mental="${t.mental}" data-teamwork="${t.teamwork}">
+                  <div class="trainee-compact-thumb">
+                    <c:choose>
+                      <c:when test="${not empty t.imagePath}">
+                        <img src="${ctx}${t.imagePath}" alt="${t.name}">
+                      </c:when>
+                      <c:otherwise><i class="fas fa-user"></i></c:otherwise>
+                    </c:choose>
+                  </div>
+                  <div class="trainee-compact-name"><c:out value="${t.name}"/></div>
+                  <div class="trainee-compact-meta">${t.gender eq 'MALE' ? '?⑥꽦' : '?ъ꽦'} 쨌 ?됯퇏 <fmt:formatNumber value="${sum div 5.0}" maxFractionDigits="1" /></div>
+                  <div class="trainee-card-tags">
+                    <span class="chip">R/SR/SSR 愿由?</span>
+                  </div>
+                </button>
+              </c:forEach>
+            </div>
+            <div class="trainee-pager" id="traineePager"></div>
+          </c:otherwise>
+        </c:choose>
+      </div>
+    </article>
+  </section>
+
+  <section class="ops-grid">
+    <article class="card" id="board-ops">
+      <div class="section-head">寃뚯떆???댁쁺 愿由?</div>
+      <div class="section-body">
+        <div class="ops-card">
+          <div class="ops-title">?댁쁺 ?붿빟</div>
+          <div class="ops-metric">
+            <div class="metric"><div class="k">珥?寃뚯떆湲 ??</div><div class="v">${totalBoardCount}</div></div>
+            <div class="metric"><div class="k">怨듭? 寃뚯떆湲 ??</div><div class="v">${noticeCount}</div></div>
+            <div class="metric"><div class="k">?쇰컲 寃뚯떆湲 ??</div><div class="v">${normalBoardCount}</div></div>
+            <div class="metric"><div class="k">?좉퀬 ?묒닔 嫄댁닔</div><div class="v">${reportCount}</div></div>
+            <div class="metric"><div class="k">釉붾씪?몃뱶/?④? 寃뚯떆湲 ??</div><div class="v">${blindedCount}</div></div>
+          </div>
+        </div>
+        <div class="ops-card" style="margin-top:10px;">
+          <div class="ops-title">?좉퀬/寃뚯떆湲 泥섎━ ?꾩슂 ??ぉ</div>
+          <div class="admin-report-filterbar">
+            <button type="button" class="report-filter-btn is-active js-admin-report-filter" data-status="all">?꾩껜</button>
+            <button type="button" class="report-filter-btn js-admin-report-filter" data-status="processing">泥섎━以?</button>
+            <button type="button" class="report-filter-btn js-admin-report-filter" data-status="completed">泥섎━?꾨즺</button>
+          </div>
+          <c:choose>
+            <c:when test="${empty recentReports}">
+              <div class="empty">?꾩옱 泥섎━???좉퀬 ?댁뿭???놁뒿?덈떎.</div>
+            </c:when>
+            <c:otherwise>
+              <div class="members-table-wrap">
+                <table class="members-table">
+                  <thead>
+                    <tr>
+                      <th>?좉퀬?쇱떆</th>
+                      <th>寃뚯떆湲 ?쒕ぉ</th>
+                      <th>?묒꽦??</th>
+                      <th>?좉퀬 ?ъ쑀</th>
+                      <th>?꾩쟻 ?좉퀬 ??</th>
+                      <th>?곹깭</th>
+                      <th style="text-align:right;">泥섎━</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <c:forEach var="r" items="${recentReports}">
+                        <tr id="reportRow-${r.id}" class="js-admin-report-row" data-workflow-status="${r.workflowStatus}">
+                        <td style="white-space:nowrap;"><c:out value="${r.reportedAt}"/></td>
+                        <td style="min-width:180px;">
+                          <a href="${ctx}${r.detailPath}" style="color:inherit;text-decoration:none;font-weight:700;">
+                            <c:out value="${r.boardTitle}"/>
+                          </a>
+                        </td>
+                        <td><c:out value="${r.authorNick}"/></td>
+                        <td><c:out value="${r.reason}"/></td>
+                        <td><fmt:formatNumber value="${r.reportCount}" pattern="#,##0"/></td>
+                        <td>
+                          <c:choose>
+                            <c:when test="${r.workflowStatus eq 'completed'}">泥섎━?꾨즺</c:when>
+                            <c:when test="${r.workflowStatus eq 'processing'}">泥섎━以?</c:when>
+                            <c:otherwise>?湲?</c:otherwise>
+                          </c:choose>
+                        </td>
+                        <td>
+                          <div class="tools">
+                            <form method="post" action="${ctx}/admin/reports/${r.id}/handle" style="margin:0;">
+                              <input type="hidden" name="action" value="detail"/>
+                              <button type="submit" class="btn" style="font-size:12px;padding:7px 10px;">?곸꽭</button>
+                            </form>
+                            <form method="post" action="${ctx}/admin/reports/${r.id}/handle" style="margin:0;">
+                              <input type="hidden" name="action" value="toggleBlind"/>
+                              <button type="submit" class="btn ${r.visible ? 'danger' : ''}" style="font-size:12px;padding:7px 10px;">${r.visible ? "釉붾씪?몃뱶" : "?댁젣"}</button>
+                            </form>
+                            <button type="button" class="btn js-report-process-toggle" data-target="reportProcessRow-${r.id}" style="font-size:12px;padding:7px 10px;">泥섎━</button>
+                          </div>
+                        </td>
+                      </tr>
+                        <tr id="reportProcessRow-${r.id}" class="js-admin-report-detail-row" data-workflow-status="${r.workflowStatus}" style="display:none;background:rgba(253,242,248,.35);">
+                        <td colspan="7">
+                          <form method="post" action="${ctx}/admin/reports/${r.id}/comment" style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;margin:0;">
+                            <textarea class="input" name="content" rows="2" maxlength="500" required placeholder="泥섎━ ?댁슜???낅젰?섎㈃ 愿由ъ옄 ?대쫫?쇰줈 ?볤????깅줉?⑸땲??" style="flex:1;min-width:320px;resize:vertical;"></textarea>
+                            <button type="submit" class="btn">泥섎━ ?깅줉</button>
+                          </form>
+                        </td>
+                      </tr>
+                    </c:forEach>
+                  </tbody>
+                </table>
+              </div>
+              <div class="trainee-pager" id="adminReportPager" style="margin-top:10px;"></div>
+            </c:otherwise>
+          </c:choose>
+        </div>
+        <div class="ops-card" style="margin-top:10px;">
+          <div class="ops-title">寃뚯떆???댁쁺 遺꾩꽍</div>
+          <div class="charts-grid" style="grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="chart-panel">
+              <div class="chart-title" style="margin-bottom:8px;">理쒓렐 7??寃뚯떆湲 ?깅줉 異붿씠</div>
+              <div class="chart-canvas-wrap"><canvas id="chartBoardTrend" aria-label="寃뚯떆湲 ?깅줉 異붿씠 李⑦듃"></canvas></div>
+            </div>
+            <div class="chart-panel">
+              <div class="chart-title" style="margin-bottom:8px;">理쒓렐 7???좉퀬 嫄댁닔 異붿씠</div>
+              <div class="chart-canvas-wrap"><canvas id="chartReportTrend" aria-label="?좉퀬 嫄댁닔 異붿씠 李⑦듃"></canvas></div>
+            </div>
+          </div>
+        </div>
+        <div class="ops-card" style="margin-top:10px;">
+          <div class="ops-title">怨듭? ?댁쁺</div>
+          <button type="button" class="btn" id="noticeFormToggleBtn">怨듭? ?묒꽦 ?닿린</button>
+          <form method="post" action="${ctx}/admin/notices" id="noticeCreateForm" style="display:none;margin-top:10px;">
+            <input class="input" name="title" placeholder="?쒕ぉ" required maxlength="200" style="width:100%;margin-bottom:8px;">
+            <textarea class="input" name="content" rows="4" placeholder="?댁슜" required style="width:100%;resize:vertical;margin-bottom:8px;"></textarea>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:8px;">
+              <input type="checkbox" name="popup" value="true">
+              <span>?곷떒 怨좎젙</span>
+            </label>
+            <button type="submit" class="btn">?깅줉</button>
+          </form>
+          <div style="margin-top:10px;">
+            <c:choose>
+              <c:when test="${empty noticeList}">
+                <div class="empty">?깅줉??怨듭?媛 ?놁뒿?덈떎. ?곷떒 踰꾪듉?쇰줈 怨듭?瑜??깅줉??二쇱꽭??</div>
+              </c:when>
+              <c:otherwise>
+                <div class="members-table-wrap">
+                  <table class="members-table">
+                    <thead>
+                      <tr>
+                        <th>?쒕ぉ</th>
+                        <th>?묒꽦??</th>
+                        <th>?묒꽦??</th>
+                        <th>?곹깭</th>
+                        <th>?곷떒 怨좎젙</th>
+                        <th style="text-align:right;">愿由?</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <c:forEach var="n" items="${noticeList}">
+                        <tr>
+                          <td style="min-width:200px;">
+                            <a href="${ctx}/boards/notice/${n.id}" style="color:inherit;text-decoration:none;font-weight:700;">
+                              <c:out value="${n.title}"/>
+                            </a>
+                          </td>
+                          <td style="white-space:nowrap;"><c:out value="${n.createdAtStr}"/></td>
+                          <td><c:out value="${empty n.authorNick ? '愿由ъ옄' : n.authorNick}"/></td>
+                          <td>${n.visible ? "게시중" : "숨김"}</td>
+                          <td>${n.popup ? "怨좎젙" : "?쇰컲"}</td>
+                          <td>
+                            <div class="tools">
+                              <a class="btn" href="${ctx}/boards/notice/${n.id}" style="font-size:12px;padding:7px 10px;">?섏젙</a>
+                              <form method="post" action="${ctx}/admin/notices/${n.id}/delete" style="margin:0;" onsubmit="return confirm('?대떦 怨듭?瑜???젣?좉퉴??');">
+                                <button type="submit" class="btn danger" style="font-size:12px;padding:7px 10px;">??젣</button>
+                              </form>
+                              <form method="post" action="${ctx}/admin/notices/${n.id}/pin" style="margin:0;">
+                                <button type="submit" class="btn" style="font-size:12px;padding:7px 10px;">${n.popup ? "怨좎젙?댁젣" : "怨좎젙"}</button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+                      </c:forEach>
+                    </tbody>
+                  </table>
+                </div>
+                <c:if test="${noticeTotalPages > 1}">
+                  <div class="members-pager" style="margin-top:10px;">
+                    <div class="info">${noticeRowFrom}??{noticeRowTo}踰덉㎏ ?쒖떆 쨌 ?꾩껜 ${noticeTotalCount}嫄?쨌 ?섏씠吏 ${noticePage} / ${noticeTotalPages}</div>
+                    <div class="nav">
+                      <c:if test="${noticePage > 1}">
+                        <c:url var="noticePageFirst" value="/admin">
+                          <c:param name="q" value="${q}"/>
+                          <c:param name="page" value="${memberPage}"/>
+                          <c:param name="coinPage" value="${coinLogPage}"/>
+                          <c:param name="noticePage" value="1"/>
+                        </c:url>
+                        <c:url var="noticePagePrev" value="/admin">
+                          <c:param name="q" value="${q}"/>
+                          <c:param name="page" value="${memberPage}"/>
+                          <c:param name="coinPage" value="${coinLogPage}"/>
+                          <c:param name="noticePage" value="${noticePage - 1}"/>
+                        </c:url>
+                        <a class="btn" href="${noticePageFirst}">짬 泥섏쓬</a>
+                        <a class="btn" href="${noticePagePrev}"><i class="fas fa-chevron-left"></i> ?댁쟾</a>
+                      </c:if>
+                      <c:forEach var="pi" items="${noticePageNumbers}">
+                        <c:url var="noticePageUrl" value="/admin">
+                          <c:param name="q" value="${q}"/>
+                          <c:param name="page" value="${memberPage}"/>
+                          <c:param name="coinPage" value="${coinLogPage}"/>
+                          <c:param name="noticePage" value="${pi}"/>
+                        </c:url>
+                        <c:choose>
+                          <c:when test="${pi == noticePage}">
+                            <span class="btn page-on" aria-current="page">${pi}</span>
+                          </c:when>
+                          <c:otherwise>
+                            <a class="btn" href="${noticePageUrl}">${pi}</a>
+                          </c:otherwise>
+                        </c:choose>
+                      </c:forEach>
+                      <c:if test="${noticePage < noticeTotalPages}">
+                        <c:url var="noticePageNext" value="/admin">
+                          <c:param name="q" value="${q}"/>
+                          <c:param name="page" value="${memberPage}"/>
+                          <c:param name="coinPage" value="${coinLogPage}"/>
+                          <c:param name="noticePage" value="${noticePage + 1}"/>
+                        </c:url>
+                        <c:url var="noticePageLast" value="/admin">
+                          <c:param name="q" value="${q}"/>
+                          <c:param name="page" value="${memberPage}"/>
+                          <c:param name="coinPage" value="${coinLogPage}"/>
+                          <c:param name="noticePage" value="${noticeTotalPages}"/>
+                        </c:url>
+                        <a class="btn" href="${noticePageNext}">?ㅼ쓬 <i class="fas fa-chevron-right"></i></a>
+                        <a class="btn" href="${noticePageLast}">留덉?留?쨩</a>
+                      </c:if>
+                    </div>
+                  </div>
+                </c:if>
+              </c:otherwise>
+            </c:choose>
+          </div>
+        </div>
+        <div class="ops-card" style="margin-top:10px;">
+          <div class="ops-title">?щ????댁쁺</div>
+          <div style="font-size:12px;color:#7f62a3;margin-bottom:8px;">
+            珥??щ???寃뚯떆湲 <strong>${fanMeetingPosts}</strong>嫄?쨌 理쒖떊 湲 湲곗? ?좎껌???섎? 鍮좊Ⅴ寃??뺤씤?⑸땲??
+          </div>
+          <div class="admin-report-filterbar" style="margin-bottom:10px;">
+            <c:url var="fmFilterAllUrl" value="/admin">
+              <c:param name="q" value="${q}"/>
+              <c:param name="page" value="${memberPage}"/>
+              <c:param name="coinPage" value="${coinLogPage}"/>
+              <c:param name="noticePage" value="${noticePage}"/>
+              <c:param name="fanMeetingPage" value="1"/>
+              <c:param name="fanMeetingStatus" value="all"/>
+            </c:url>
+            <c:url var="fmFilterRecUrl" value="/admin">
+              <c:param name="q" value="${q}"/>
+              <c:param name="page" value="${memberPage}"/>
+              <c:param name="coinPage" value="${coinLogPage}"/>
+              <c:param name="noticePage" value="${noticePage}"/>
+              <c:param name="fanMeetingPage" value="1"/>
+              <c:param name="fanMeetingStatus" value="recruiting"/>
+            </c:url>
+            <c:url var="fmFilterDoneUrl" value="/admin">
+              <c:param name="q" value="${q}"/>
+              <c:param name="page" value="${memberPage}"/>
+              <c:param name="coinPage" value="${coinLogPage}"/>
+              <c:param name="noticePage" value="${noticePage}"/>
+              <c:param name="fanMeetingPage" value="1"/>
+              <c:param name="fanMeetingStatus" value="done"/>
+            </c:url>
+            <a class="report-filter-btn ${fanMeetingStatus eq 'all' ? 'is-active' : ''}" href="${fmFilterAllUrl}#board-ops">?꾩껜</a>
+            <a class="report-filter-btn ${fanMeetingStatus eq 'recruiting' ? 'is-active' : ''}" href="${fmFilterRecUrl}#board-ops">紐⑥쭛以?</a>
+            <a class="report-filter-btn ${fanMeetingStatus eq 'done' ? 'is-active' : ''}" href="${fmFilterDoneUrl}#board-ops">?꾨즺</a>
+          </div>
+          <c:choose>
+            <c:when test="${empty recentFanMeetingPosts}">
+              <div class="empty">?깅줉???щ???湲???놁뒿?덈떎.</div>
+            </c:when>
+            <c:otherwise>
+              <div class="members-table-wrap">
+                <table class="members-table">
+                  <thead>
+                    <tr>
+                      <th>?쒕ぉ</th>
+                      <th>?묒꽦??</th>
+                      <th>?곹깭</th>
+                      <th>?좎껌??</th>
+                      <th>?묒꽦??</th>
+                      <th style="text-align:right;">愿由?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <c:forEach var="fm" items="${recentFanMeetingPosts}">
+                      <tr>
+                        <td style="min-width:220px;"><c:out value="${fm.title}"/></td>
+                        <td><c:out value="${fm.authorNick}"/></td>
+                        <td>
+                          <span class="badge-status ${fm.fanMeetingStatusKey == 'DONE' ? 'done' : 'open'}"><c:out value="${fm.recruitStatusLabel}"/></span>
+                          <c:if test="${!fm.visible}">
+                            <span class="badge-status blind">釉붾씪?몃뱶</span>
+                          </c:if>
+                        </td>
+                        <td>${fanMeetingApplicantCount[fm.id]}紐?</td>
+                        <td style="white-space:nowrap;"><c:out value="${fm.createdAtStr}"/></td>
+                        <td>
+                          <div class="tools" style="justify-content:flex-end;">
+                            <a class="btn" href="${ctx}/boards/fanmeeting/${fm.id}" style="font-size:12px;padding:7px 10px;">?곸꽭</a>
+                            <a class="btn" href="${ctx}/boards/fanmeeting/${fm.id}/edit" style="font-size:12px;padding:7px 10px;">?섏젙</a>
+                            <form method="post" action="${ctx}/admin/fanmeeting/${fm.id}/visibility" style="margin:0;">
+                              <input type="hidden" name="visible" value="${fm.visible ? 'false' : 'true'}"/>
+                              <input type="hidden" name="q" value="${q}"/>
+                              <input type="hidden" name="page" value="${memberPage}"/>
+                              <input type="hidden" name="coinPage" value="${coinLogPage}"/>
+                              <input type="hidden" name="noticePage" value="${noticePage}"/>
+                              <input type="hidden" name="fanMeetingPage" value="${fanMeetingPage}"/>
+                              <input type="hidden" name="fanMeetingStatus" value="${fanMeetingStatus}"/>
+                              <button type="submit" class="btn ${fm.visible ? 'danger' : ''}" style="font-size:12px;padding:7px 10px;">${fm.visible ? '釉붾씪?몃뱶' : '?댁젣'}</button>
+                            </form>
+                          </div>
+                        </td>
+                      </tr>
+                    </c:forEach>
+                  </tbody>
+                </table>
+              </div>
+              <c:if test="${fanMeetingTotalPages > 1}">
+                <div class="members-pager" style="margin-top:10px;">
+                  <div class="info">${fanMeetingRowFrom}??{fanMeetingRowTo}踰덉㎏ ?쒖떆 쨌 ?꾩껜 ${fanMeetingTotalCount}嫄?쨌 ?섏씠吏 ${fanMeetingPage} / ${fanMeetingTotalPages}</div>
+                  <div class="nav">
+                    <c:if test="${fanMeetingPage > 1}">
+                      <c:url var="fmPageFirst" value="/admin">
+                        <c:param name="q" value="${q}"/>
+                        <c:param name="page" value="${memberPage}"/>
+                        <c:param name="coinPage" value="${coinLogPage}"/>
+                        <c:param name="noticePage" value="${noticePage}"/>
+                        <c:param name="fanMeetingPage" value="1"/>
+                        <c:param name="fanMeetingStatus" value="${fanMeetingStatus}"/>
+                      </c:url>
+                      <c:url var="fmPagePrev" value="/admin">
+                        <c:param name="q" value="${q}"/>
+                        <c:param name="page" value="${memberPage}"/>
+                        <c:param name="coinPage" value="${coinLogPage}"/>
+                        <c:param name="noticePage" value="${noticePage}"/>
+                        <c:param name="fanMeetingPage" value="${fanMeetingPage - 1}"/>
+                        <c:param name="fanMeetingStatus" value="${fanMeetingStatus}"/>
+                      </c:url>
+                      <a class="btn" href="${fmPageFirst}#board-ops">짬 泥섏쓬</a>
+                      <a class="btn" href="${fmPagePrev}#board-ops"><i class="fas fa-chevron-left"></i> ?댁쟾</a>
+                    </c:if>
+                    <c:forEach var="pi" items="${fanMeetingPageNumbers}">
+                      <c:url var="fmPageUrl" value="/admin">
+                        <c:param name="q" value="${q}"/>
+                        <c:param name="page" value="${memberPage}"/>
+                        <c:param name="coinPage" value="${coinLogPage}"/>
+                        <c:param name="noticePage" value="${noticePage}"/>
+                        <c:param name="fanMeetingPage" value="${pi}"/>
+                        <c:param name="fanMeetingStatus" value="${fanMeetingStatus}"/>
+                      </c:url>
+                      <c:choose>
+                        <c:when test="${pi == fanMeetingPage}">
+                          <span class="btn page-on" aria-current="page">${pi}</span>
+                        </c:when>
+                        <c:otherwise>
+                          <a class="btn" href="${fmPageUrl}#board-ops">${pi}</a>
+                        </c:otherwise>
+                      </c:choose>
+                    </c:forEach>
+                    <c:if test="${fanMeetingPage < fanMeetingTotalPages}">
+                      <c:url var="fmPageNext" value="/admin">
+                        <c:param name="q" value="${q}"/>
+                        <c:param name="page" value="${memberPage}"/>
+                        <c:param name="coinPage" value="${coinLogPage}"/>
+                        <c:param name="noticePage" value="${noticePage}"/>
+                        <c:param name="fanMeetingPage" value="${fanMeetingPage + 1}"/>
+                        <c:param name="fanMeetingStatus" value="${fanMeetingStatus}"/>
+                      </c:url>
+                      <c:url var="fmPageLast" value="/admin">
+                        <c:param name="q" value="${q}"/>
+                        <c:param name="page" value="${memberPage}"/>
+                        <c:param name="coinPage" value="${coinLogPage}"/>
+                        <c:param name="noticePage" value="${noticePage}"/>
+                        <c:param name="fanMeetingPage" value="${fanMeetingTotalPages}"/>
+                        <c:param name="fanMeetingStatus" value="${fanMeetingStatus}"/>
+                      </c:url>
+                      <a class="btn" href="${fmPageNext}#board-ops">?ㅼ쓬 <i class="fas fa-chevron-right"></i></a>
+                      <a class="btn" href="${fmPageLast}#board-ops">留덉?留?쨩</a>
+                    </c:if>
+                  </div>
+                </div>
+              </c:if>
+            </c:otherwise>
+          </c:choose>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="card" id="chatroom-admin">
+    <div class="section-head">?ㅼ떆媛?梨꾪똿諛?愿由?</div>
+    <div class="section-body">
+      <p style="margin:0 0 12px;font-size:13px;color:#6B7280;">
+        媛쒖꽕??梨꾪똿諛㈑룹젒?띿옄 紐⑸줉???뺤씤?섍퀬, 遺?곸젅 ?ㅼ썙?쒓? ?ы븿??硫붿떆吏???먮룞?쇰줈 ?꾨옒 濡쒓렇???볦엯?덈떎. 諛???젣 ???대떦 諛⑹쓽 紐⑤뱺 ?묒냽???딄퉩?덈떎.
+      </p>
+      <div class="tools" style="margin-bottom:10px;">
+        <button type="button" class="btn" id="chatroomAdminRefresh">?덈줈怨좎묠</button>
+      </div>
+      <div id="chatroomAdminRooms"></div>
+      <div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(244,114,182,.12);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;">
+        <div style="font-size:11px;letter-spacing:.12em;color:#7f62a3;font-family:Orbitron,sans-serif;">?섏떖 硫붿떆吏 (?ㅼ썙??媛먯?)</div>
+        <button type="button" class="btn" id="chatKeywordSettingsBtn" style="white-space:nowrap;">?ㅼ썙??媛먯? ?ㅼ젙</button>
+      </div>
+      <div id="chatroomAdminFlags" style="margin-top:10px;"></div>
+    </div>
+  </section>
+</main>
+
+<div id="traineeDetailModal" class="ad-modal-overlay" style="display:none;">
+  <div class="ad-modal" onclick="event.stopPropagation()">
+    <div class="ad-modal__bar"></div>
+    <div class="ad-modal__body">
+      <div class="trainee-detail-hero">
+        <div style="min-width:0;">
+          <div class="trainee-name" id="td_name" style="display:inline;"></div>
+          <span class="badge" id="td_grade_badge" style="margin-left:8px;font-size:11px;font-weight:800;"></span>
+        </div>
+        <button type="button" class="btn" onclick="closeTraineeDetailModal()" aria-label="?リ린">횞</button>
+      </div>
+      <div class="m" id="td_sub" style="margin-top:6px;"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin:12px 0 8px;">
+        <span class="badge">TOTAL</span>
+        <span class="score" id="td_total"></span>
+      </div>
+      <div id="td_stats"></div>
+      <div class="tools" style="margin-top:14px;">
+        <button type="button" class="btn" id="td_btn_edit">?섏젙</button>
+        <form method="post" id="td_form_delete" style="margin:0;" onsubmit="return confirm('??젣?좉퉴??');">
+          <button type="submit" class="btn danger">??젣</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="editModal" class="ad-modal-overlay">
+  <div class="ad-modal" onclick="event.stopPropagation()">
+    <div class="ad-modal__bar"></div>
+    <div class="ad-modal__body">
+      <h3 style="font-size:16px;margin:0 0 12px;font-weight:900;">?곗뒿???뺣낫 ?섏젙</h3>
+      <form id="editForm" method="post" action="">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <label style="display:block;font-size:11px;color:#8e6476;margin-bottom:4px;">?대쫫</label>
+            <input type="text" name="name" id="edit_name" class="input" style="width:100%;">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;color:#8e6476;margin-bottom:4px;">?깃툒</label>
+            <select name="grade" id="edit_grade" class="input" style="width:100%;">
+              <option value="N">N</option>
+              <option value="R">R</option>
+              <option value="SR">SR</option>
+              <option value="SSR">SSR</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;">
+          <div><label style="display:block;font-size:11px;color:#8e6476;margin-bottom:4px;">蹂댁뺄</label><input type="number" name="vocal" id="edit_vocal" min="0" max="20" class="input" style="width:100%;text-align:center;"></div>
+          <div><label style="display:block;font-size:11px;color:#8e6476;margin-bottom:4px;">?꾩뒪</label><input type="number" name="dance" id="edit_dance" min="0" max="20" class="input" style="width:100%;text-align:center;"></div>
+          <div><label style="display:block;font-size:11px;color:#8e6476;margin-bottom:4px;">?ㅽ?</label><input type="number" name="star" id="edit_star" min="0" max="20" class="input" style="width:100%;text-align:center;"></div>
+          <div><label style="display:block;font-size:11px;color:#8e6476;margin-bottom:4px;">硫섑깉</label><input type="number" name="mental" id="edit_mental" min="0" max="20" class="input" style="width:100%;text-align:center;"></div>
+          <div><label style="display:block;font-size:11px;color:#8e6476;margin-bottom:4px;">??뚰겕</label><input type="number" name="teamwork" id="edit_teamwork" min="0" max="20" class="input" style="width:100%;text-align:center;"></div>
+        </div>
+        <div class="tools">
+          <button type="submit" class="btn">???</button>
+          <button type="button" class="btn" onclick="closeEditModal()">痍⑥냼</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+const ctx = '${pageContext.request.contextPath}';
+const GAME_DAILY_KEYS = ${gameDailyKeysJson};
+const GAME_DAILY_VALS = ${gameDailyValsJson};
+const GAME_WEEKLY_KEYS = ${gameWeeklyKeysJson};
+const GAME_WEEKLY_VALS = ${gameWeeklyValsJson};
+const GAME_MONTHLY_KEYS = ${gameMonthlyKeysJson};
+const GAME_MONTHLY_VALS = ${gameMonthlyValsJson};
+const GAME_PHASE_DAILY_LABELS = ${gamePhaseDailyLabelsJson};
+const GAME_PHASE_DAILY_VALS = ${gamePhaseDailyValuesJson};
+const GAME_PHASE_WEEKLY_LABELS = ${gamePhaseWeeklyLabelsJson};
+const GAME_PHASE_WEEKLY_VALS = ${gamePhaseWeeklyValuesJson};
+const GAME_PHASE_MONTHLY_LABELS = ${gamePhaseMonthlyLabelsJson};
+const GAME_PHASE_MONTHLY_VALS = ${gamePhaseMonthlyValuesJson};
+const HOURLY_PLAY_DAILY_LABELS = ${hourlyPlayDailyLabelsJson};
+const HOURLY_PLAY_DAILY_VALS = ${hourlyPlayDailyValuesJson};
+const HOURLY_PLAY_WEEKLY_LABELS = ${hourlyPlayWeeklyLabelsJson};
+const HOURLY_PLAY_WEEKLY_VALS = ${hourlyPlayWeeklyValuesJson};
+const HOURLY_PLAY_MONTHLY_LABELS = ${hourlyPlayMonthlyLabelsJson};
+const HOURLY_PLAY_MONTHLY_VALS = ${hourlyPlayMonthlyValuesJson};
+const DROPOFF_DAILY_LABELS = ${dropOffDailyLabelsJson};
+const DROPOFF_DAILY_VALS = ${dropOffDailyValuesJson};
+const DROPOFF_WEEKLY_LABELS = ${dropOffWeeklyLabelsJson};
+const DROPOFF_WEEKLY_VALS = ${dropOffWeeklyValuesJson};
+const DROPOFF_MONTHLY_LABELS = ${dropOffMonthlyLabelsJson};
+const DROPOFF_MONTHLY_VALS = ${dropOffMonthlyValuesJson};
+const COIN_FLOW_DAILY_LABELS = ${coinFlowDailyLabelsJson};
+const COIN_FLOW_DAILY_CHARGE = ${coinFlowDailyChargeJson};
+const COIN_FLOW_DAILY_USED = ${coinFlowDailyUsedJson};
+const COIN_FLOW_DAILY_NET = ${coinFlowDailyNetJson};
+const COIN_FLOW_WEEKLY_LABELS = ${coinFlowWeeklyLabelsJson};
+const COIN_FLOW_WEEKLY_CHARGE = ${coinFlowWeeklyChargeJson};
+const COIN_FLOW_WEEKLY_USED = ${coinFlowWeeklyUsedJson};
+const COIN_FLOW_WEEKLY_NET = ${coinFlowWeeklyNetJson};
+const COIN_FLOW_MONTHLY_LABELS = ${coinFlowMonthlyLabelsJson};
+const COIN_FLOW_MONTHLY_CHARGE = ${coinFlowMonthlyChargeJson};
+const COIN_FLOW_MONTHLY_USED = ${coinFlowMonthlyUsedJson};
+const COIN_FLOW_MONTHLY_NET = ${coinFlowMonthlyNetJson};
+const COIN_DISTRIBUTION_LABELS = ${coinDistributionLabelsJson};
+const COIN_DISTRIBUTION_VALUES = ${coinDistributionValuesJson};
+const BOARD_TREND_KEYS = ${boardTrendKeysJson};
+const BOARD_TREND_VALS = ${boardTrendValsJson};
+const REPORT_TREND_KEYS = ${reportTrendKeysJson};
+const REPORT_TREND_VALS = ${reportTrendValsJson};
+const MEMBER_AGE_BUCKET_LABELS = ${memberAgeBucketLabelsJson};
+const MEMBER_AGE_BUCKET_VALUES = ${memberAgeBucketValuesJson};
+
+function formatDateLabelKo(s) {
+  if (s == null || typeof s !== 'string') return s;
+  var m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) {
+    return parseInt(m[1], 10) + '??' + parseInt(m[2], 10) + '??' + parseInt(m[3], 10) + '??;
+  }
+  return s;
+}
+
+function phaseLabelKo(s) {
+  if (s == null || s === '') return '誘몄???;
+  var u = String(s).toUpperCase();
+  if (u === 'UNKNOWN' || u === '(NULL)') return '誘몄???;
+  return String(s);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof Chart === 'undefined') return;
+  if (typeof Chart.defaults !== 'undefined') {
+    Chart.defaults.locale = 'ko';
+  }
+  var dailyEl = document.getElementById('chartGameDaily');
+  var phaseEl = document.getElementById('chartGamePhase');
+  var hourlyEl = document.getElementById('chartHourlyPlay');
+  var dropOffEl = document.getElementById('chartDropOff');
+  var coinFlowEl = document.getElementById('chartCoinFlow');
+  var coinDistEl = document.getElementById('chartCoinDistribution');
+  var memberAgeEl = document.getElementById('chartMemberAge');
+  var boardTrendEl = document.getElementById('chartBoardTrend');
+  var reportTrendEl = document.getElementById('chartReportTrend');
+  var gamePlaySets = {
+    daily: {
+      labels: Array.isArray(GAME_DAILY_KEYS) ? GAME_DAILY_KEYS.map(formatDateLabelKo) : [],
+      values: Array.isArray(GAME_DAILY_VALS) ? GAME_DAILY_VALS : []
+    },
+    weekly: {
+      labels: Array.isArray(GAME_WEEKLY_KEYS) ? GAME_WEEKLY_KEYS : [],
+      values: Array.isArray(GAME_WEEKLY_VALS) ? GAME_WEEKLY_VALS : []
+    },
+    monthly: {
+      labels: Array.isArray(GAME_MONTHLY_KEYS) ? GAME_MONTHLY_KEYS : [],
+      values: Array.isArray(GAME_MONTHLY_VALS) ? GAME_MONTHLY_VALS : []
+    }
+  };
+  var phaseSets = {
+    daily: { labels: Array.isArray(GAME_PHASE_DAILY_LABELS) ? GAME_PHASE_DAILY_LABELS.map(phaseLabelKo) : [], values: Array.isArray(GAME_PHASE_DAILY_VALS) ? GAME_PHASE_DAILY_VALS : [] },
+    weekly: { labels: Array.isArray(GAME_PHASE_WEEKLY_LABELS) ? GAME_PHASE_WEEKLY_LABELS.map(phaseLabelKo) : [], values: Array.isArray(GAME_PHASE_WEEKLY_VALS) ? GAME_PHASE_WEEKLY_VALS : [] },
+    monthly: { labels: Array.isArray(GAME_PHASE_MONTHLY_LABELS) ? GAME_PHASE_MONTHLY_LABELS.map(phaseLabelKo) : [], values: Array.isArray(GAME_PHASE_MONTHLY_VALS) ? GAME_PHASE_MONTHLY_VALS : [] }
+  };
+
+  var gamePlayChart = null;
+  var phaseChart = null;
+
+  function renderGamePlay(period) {
+    var ds = gamePlaySets[period] || gamePlaySets.daily;
+    if (!dailyEl || !Array.isArray(ds.labels) || ds.labels.length === 0) {
+      if (dailyEl && dailyEl.parentElement) dailyEl.parentElement.innerHTML = '<div class="chart-placeholder">?뚮젅???곗씠?곌? ?놁뒿?덈떎.</div>';
+      return;
+    }
+    if (gamePlayChart) {
+      gamePlayChart.destroy();
+    }
+    gamePlayChart = new Chart(dailyEl, {
+      type: 'line',
+      data: {
+        labels: ds.labels,
+        datasets: [{
+          label: '寃뚯엫 ?뚮젅??,
+          data: ds.values.map(function(v) { return Number(v); }),
+          borderColor: 'rgba(236,72,153,.9)',
+          backgroundColor: 'rgba(253,242,248,.55)',
+          fill: true,
+          tension: 0.28,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        locale: 'ko',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: function(items) {
+                var i = items[0].dataIndex;
+                return ds.labels[i] || '';
+              },
+              label: function(ctx) {
+                return '?뚮젅??' + ctx.parsed.y + '??;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: period === 'monthly' ? '?? : (period === 'weekly' ? '二쇨컙' : '?좎쭨') },
+            ticks: { maxRotation: 40, minRotation: 0, autoSkip: true, maxTicksLimit: period === 'daily' ? 14 : 12 }
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: '?뚮젅???잛닔' },
+            ticks: { precision: 0, callback: function(v) { return v + '??; } }
+          }
+        }
+      }
+    });
+  }
+
+  function renderPhase(period) {
+    var ds = phaseSets[period] || phaseSets.daily;
+    if (!phaseEl || !Array.isArray(ds.labels) || ds.labels.length === 0) {
+      if (phaseEl && phaseEl.parentElement) phaseEl.parentElement.innerHTML = '<div class="chart-placeholder">?섏씠利?遺꾪룷 ?곗씠?곌? ?놁뒿?덈떎.</div>';
+      return;
+    }
+    var colors = ['#ec4899','#d946ef','#a855f7','#8b5cf6','#6366f1','#0ea5e9','#14b8a6','#22c55e','#eab308','#f97316'];
+    var phaseTotal = ds.values.reduce(function(a, b) { return a + Number(b); }, 0);
+    if (phaseChart) {
+      phaseChart.destroy();
+    }
+    phaseChart = new Chart(phaseEl, {
+      type: 'doughnut',
+      data: {
+        labels: ds.labels,
+        datasets: [{
+          label: '嫄댁닔',
+          data: ds.values.map(function(v) { return Number(v); }),
+          backgroundColor: ds.labels.map(function(_, i) { return colors[i % colors.length]; }),
+          borderWidth: 0
+        }]
+      },
+      options: {
+        locale: 'ko',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                var val = ctx.parsed;
+                var pct = phaseTotal ? Math.round((val / phaseTotal) * 1000) / 10 : 0;
+                return (ctx.label || '') + ': ' + val + '嫄?(' + pct + '%)';
+              }
+            }
+          },
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 10, font: { size: 10 }, padding: 10 }
+          }
+        }
+      }
+    });
+  }
+
+  function bindPeriodTabs(groupName, onChange) {
+    var wrap = document.querySelector('[data-chart-tabs="' + groupName + '"]');
+    if (!wrap) return;
+    wrap.querySelectorAll('.chart-tab').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var period = btn.getAttribute('data-period') || 'daily';
+        wrap.querySelectorAll('.chart-tab').forEach(function(b) {
+          b.classList.toggle('is-on', b.getAttribute('data-period') === period);
+        });
+        onChange(period);
+      });
+    });
+  }
+
+  renderGamePlay('daily');
+  renderPhase('daily');
+  bindPeriodTabs('game-play', renderGamePlay);
+  bindPeriodTabs('phase', renderPhase);
+
+  var hourlySets = {
+    daily: { labels: Array.isArray(HOURLY_PLAY_DAILY_LABELS) ? HOURLY_PLAY_DAILY_LABELS : [], values: Array.isArray(HOURLY_PLAY_DAILY_VALS) ? HOURLY_PLAY_DAILY_VALS : [] },
+    weekly: { labels: Array.isArray(HOURLY_PLAY_WEEKLY_LABELS) ? HOURLY_PLAY_WEEKLY_LABELS : [], values: Array.isArray(HOURLY_PLAY_WEEKLY_VALS) ? HOURLY_PLAY_WEEKLY_VALS : [] },
+    monthly: { labels: Array.isArray(HOURLY_PLAY_MONTHLY_LABELS) ? HOURLY_PLAY_MONTHLY_LABELS : [], values: Array.isArray(HOURLY_PLAY_MONTHLY_VALS) ? HOURLY_PLAY_MONTHLY_VALS : [] }
+  };
+  var dropOffSets = {
+    daily: { labels: Array.isArray(DROPOFF_DAILY_LABELS) ? DROPOFF_DAILY_LABELS : [], values: Array.isArray(DROPOFF_DAILY_VALS) ? DROPOFF_DAILY_VALS : [] },
+    weekly: { labels: Array.isArray(DROPOFF_WEEKLY_LABELS) ? DROPOFF_WEEKLY_LABELS : [], values: Array.isArray(DROPOFF_WEEKLY_VALS) ? DROPOFF_WEEKLY_VALS : [] },
+    monthly: { labels: Array.isArray(DROPOFF_MONTHLY_LABELS) ? DROPOFF_MONTHLY_LABELS : [], values: Array.isArray(DROPOFF_MONTHLY_VALS) ? DROPOFF_MONTHLY_VALS : [] }
+  };
+  var hourlyChart = null;
+  var dropOffChart = null;
+
+  function renderExtraCharts(period) {
+    var hs = hourlySets[period] || hourlySets.daily;
+    var ds = dropOffSets[period] || dropOffSets.daily;
+
+    if (hourlyEl && Array.isArray(hs.labels) && hs.labels.length > 0) {
+      if (hourlyChart) {
+        hourlyChart.destroy();
+      }
+      hourlyChart = new Chart(hourlyEl, {
+      type: 'bar',
+      data: {
+        labels: hs.labels,
+        datasets: [{
+          label: '?쒓컙?蹂??뚮젅??,
+          data: hs.values.map(function(v){ return Number(v); }),
+          borderColor: '#a855f7',
+          backgroundColor: 'rgba(196,181,253,.45)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 } }
+        }
+      }
+    });
+    } else if (hourlyEl && hourlyEl.parentElement) {
+      hourlyEl.parentElement.innerHTML = '<div class="chart-placeholder">?쒓컙?蹂??곗씠?곌? ?놁뒿?덈떎.</div>';
+    }
+
+    if (dropOffEl && Array.isArray(ds.labels) && ds.labels.length > 0) {
+      if (dropOffChart) {
+        dropOffChart.destroy();
+      }
+      dropOffChart = new Chart(dropOffEl, {
+      type: 'bar',
+      data: {
+        labels: ds.labels,
+        datasets: [{
+          label: '?댄깉 嫄댁닔',
+          data: ds.values.map(function(v){ return Number(v); }),
+          borderColor: '#f472b6',
+          backgroundColor: 'rgba(251,207,232,.55)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { maxRotation: 45, minRotation: 0 } },
+          y: { beginAtZero: true, ticks: { precision: 0 } }
+        }
+      }
+    });
+    } else if (dropOffEl && dropOffEl.parentElement) {
+      dropOffEl.parentElement.innerHTML = '<div class="chart-placeholder">?댄깉 援ш컙 ?곗씠?곌? ?놁뒿?덈떎.</div>';
+    }
+  }
+
+  renderExtraCharts('daily');
+  bindPeriodTabs('extra', renderExtraCharts);
+
+  var coinFlowSets = {
+    daily: {
+      labels: Array.isArray(COIN_FLOW_DAILY_LABELS) ? COIN_FLOW_DAILY_LABELS : [],
+      charge: Array.isArray(COIN_FLOW_DAILY_CHARGE) ? COIN_FLOW_DAILY_CHARGE : [],
+      used: Array.isArray(COIN_FLOW_DAILY_USED) ? COIN_FLOW_DAILY_USED : [],
+      net: Array.isArray(COIN_FLOW_DAILY_NET) ? COIN_FLOW_DAILY_NET : []
+    },
+    weekly: {
+      labels: Array.isArray(COIN_FLOW_WEEKLY_LABELS) ? COIN_FLOW_WEEKLY_LABELS : [],
+      charge: Array.isArray(COIN_FLOW_WEEKLY_CHARGE) ? COIN_FLOW_WEEKLY_CHARGE : [],
+      used: Array.isArray(COIN_FLOW_WEEKLY_USED) ? COIN_FLOW_WEEKLY_USED : [],
+      net: Array.isArray(COIN_FLOW_WEEKLY_NET) ? COIN_FLOW_WEEKLY_NET : []
+    },
+    monthly: {
+      labels: Array.isArray(COIN_FLOW_MONTHLY_LABELS) ? COIN_FLOW_MONTHLY_LABELS : [],
+      charge: Array.isArray(COIN_FLOW_MONTHLY_CHARGE) ? COIN_FLOW_MONTHLY_CHARGE : [],
+      used: Array.isArray(COIN_FLOW_MONTHLY_USED) ? COIN_FLOW_MONTHLY_USED : [],
+      net: Array.isArray(COIN_FLOW_MONTHLY_NET) ? COIN_FLOW_MONTHLY_NET : []
+    }
+  };
+  var coinFlowChart = null;
+  var coinDistChart = null;
+
+  function renderCoinFlow(period) {
+    var ds = coinFlowSets[period] || coinFlowSets.daily;
+    if (!coinFlowEl || !Array.isArray(ds.labels) || ds.labels.length === 0) {
+      if (coinFlowEl && coinFlowEl.parentElement) {
+        coinFlowEl.parentElement.innerHTML = '<div class="chart-placeholder">肄붿씤 ?먮쫫 ?곗씠?곌? ?놁뒿?덈떎.</div>';
+      }
+      return;
+    }
+    if (coinFlowChart) {
+      coinFlowChart.destroy();
+    }
+    coinFlowChart = new Chart(coinFlowEl, {
+      type: 'line',
+      data: {
+        labels: ds.labels,
+        datasets: [
+          {
+            label: '異⑹쟾 肄붿씤',
+            data: ds.charge.map(function(v){ return Number(v); }),
+            borderColor: '#ec4899',
+            backgroundColor: 'rgba(236,72,153,.15)',
+            tension: 0.28,
+            pointRadius: 2.8,
+            fill: false
+          },
+          {
+            label: '?ъ슜 肄붿씤',
+            data: ds.used.map(function(v){ return Number(v); }),
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139,92,246,.12)',
+            tension: 0.28,
+            pointRadius: 2.8,
+            fill: false
+          },
+          {
+            label: '?쒖쬆媛??,
+            data: ds.net.map(function(v){ return Number(v); }),
+            borderColor: '#14b8a6',
+            backgroundColor: 'rgba(20,184,166,.12)',
+            tension: 0.22,
+            pointRadius: 2.8,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        locale: 'ko',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 10, font: { size: 11 }, padding: 10 } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return (ctx.dataset.label || '') + ': ' + ctx.parsed.y + ' 肄붿씤';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: period === 'monthly' ? '?? : (period === 'weekly' ? '二쇨컙' : '?좎쭨') },
+            ticks: { maxRotation: 40, minRotation: 0, autoSkip: true, maxTicksLimit: period === 'daily' ? 14 : 12 }
+          },
+          y: {
+            ticks: { precision: 0, callback: function(v){ return v + 'C'; } }
+          }
+        }
+      }
+    });
+  }
+
+  function renderCoinDistribution(period) {
+    if (!coinDistEl || !Array.isArray(COIN_DISTRIBUTION_LABELS) || COIN_DISTRIBUTION_LABELS.length === 0) {
+      if (coinDistEl && coinDistEl.parentElement) {
+        coinDistEl.parentElement.innerHTML = '<div class="chart-placeholder">?뚯썝 肄붿씤 遺꾪룷 ?곗씠?곌? ?놁뒿?덈떎.</div>';
+      }
+      return;
+    }
+    if (coinDistChart) {
+      coinDistChart.destroy();
+    }
+    coinDistChart = new Chart(coinDistEl, {
+      type: 'doughnut',
+      data: {
+        labels: COIN_DISTRIBUTION_LABELS,
+        datasets: [{
+          label: '?뚯썝 ??,
+          data: COIN_DISTRIBUTION_VALUES.map(function(v){ return Number(v); }),
+          backgroundColor: ['#f9a8d4','#d8b4fe','#a78bfa','#7c3aed'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, padding: 10 } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return (ctx.label || '') + ': ' + ctx.parsed + '紐?;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  renderCoinFlow('daily');
+  bindPeriodTabs('coin-flow', renderCoinFlow);
+  renderCoinDistribution('daily');
+  bindPeriodTabs('coin-distribution', renderCoinDistribution);
+
+  if (memberAgeEl && Array.isArray(MEMBER_AGE_BUCKET_LABELS) && MEMBER_AGE_BUCKET_LABELS.length > 0) {
+    new Chart(memberAgeEl, {
+      type: 'bar',
+      data: {
+        labels: MEMBER_AGE_BUCKET_LABELS,
+        datasets: [{
+          label: '?뚯썝 ??,
+          data: MEMBER_AGE_BUCKET_VALUES.map(function(v) { return Number(v); }),
+          borderColor: '#ec4899',
+          backgroundColor: 'rgba(244,114,182,.35)',
+          borderWidth: 1.2,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return '?뚯썝 ' + ctx.parsed.y + '紐?;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              callback: function(v) { return v + '紐?; }
+            }
+          }
+        }
+      }
+    });
+  } else if (memberAgeEl && memberAgeEl.parentElement) {
+    memberAgeEl.parentElement.innerHTML = '<div class="chart-placeholder">?곕졊 ?듦퀎 ?곗씠?곌? ?놁뒿?덈떎.</div>';
+  }
+
+  if (boardTrendEl && Array.isArray(BOARD_TREND_KEYS) && BOARD_TREND_KEYS.length > 0) {
+    new Chart(boardTrendEl, {
+      type: 'line',
+      data: {
+        labels: BOARD_TREND_KEYS,
+        datasets: [{
+          label: '寃뚯떆湲',
+          data: BOARD_TREND_VALS.map(function(v) { return Number(v); }),
+          borderColor: '#a855f7',
+          backgroundColor: 'rgba(216,180,254,.28)',
+          fill: true,
+          tension: 0.25
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    });
+  } else if (boardTrendEl && boardTrendEl.parentElement) {
+    boardTrendEl.parentElement.innerHTML = '<div class="chart-placeholder">寃뚯떆湲 異붿씠 ?곗씠?곌? ?놁뒿?덈떎.</div>';
+  }
+
+  if (reportTrendEl && Array.isArray(REPORT_TREND_KEYS) && REPORT_TREND_KEYS.length > 0) {
+    new Chart(reportTrendEl, {
+      type: 'bar',
+      data: {
+        labels: REPORT_TREND_KEYS,
+        datasets: [{
+          label: '?좉퀬',
+          data: REPORT_TREND_VALS.map(function(v) { return Number(v); }),
+          borderColor: '#ec4899',
+          backgroundColor: 'rgba(244,114,182,.38)'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    });
+  } else if (reportTrendEl && reportTrendEl.parentElement) {
+    reportTrendEl.parentElement.innerHTML = '<div class="chart-placeholder">?좉퀬 異붿씠 ?곗씠?곌? ?놁뒿?덈떎.</div>';
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  var addToggleBtn = document.getElementById('toggleTraineeAddForm');
+  var addForm = document.getElementById('traineeAddFormInDashboard');
+  var noticeToggleBtn = document.getElementById('noticeFormToggleBtn');
+  var noticeForm = document.getElementById('noticeCreateForm');
+  if (noticeToggleBtn && noticeForm) {
+    noticeToggleBtn.addEventListener('click', function() {
+      var open = noticeForm.style.display !== 'none';
+      noticeForm.style.display = open ? 'none' : 'block';
+      noticeToggleBtn.textContent = open ? '怨듭? ?묒꽦 ?닿린' : '怨듭? ?묒꽦 ?リ린';
+    });
+  }
+  if (addToggleBtn && addForm) {
+    addToggleBtn.addEventListener('click', function () {
+      addForm.classList.toggle('on');
+    });
+  }
+  var suspendButtons = document.querySelectorAll('.js-open-suspend');
+  suspendButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-target');
+      if (!id) return;
+      var form = document.getElementById(id);
+      if (!form) return;
+      var open = form.style.display !== 'none';
+      form.style.display = open ? 'none' : 'flex';
+      btn.textContent = open ? '?뺤?' : '?뺤? ?リ린';
+    });
+  });
+  var processToggleButtons = document.querySelectorAll('.js-report-process-toggle');
+  processToggleButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var targetId = btn.getAttribute('data-target');
+      if (!targetId) return;
+      var row = document.getElementById(targetId);
+      if (!row) return;
+      var open = row.style.display !== 'none';
+      row.style.display = open ? 'none' : 'table-row';
+      btn.textContent = open ? '泥섎━' : '泥섎━ ?リ린';
+    });
+  });
+  var adminReportFilters = document.querySelectorAll('.js-admin-report-filter');
+  var adminReportRows = Array.prototype.slice.call(document.querySelectorAll('.js-admin-report-row'));
+  var adminReportPager = document.getElementById('adminReportPager');
+  var adminReportPageSize = 5;
+  var adminReportPageWindow = 5;
+  var adminReportCurrentPage = 1;
+  var adminReportCurrentFilter = 'all';
+  function matchAdminReportFilter(row, filter) {
+    var rowStatus = row.getAttribute('data-workflow-status') || 'pending';
+    return filter === 'all'
+      || (filter === 'completed' && rowStatus === 'completed')
+      || (filter === 'processing' && (rowStatus === 'processing' || rowStatus === 'pending'));
+  }
+  function renderAdminReportPager(totalPages) {
+    if (!adminReportPager) return;
+    adminReportPager.innerHTML = '';
+    if (totalPages <= 1) return;
+    function makeButton(label, page, disabled, active) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn' + (active ? ' danger' : '');
+      btn.textContent = label;
+      btn.disabled = !!disabled;
+      if (!disabled) {
+        btn.addEventListener('click', function() {
+          adminReportCurrentPage = page;
+          applyAdminReportFilterAndPagination();
+        });
+      }
+      adminReportPager.appendChild(btn);
+    }
+    var half = Math.floor(adminReportPageWindow / 2);
+    var start = Math.max(1, adminReportCurrentPage - half);
+    var end = Math.min(totalPages, start + adminReportPageWindow - 1);
+    start = Math.max(1, end - adminReportPageWindow + 1);
+    makeButton('\\uc774\\uc804', adminReportCurrentPage - 1, adminReportCurrentPage <= 1, false);
+    for (var page = start; page <= end; page++) {
+      makeButton(String(page), page, false, page === adminReportCurrentPage);
+    }
+    makeButton('\\ub2e4\\uc74c', adminReportCurrentPage + 1, adminReportCurrentPage >= totalPages, false);
+  }
+  function applyAdminReportFilterAndPagination() {
+    if (!adminReportRows.length) return;
+    processToggleButtons.forEach(function(btn) { btn.textContent = '\\ucc98\\ub9ac'; });
+    adminReportRows.forEach(function(row) {
+      row.style.display = 'none';
+      var detailRow = document.getElementById('reportProcessRow-' + row.id.replace('reportRow-', ''));
+      if (detailRow) {
+        detailRow.style.display = 'none';
+      }
+    });
+    var filteredRows = adminReportRows.filter(function(row) {
+      return matchAdminReportFilter(row, adminReportCurrentFilter);
+    });
+    var totalPages = Math.max(1, Math.ceil(filteredRows.length / adminReportPageSize));
+    if (adminReportCurrentPage > totalPages) adminReportCurrentPage = totalPages;
+    if (adminReportCurrentPage < 1) adminReportCurrentPage = 1;
+    var startIdx = (adminReportCurrentPage - 1) * adminReportPageSize;
+    var endIdx = startIdx + adminReportPageSize;
+    filteredRows.forEach(function(row, idx) {
+      if (idx >= startIdx && idx < endIdx) {
+        row.style.display = 'table-row';
+      }
+    });
+    renderAdminReportPager(totalPages);
+  }
+  adminReportFilters.forEach(function(filterBtn) {
+    filterBtn.addEventListener('click', function() {
+      adminReportCurrentFilter = filterBtn.getAttribute('data-status') || 'all';
+      adminReportCurrentPage = 1;
+      adminReportFilters.forEach(function(b) { b.classList.remove('is-active'); });
+      filterBtn.classList.add('is-active');
+      applyAdminReportFilterAndPagination();
+      return;
+    });
+  });
+  applyAdminReportFilterAndPagination();
+
+  var searchEl = document.getElementById('traineeLocalSearch');
+  var genderEl = document.getElementById('traineeGenderFilter');
+  var gradeEl = document.getElementById('traineeGradeFilter');
+  var sortEl = document.getElementById('traineeSortFilter');
+  var grid = document.querySelector('#trainees .trainee-grid');
+  var pager = document.getElementById('traineePager');
+  var pageSize = 15;
+  var currentPage = 1;
+  if (!grid) return;
+
+  function getFilteredAndSortedCards() {
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('.js-trainee-open'));
+    var keyword = searchEl ? String(searchEl.value || '').trim().toLowerCase() : '';
+    var gender = genderEl ? genderEl.value : 'ALL';
+    var grade = gradeEl ? gradeEl.value : 'ALL';
+    var sort = sortEl ? sortEl.value : 'default';
+
+    var visibleCards = cards.filter(function (card) {
+      var name = String(card.getAttribute('data-name') || '').toLowerCase();
+      var g = String(card.getAttribute('data-gender') || 'ALL');
+      var gr = String(card.getAttribute('data-grade') || 'N');
+      return (!keyword || name.indexOf(keyword) >= 0)
+        && (gender === 'ALL' || g === gender)
+        && (grade === 'ALL' || gr === grade);
+    });
+
+    visibleCards.sort(function (a, b) {
+      if (sort === 'name') {
+        return String(a.getAttribute('data-name') || '').localeCompare(String(b.getAttribute('data-name') || ''), 'ko');
+      }
+      if (sort === 'avg') {
+        return Number(b.getAttribute('data-avg') || 0) - Number(a.getAttribute('data-avg') || 0);
+      }
+      return Number(a.getAttribute('data-id') || 0) - Number(b.getAttribute('data-id') || 0);
+    });
+    return { cards: cards, visibleCards: visibleCards };
+  }
+
+  function renderPager(totalPages) {
+    if (!pager) return;
+    pager.innerHTML = '';
+    if (totalPages <= 1) return;
+
+    function makeButton(label, page, disabled, isCurrent) {
+      var el = document.createElement(disabled || isCurrent ? 'span' : 'button');
+      el.className = 'btn' + (isCurrent ? ' page-on' : '');
+      el.textContent = label;
+      if (!disabled && !isCurrent) {
+        el.type = 'button';
+        el.addEventListener('click', function () {
+          currentPage = page;
+          applyFiltersAndPagination();
+        });
+      }
+      pager.appendChild(el);
+    }
+
+    makeButton('?댁쟾', currentPage - 1, currentPage <= 1, false);
+    for (var i = 1; i <= totalPages; i++) {
+      makeButton(String(i), i, false, i === currentPage);
+    }
+    makeButton('?ㅼ쓬', currentPage + 1, currentPage >= totalPages, false);
+  }
+
+  function applyFiltersAndPagination() {
+    var result = getFilteredAndSortedCards();
+    var cards = result.cards;
+    var visibleCards = result.visibleCards;
+
+    cards.forEach(function (card) {
+      card.style.display = 'none';
+    });
+
+    var totalPages = Math.max(1, Math.ceil(visibleCards.length / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    var start = (currentPage - 1) * pageSize;
+    var end = start + pageSize;
+    visibleCards.forEach(function (card, idx) {
+      if (idx >= start && idx < end) {
+        card.style.display = '';
+      }
+      grid.appendChild(card);
+    });
+    renderPager(totalPages);
+  }
+
+  if (searchEl) searchEl.addEventListener('input', function () { currentPage = 1; applyFiltersAndPagination(); });
+  if (genderEl) genderEl.addEventListener('change', function () { currentPage = 1; applyFiltersAndPagination(); });
+  if (gradeEl) gradeEl.addEventListener('change', function () { currentPage = 1; applyFiltersAndPagination(); });
+  if (sortEl) sortEl.addEventListener('change', function () { currentPage = 1; applyFiltersAndPagination(); });
+  applyFiltersAndPagination();
+});
+
+function openEditModal(id, name, grade, vocal, dance, star, mental, teamwork) {
+  document.getElementById('edit_name').value = name;
+  var g = grade || 'N';
+  var ge = document.getElementById('edit_grade');
+  if (ge && !Array.prototype.some.call(ge.options, function(o){ return o.value === g; })) g = 'N';
+  document.getElementById('edit_grade').value = g;
+  document.getElementById('edit_vocal').value = vocal;
+  document.getElementById('edit_dance').value = dance;
+  document.getElementById('edit_star').value = star;
+  document.getElementById('edit_mental').value = mental;
+  document.getElementById('edit_teamwork').value = teamwork;
+  document.getElementById('editForm').action = ctx + '/admin/trainees/' + id + '/edit';
+  document.getElementById('editModal').style.display = 'flex';
+}
+function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
+
+function renderTraineeStatBars(vocal, dance, star, mental, teamwork) {
+  var stats = [
+    ['蹂댁뺄', vocal], ['?꾩뒪', dance], ['?ㅽ?', star], ['硫섑깉', mental], ['??뚰겕', teamwork]
+  ];
+  return stats.map(function(s) {
+    var w = Math.min(100, Math.max(0, s[1]));
+    return '<div class="stat"><div class="stat-head"><span>' + s[0] + '</span><span>' + s[1] + '</span></div>' +
+      '<div class="bar"><span style="width:' + w + '%;"></span></div></div>';
+  }).join('');
+}
+
+function openTraineeDetailModal(el) {
+  var id = parseInt(el.getAttribute('data-id'), 10);
+  var name = el.getAttribute('data-name') || '';
+  var grade = el.getAttribute('data-grade') || '';
+  var gender = el.getAttribute('data-gender') === 'MALE' ? '?⑥꽦' : '?ъ꽦';
+  var vocal = parseInt(el.getAttribute('data-vocal'), 10) || 0;
+  var dance = parseInt(el.getAttribute('data-dance'), 10) || 0;
+  var star = parseInt(el.getAttribute('data-star'), 10) || 0;
+  var mental = parseInt(el.getAttribute('data-mental'), 10) || 0;
+  var teamwork = parseInt(el.getAttribute('data-teamwork'), 10) || 0;
+  var sum = vocal + dance + star + mental + teamwork;
+  var avg = (sum / 5).toFixed(1);
+
+  document.getElementById('td_name').textContent = name;
+  var gb = document.getElementById('td_grade_badge');
+  if (gb) {
+    gb.textContent = grade ? grade : '';
+    gb.style.display = grade ? 'inline' : 'none';
+  }
+  document.getElementById('td_sub').textContent = gender + ' 쨌 ?됯퇏 ' + avg;
+  document.getElementById('td_total').textContent = sum;
+  document.getElementById('td_stats').innerHTML = renderTraineeStatBars(vocal, dance, star, mental, teamwork);
+
+  var modal = document.getElementById('traineeDetailModal');
+  document.getElementById('td_form_delete').action = ctx + '/admin/trainees/' + id + '/delete';
+
+  modal.dataset.editId = String(id);
+  modal.dataset.editName = name;
+  modal.dataset.editGrade = grade;
+  modal.dataset.editVocal = String(vocal);
+  modal.dataset.editDance = String(dance);
+  modal.dataset.editStar = String(star);
+  modal.dataset.editMental = String(mental);
+  modal.dataset.editTeamwork = String(teamwork);
+
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeTraineeDetailModal() {
+  var modal = document.getElementById('traineeDetailModal');
+  if (!modal) return;
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+var traineeDetailModalEl = document.getElementById('traineeDetailModal');
+if (traineeDetailModalEl) {
+  traineeDetailModalEl.addEventListener('click', function(e) {
+    if (e.target === this) closeTraineeDetailModal();
+  });
+}
+
+document.querySelectorAll('.js-trainee-open').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    openTraineeDetailModal(this);
+  });
+});
+
+var tdBtnEdit = document.getElementById('td_btn_edit');
+if (tdBtnEdit) {
+  tdBtnEdit.addEventListener('click', function() {
+    var modal = document.getElementById('traineeDetailModal');
+    if (!modal) return;
+    var id = parseInt(modal.dataset.editId, 10);
+    var name = modal.dataset.editName || '';
+    var grade = modal.dataset.editGrade || '';
+    var vocal = parseInt(modal.dataset.editVocal, 10);
+    var dance = parseInt(modal.dataset.editDance, 10);
+    var star = parseInt(modal.dataset.editStar, 10);
+    var mental = parseInt(modal.dataset.editMental, 10);
+    var teamwork = parseInt(modal.dataset.editTeamwork, 10);
+    closeTraineeDetailModal();
+    openEditModal(id, name, grade, vocal, dance, star, mental, teamwork);
+  });
+}
+
+function safeFetch(url, opt){ return fetch(url, Object.assign({ credentials: 'same-origin' }, opt || {})); }
+
+function openChatroomDetail(roomId) {
+  if (!roomId) return;
+  safeFetch(ctx + '/admin/chatroom/' + encodeURIComponent(roomId) + '/detail')
+    .then(function(r){ if (!r.ok) throw new Error(); return r.json(); })
+    .then(function(d){
+      if (d.error) { alert('諛⑹쓣 李얠쓣 ???놁뒿?덈떎.'); return; }
+      var modal = document.getElementById('chatroomDetailModal');
+      var body = document.getElementById('chatroomDetailBody');
+      if (!modal || !body) return;
+      var uid = encodeURIComponent(d.roomId);
+      var online = d.users || [];
+      var hist = d.visitorHistory || [];
+      var onlineSet = {};
+      online.forEach(function(u){ onlineSet[u] = true; });
+      var histHtml = hist.length ? hist.map(function(n){
+        var on = onlineSet[n] ? ' <span class="chip" style="font-size:9px;">?묒냽以?</span>' : '';
+        var kick = onlineSet[n]
+          ? '<form method="post" action="' + ctx + '/admin/chatroom/' + uid + '/kick" style="margin:0 0 0 8px;display:inline;" onsubmit="return confirm(\'???ъ슜?먮? 異붾갑?좉퉴??\');">'
+            + '<input type="hidden" name="nickname" value="' + escapeHtml(n) + '"/>'
+            + '<button type="submit" class="btn danger" style="padding:2px 8px;font-size:11px;">異붾갑</button></form>'
+          : '';
+        return '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 0;border-bottom:1px solid rgba(244,114,182,.10);">'
+          + '<span style="font-weight:700;">' + escapeHtml(n) + '</span>' + on + kick + '</div>';
+      }).join('') : '<div class="empty">?꾩쭅 ?낆옣 湲곕줉???놁뒿?덈떎.</div>';
+      body.innerHTML = '<div style="font-weight:900;margin-bottom:8px;font-size:15px;">' + escapeHtml(d.roomName || '') + '</div>'
+        + '<div class="m" style="margin-bottom:14px;">諛⑹옣: ' + escapeHtml(d.creatorNickname || '') + ' 쨌 諛?ID: ' + escapeHtml(d.roomId || '') + ' 쨌 ' + (d.secret ? '鍮꾨?諛? : '怨듦컻') + '</div>'
+        + '<div style="font-size:11px;letter-spacing:.08em;color:#7f62a3;margin-bottom:8px;font-family:Orbitron,sans-serif;">?꾩쟻 ?낆옣 ?됰꽕??(??踰덉씠?쇰룄 ?ㅼ뼱???щ엺)</div>'
+        + '<div>' + histHtml + '</div>';
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+    })
+    .catch(function(){ alert('?곸꽭 ?뺣낫瑜?遺덈윭?ㅼ? 紐삵뻽?듬땲??'); });
+}
+
+(function(){
+  var roomsEl = document.getElementById('chatroomAdminRooms');
+  var flagsEl = document.getElementById('chatroomAdminFlags');
+  var btn = document.getElementById('chatroomAdminRefresh');
+  if (!roomsEl || !flagsEl) return;
+  roomsEl.addEventListener('click', function(e){
+    var b = e.target.closest('.js-chatroom-detail');
+    if (!b) return;
+    e.preventDefault();
+    var id = b.getAttribute('data-room-id');
+    if (id) openChatroomDetail(id);
+  });
+  function loadChatroomAdmin(){
+    safeFetch(ctx + '/admin/chatroom/data')
+      .then(function(r){ if (!r.ok) throw new Error(); return r.json(); })
+      .then(function(d){
+        var rooms = d.rooms || [];
+        var flags = d.flags || [];
+        roomsEl.innerHTML = rooms.length ? rooms.map(function(room){
+          var rid = room.roomId || '';
+          var uid = encodeURIComponent(rid);
+          var users = (room.users || []);
+          var usersHtml = users.length
+            ? users.map(function(u){
+                return '<span style="display:inline-flex;align-items:center;gap:6px;margin:3px 6px 3px 0;">'
+                  + '<span class="chip">' + escapeHtml(u) + '</span>'
+                  + '<form method="post" action="' + ctx + '/admin/chatroom/' + uid + '/kick" style="margin:0;display:inline;" onsubmit="return confirm(\'異붾갑?좉퉴??\');">'
+                  + '<input type="hidden" name="nickname" value="' + escapeHtml(u) + '"/>'
+                  + '<button type="submit" class="btn danger" style="padding:3px 8px;font-size:11px;">異붾갑</button>'
+                  + '</form></span>';
+              }).join('')
+            : '<span style="font-size:12px;color:#8e6f7f;">?묒냽???놁쓬</span>';
+          return '<div class="row" style="flex-wrap:wrap;align-items:flex-start;">'
+            + '<div style="min-width:220px;flex:1;">'
+            + '<div class="t">' + escapeHtml(room.roomName || '') + ' <span style="font-size:11px;color:#8e6f7f;">' + escapeHtml(rid) + '</span></div>'
+            + '<div class="m">諛⑹옣: ' + escapeHtml(room.creatorNickname || '') + ' 쨌 ' + (room.userCount || 0) + '紐?쨌 ' + (room.secret ? '鍮꾨?諛? : '怨듦컻') + '</div>'
+            + '<div style="margin-top:8px;">' + usersHtml + '</div>'
+            + '</div>'
+            + '<div class="tools" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">'
+            + '<button type="button" class="btn js-chatroom-detail" data-room-id="' + escapeHtml(rid) + '">諛??곸꽭</button>'
+            + '<form method="post" action="' + ctx + '/admin/chatroom/' + uid + '/delete" style="margin:0;" onsubmit="return confirm(\'??諛⑹쓣 ??젣?좉퉴?? ?묒냽 以묒씤 ?ъ슜?먭? 紐⑤몢 ?섍?寃??⑸땲??\');">'
+            + '<button type="submit" class="btn danger">諛???젣</button>'
+            + '</form></div>'
+            + '</div>';
+        }).join('') : '<div class="empty">媛쒖꽕??梨꾪똿諛⑹씠 ?놁뒿?덈떎.</div>';
+
+        var fr = flags.slice().reverse();
+        flagsEl.innerHTML = fr.length ? fr.map(function(f){
+          var fid = encodeURIComponent(f.roomId || '');
+          return '<div class="row" style="flex-wrap:wrap;align-items:flex-start;">'
+            + '<div style="min-width:0;flex:1;">'
+            + '<div class="t" style="font-size:12px;">' + escapeHtml(f.roomName || '') + ' 쨌 ' + escapeHtml(f.nickname || '') + '</div>'
+            + '<div class="m" style="white-space:pre-wrap;word-break:break-word;">' + escapeHtml(f.content || '') + '</div>'
+            + '<div class="m">' + escapeHtml(f.reason || '') + ' 쨌 ' + escapeHtml(f.at || '') + '</div>'
+            + '</div>'
+            + '<form method="post" action="' + ctx + '/admin/chatroom/' + fid + '/delete" style="margin:0;" onsubmit="return confirm(\'?대떦 諛⑹쓣 ??젣?좉퉴??\');">'
+            + '<button type="submit" class="btn danger">諛???젣</button>'
+            + '</form>'
+            + '</div>';
+        }).join('') : '<div class="empty">?섏떖 硫붿떆吏 濡쒓렇媛 ?놁뒿?덈떎.</div>';
+      })
+      .catch(function(){
+        roomsEl.innerHTML = '<div class="empty">遺덈윭?ㅼ? 紐삵뻽?듬땲?? 愿由ъ옄 沅뚰븳?쇰줈 濡쒓렇?명뻽?붿? ?뺤씤?섏꽭??</div>';
+      });
+  }
+  if (btn) btn.addEventListener('click', loadChatroomAdmin);
+  loadChatroomAdmin();
+  setInterval(loadChatroomAdmin, 60000);
+})();
+
+function closeChatKeywordModal() {
+  var m = document.getElementById('chatKeywordModal');
+  if (!m) return;
+  m.style.display = 'none';
+  m.setAttribute('aria-hidden', 'true');
+}
+
+function renderChatKeywordModalHtml(data) {
+  var builtIn = data.builtIn || [];
+  var custom = data.custom || [];
+  var chips = builtIn.map(function(k) {
+    return '<span class="chip" style="margin:3px 4px 3px 0;">' + escapeHtml(k) + '</span>';
+  }).join('');
+  var rows = custom.map(function(c) {
+    var id = c.id;
+    var kw = c.keyword || '';
+    return '<div class="row" style="margin-bottom:8px;align-items:center;"><div class="t" style="min-width:0;flex:1;">' + escapeHtml(kw) + '</div>'
+      + '<button type="button" class="btn danger js-chat-kw-del" style="padding:4px 10px;font-size:11px;" data-kwid="' + id + '">??젣</button></div>';
+  }).join('');
+  return '<div style="font-size:12px;font-weight:800;margin-bottom:8px;color:#7f62a3;">湲곕낯 ?ㅼ썙??(??긽 ?곸슜)</div>'
+    + '<div style="margin-bottom:16px;line-height:1.6;">' + (chips || '<span style="font-size:12px;color:#8e6f7f;">?놁쓬</span>') + '</div>'
+    + '<div style="font-size:12px;font-weight:800;margin-bottom:8px;color:#7f62a3;">異붽? ?ㅼ썙??</div>'
+    + (rows || '<div class="empty" style="padding:12px;">異붽????ㅼ썙?쒓? ?놁뒿?덈떎.</div>')
+    + '<div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(244,114,182,.12);">'
+    + '<div style="font-size:12px;font-weight:700;margin-bottom:8px;">?ㅼ썙??異붽?</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
+    + '<input type="text" id="chatKeywordNewInput" class="input" style="flex:1;min-width:160px;" maxlength="100" placeholder="새 키워드"/>'
+    + '<button type="button" class="btn" id="chatKeywordAddBtn">異붽?</button>'
+    + '</div>'
+    + '<p style="margin:8px 0 0;font-size:11px;color:#8e6f7f;">遺遺??쇱튂(??뚮Ц??臾댁떆)濡?媛먯??⑸땲?? 湲곕낯 ?ㅼ썙?쒖? ?숈씪??臾멸뎄??異붽??????놁뒿?덈떎.</p>'
+    + '</div>';
+}
+
+function bindChatKeywordModalActions() {
+  var body = document.getElementById('chatKeywordModalBody');
+  if (!body) return;
+  body.querySelectorAll('.js-chat-kw-del').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var id = btn.getAttribute('data-kwid');
+      if (!id || !confirm('???ㅼ썙?쒕? ??젣?좉퉴??')) return;
+      var fd = new FormData();
+      safeFetch(ctx + '/admin/chatroom/keywords/' + id + '/delete', { method: 'POST', body: fd })
+        .then(function(r) { return r.json(); })
+        .then(function(x) {
+          if (x && x.ok) { openChatKeywordModal(); }
+          else { alert('??젣???ㅽ뙣?덉뒿?덈떎.'); }
+        })
+        .catch(function() { alert('??젣 ?붿껌???ㅽ뙣?덉뒿?덈떎.'); });
+    });
+  });
+  var addBtn = document.getElementById('chatKeywordAddBtn');
+  var inp = document.getElementById('chatKeywordNewInput');
+  if (addBtn && inp) {
+    addBtn.addEventListener('click', function() {
+      var kw = (inp.value || '').trim();
+      if (!kw) { alert('?ㅼ썙?쒕? ?낅젰?섏꽭??'); return; }
+      var fd = new FormData();
+      fd.append('keyword', kw);
+      safeFetch(ctx + '/admin/chatroom/keywords/add', { method: 'POST', body: fd })
+        .then(function(r) { return r.json(); })
+        .then(function(x) {
+          var res = x && x.result;
+          if (res === 'ok') { openChatKeywordModal(); return; }
+          var msg = { empty: '鍮?媛믪엯?덈떎.', invalid: '100???대궡濡??낅젰?섏꽭??', duplicate: '?대? ?깅줉???ㅼ썙?쒖엯?덈떎.', builtin: '湲곕낯 ?ㅼ썙?쒖? ?숈씪?⑸땲??' };
+          alert(msg[res] || '異붽????ㅽ뙣?덉뒿?덈떎.');
+        })
+        .catch(function() { alert('異붽? ?붿껌???ㅽ뙣?덉뒿?덈떎.'); });
+    });
+  }
+}
+
+function openChatKeywordModal() {
+  var modal = document.getElementById('chatKeywordModal');
+  var body = document.getElementById('chatKeywordModalBody');
+  if (!modal || !body) return;
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden', 'false');
+  body.innerHTML = '<div class="empty">遺덈윭?ㅻ뒗 以묅?</div>';
+  safeFetch(ctx + '/admin/chatroom/keywords/data')
+    .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+    .then(function(d) {
+      body.innerHTML = renderChatKeywordModalHtml(d);
+      bindChatKeywordModalActions();
+    })
+    .catch(function() {
+      body.innerHTML = '<div class="empty">遺덈윭?ㅼ? 紐삵뻽?듬땲??</div>';
+    });
+}
+
+var chatKeywordBtn = document.getElementById('chatKeywordSettingsBtn');
+if (chatKeywordBtn) {
+  chatKeywordBtn.addEventListener('click', openChatKeywordModal);
+}
+
+function escapeHtml(s) {
+  if (s == null || s === '') return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatNumber(n){
+  var v = Number(n || 0);
+  return v.toLocaleString('ko-KR');
+}
+function wireListFilter(inputId, itemSelector){
+  var input = document.getElementById(inputId);
+  if (!input) return;
+  var items = Array.prototype.slice.call(document.querySelectorAll(itemSelector));
+  function applyFilter(){
+    var q = (input.value || '').trim().toLowerCase();
+    items.forEach(function(el){
+      var hay = String(el.getAttribute('data-search') || '').toLowerCase();
+      el.style.display = (!q || hay.indexOf(q) !== -1) ? '' : 'none';
+    });
+  }
+  input.addEventListener('input', applyFilter);
+  applyFilter();
+}
+function openMemberDetail(mno){
+  safeFetch(ctx + '/admin/members/' + mno + '/detail')
+    .then(function(r){
+      if (!r.ok) return r.text().then(function(t){ throw new Error(t || r.status); });
+      return r.json();
+    })
+    .then(function(d){
+      if(d && d.error){ alert(d.error); return; }
+      var old = document.getElementById('memberDetailOverlay');
+      if(old) old.remove();
+      var runs = d.recentRuns || [];
+      var runsHtml = runs.length
+        ? runs.map(function(r){
+            return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid rgba(244,114,182,.14);border-radius:10px;background:#fff;margin-bottom:6px;">'
+              + '<div><strong>#'+(r.runId||'-')+'</strong> <span style="font-size:12px;color:#8e6f7f;">'+escapeHtml(r.groupType||'')+' 쨌 '+escapeHtml(r.phase||'')+'</span></div>'
+              + '<a class="btn" style="text-decoration:none;" href="'+ctx+'/game/run/'+(r.runId||0)+'/start">?닿린</a>'
+              + '</div>';
+          }).join('')
+        : '<div style="font-size:13px;color:#8e6f7f;">理쒓렐 ?뚮젅???놁쓬</div>';
+      var ownTrainees = d.ownedTrainees || [];
+      var ownTraineeRows = d.ownedTraineeRows || [];
+      var ownCards = d.ownedPhotoCards || [];
+      var traineeCheckList = (d.allTrainees || []).map(function(t){
+        return '<label style="display:inline-flex;align-items:center;gap:6px;padding:4px 6px;border:1px solid rgba(244,114,182,.12);border-radius:8px;background:#fff;">'
+          + '<input type="checkbox" class="js-trainee-check" value="'+t.id+'" />'
+          + '<span>'+escapeHtml(t.name||('-#'+t.id))+'</span>'
+          + '</label>';
+      }).join('');
+      var activityHtml = (d.recentActivities || []).length
+        ? d.recentActivities.map(function(a){
+            var delta = Number(a.coinDelta || 0);
+            var sign = delta > 0 ? '+' : '';
+            return '<div style="padding:6px 8px;border-bottom:1px solid rgba(244,114,182,.08);font-size:12px;">'
+              + '<strong>'+escapeHtml(a.type || '-')
+              + '</strong> 쨌 '+sign+formatNumber(delta)+'C'
+              + ' 쨌 '+escapeHtml(a.note || '-')
+              + ' <span style="color:#8e6f7f;">('+escapeHtml(a.createdAt || '-')+')</span></div>';
+          }).join('')
+        : '<div style="font-size:12px;color:#8e6f7f;">理쒓렐 ?쒕룞 ?놁쓬</div>';
+      var sanctionsHtml = (d.recentSanctions || []).length
+        ? d.recentSanctions.map(function(s){
+            return '<div style="padding:6px 8px;border-bottom:1px solid rgba(244,114,182,.08);font-size:12px;">'
+              + '<strong>' + (Number(s.days || 0)) + '???뺤?</strong>'
+              + ' 쨌 愿由ъ옄 ' + escapeHtml(s.adminNick || '-')
+              + ' 쨌 ?쒖옉 ' + escapeHtml(s.createdAt || '-')
+              + ' 쨌 留뚮즺 ' + escapeHtml(s.expiresAt || '-')
+              + (s.reason ? ' 쨌 ?ъ쑀 ' + escapeHtml(s.reason) : '')
+              + '</div>';
+          }).join('')
+        : '<div style="font-size:12px;color:#8e6f7f;">理쒓렐 ?쒖옱 ?댁뿭 ?놁쓬</div>';
+      var traineeEnhanceOptions = ownTraineeRows.map(function(t){
+        var lv = Number(t.enhanceLevel || 0);
+        var text = (lv >= 5 ? 'MAX' : ('+' + lv));
+        var qty = Number(t.quantity || 0);
+        return '<option value="' + Number(t.traineeId || 0) + '" data-lv="' + lv + '" data-qty="' + qty + '">'
+          + escapeHtml(t.name || ('#' + t.traineeId)) + ' 쨌 ' + text + ' 쨌 ' + qty + '??
+          + '</option>';
+      }).join('');
+
+      var opts = d.rankOptions || [];
+      var rankSel = opts.map(function(o){
+        var c = o.code || '';
+        var sel = (d.effectiveRankCode && d.effectiveRankCode === c) ? ' selected' : '';
+        return '<option value="'+escapeHtml(c)+'"'+sel+'>'+escapeHtml(o.label || c)+'</option>';
+      }).join('');
+
+      var profBlock = '';
+      if (d.profileImage && String(d.profileImage).trim() !== '') {
+        profBlock = '<div style="margin:10px 0;"><img src="'+ctx+'/profile-image/'+escapeHtml(d.profileImage)+'" alt="" style="max-width:120px;max-height:120px;border-radius:12px;border:1px solid rgba(244,114,182,.2);object-fit:cover;" /></div>';
+      }
+
+      var html = ''
+        + '<div id="memberDetailOverlay" style="position:fixed;inset:0;z-index:1200;background:rgba(31,15,23,.42);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;" onclick="if(event.target===this)this.remove()">'
+        + '  <div style="width:min(760px,97vw);max-height:92vh;overflow:auto;background:#fff;border:1px solid rgba(244,114,182,.2);border-radius:16px;box-shadow:0 28px 54px rgba(31,15,23,.25);" onclick="event.stopPropagation()">'
+        + '    <div style="height:3px;background:linear-gradient(90deg,#f472b6,#fbcfe8);"></div>'
+        + '    <div style="padding:16px;">'
+        + '      <div style="position:sticky;top:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-16px -16px 12px -16px;padding:12px 16px;background:linear-gradient(180deg,#fff 70%,rgba(255,255,255,.92));border-bottom:1px solid rgba(244,114,182,.14);">'
+        + '        <div style="font-weight:900;font-size:16px;">?뚯썝 ?곸꽭</div>'
+        + '        <button type="button" class="btn" aria-label="紐⑤떖 ?リ린" onclick="document.getElementById(\'memberDetailOverlay\').remove()" style="flex-shrink:0;">?リ린</button>'
+        + '      </div>'
+        +        profBlock
+        + '      <div style="font-size:13px;line-height:1.85;color:#4a3340;">'
+        + '        <div><strong>ID</strong> '+escapeHtml(d.mid||'-')+'</div>'
+        + '        <div><strong>?대쫫</strong> '+escapeHtml(d.name||'-')+'</div>'
+        + '        <div><strong>?됰꽕??</strong> '+escapeHtml((d.nickname&&d.nickname.trim())?d.nickname:'-')+'</div>'
+        + '        <div><strong>?대찓??</strong> '+escapeHtml(d.email||'-')+'</div>'
+        + '        <div><strong>?대???</strong> '+escapeHtml(d.phone||'-')+'</div>'
+        + '        <div><strong>二쇱냼</strong> '+escapeHtml(d.address||'-')+'</div>'
+        + '        <div><strong>?곸꽭二쇱냼</strong> '+escapeHtml(d.addressDetail||'-')+'</div>'
+        + '        <div><strong>二쇰?踰덊샇</strong> '+escapeHtml(d.jumin||'-')+'</div>'
+        + '        <div><strong>沅뚰븳</strong> '+escapeHtml(d.role||'-')+'</div>'
+        + '        <div><strong>怨꾩젙 ?곹깭</strong> '+escapeHtml(d.accountStatus||'?쒖꽦')+'</div>'
+        + '        <div><strong>?뺤? 留뚮즺??</strong> '+escapeHtml(d.suspendedUntil||'-')+'</div>'
+        + '        <div><strong>媛?낆씪</strong> '+escapeHtml(d.createdAt||'-')+'</div>'
+        + '        <div><strong>?ㅼ떆戮묎린 ?붿뿬</strong> '+(d.rerollRemaining != null ? d.rerollRemaining : '-')+' / 異⑹쟾湲곗? '+escapeHtml(d.rerollLastAt||'-')+'</div>'
+        + '        <div><strong>?꾩쟻 ???깃툒 寃쏀뿕移?</strong> '+(d.rankExp != null ? d.rankExp : '-')+'</div>'
+        + '        <div><strong>?꾩옱 ?쒖떆 ?깃툒</strong> '+escapeHtml(d.effectiveRankLabel||'-')+' <span style="font-size:12px;color:#8e6f7f;">('+escapeHtml(d.effectiveRankCode||'')+')</span></div>'
+        + '      </div>'
+        + '      <div style="margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;">'
+        + '        <div class="metric"><div class="k">蹂댁쑀 肄붿씤</div><div class="v">'+formatNumber(d.coin||0)+'</div></div>'
+        + '        <div class="metric"><div class="k">蹂댁쑀 ?곗뒿??</div><div class="v">'+formatNumber(d.traineeCount||0)+'</div></div>'
+        + '        <div class="metric"><div class="k">蹂댁쑀 ?ы넗移대뱶</div><div class="v">'+formatNumber(d.photoCardCount||0)+'</div></div>'
+        + '      </div>'
+        + '      <div style="margin-top:14px;padding:12px;border:1px solid rgba(244,114,182,.18);border-radius:12px;background:#fffafb;">'
+        + '        <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#7c1d51;">?깃툒 吏??</div>'
+        + '        <div style="font-size:12px;color:#8e6f7f;margin-bottom:8px;">?좏깮???깃툒??理쒖냼 寃쏀뿕移섎줈 留욎떠 ??λ맗?덈떎. (???쒕룞?쇰줈 寃쏀뿕移섍? ?щ씪媛硫??깃툒???④퍡 蹂?????덉뒿?덈떎.)</div>'
+        + '        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">'
+        + '          <label style="font-size:13px;">?깃툒 <select id="memberDetailRankSel" class="input" style="min-width:180px;">'+rankSel+'</select></label>'
+        + '          <button type="button" class="btn" id="memberDetailSaveRank">?깃툒 ???</button>'
+        + '        </div>'
+        + '      </div>'
+        + '      <div style="margin-top:10px;padding:12px;border:1px solid rgba(244,114,182,.18);border-radius:12px;background:#fff;">'
+        + '        <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#7c1d51;">肄붿씤 愿由?</div>'
+        + '        <div style="font-size:12px;color:#8e6f7f;margin-bottom:8px;">?꾩옱 肄붿씤: <strong>'+formatNumber(d.coin||0)+'</strong></div>'
+        + '        <div style="display:flex;flex-wrap:wrap;gap:8px;">'
+        + '          <select id="memberCoinType" class="input"><option value="ADD">吏湲?ADD)</option><option value="SUBTRACT">李④컧(SUBTRACT)</option></select>'
+        + '          <input id="memberCoinAmount" type="number" min="1" class="input" placeholder="?섎웾" />'
+        + '          <input id="memberCoinReason" type="text" class="input" placeholder="?ъ쑀" style="flex:1;min-width:180px;" />'
+        + '          <button type="button" class="btn" id="memberCoinApply">?곸슜</button>'
+        + '        </div>'
+        + '      </div>'
+        + '      <div style="margin-top:10px;padding:12px;border:1px solid rgba(244,114,182,.18);border-radius:12px;background:#fff;">'
+        + '        <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#7c1d51;">蹂댁쑀 ?곗뒿??愿由?</div>'
+        + '        <div style="font-size:12px;color:#8e6f7f;margin-bottom:8px;">?꾩옱 蹂댁쑀: '+(ownTrainees.length ? ownTrainees.map(escapeHtml).join(', ') : '?놁쓬')+'</div>'
+        + '        <div style="font-size:11px;color:#8e6f7f;margin-bottom:6px;">異붽????곗뒿?앹쓣 泥댄겕?섏꽭??</div>'
+        + '        <div style="display:flex;gap:8px;flex-wrap:wrap;max-height:140px;overflow:auto;padding:4px;">'+(traineeCheckList || '<span style="font-size:12px;color:#8e6f7f;">?곗뒿???놁쓬</span>')+'</div>'
+        + '        <div style="margin-top:8px;">'
+        + '          <button type="button" class="btn" id="memberAddTraineeBtn">?좏깮 ?곗뒿??異붽?</button>'
+        + '        </div>'
+        + '      </div>'
+        + '      <div style="margin-top:10px;padding:12px;border:1px solid rgba(244,114,182,.18);border-radius:12px;background:#fff;">'
+        + '        <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#7c1d51;">?ы넗移대뱶 吏湲?</div>'
+        + '        <div style="font-size:12px;color:#8e6f7f;margin-bottom:8px;">?꾩옱 蹂댁쑀: '+(ownCards.length ? ownCards.map(escapeHtml).join(', ') : '?놁쓬')+'</div>'
+        + '        <div style="font-size:11px;color:#8e6f7f;margin-bottom:6px;">吏湲됲븷 ?곗뒿?앹쓣 泥댄겕?섍퀬 ?깃툒???좏깮?섏꽭??</div>'
+        + '        <div style="display:flex;gap:8px;flex-wrap:wrap;max-height:140px;overflow:auto;padding:4px;">'
+        +            (traineeCheckList ? traineeCheckList.replace(/js-trainee-check/g,'js-photo-trainee-check') : '<span style="font-size:12px;color:#8e6f7f;">?곗뒿???놁쓬</span>')
+        + '        </div>'
+        + '        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">'
+        + '          <select id="memberPhotoGradeSel" class="input"><option value="R">R</option><option value="SR">SR</option><option value="SSR">SSR</option></select>'
+        + '          <button type="button" class="btn" id="memberGrantPhotoBtn">吏湲?</button>'
+        + '        </div>'
+        + '      </div>'
+        + '      <div style="margin-top:10px;padding:12px;border:1px solid rgba(244,114,182,.18);border-radius:12px;background:#fff;">'
+        + '        <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#7c1d51;">移대뱶 媛뺥솕 愿由?</div>'
+        + '        <div style="font-size:12px;color:#8e6f7f;margin-bottom:8px;">?뚯썝 蹂댁쑀 ?곗뒿?앹쓽 媛뺥솕 ?④퀎(0~5)? 移대뱶 ?섎웾??吏곸젒 蹂댁젙?⑸땲??</div>'
+        + '        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
+        + '          <select id="memberEnhanceTraineeSel" class="input" style="min-width:230px;">'
+        +              (traineeEnhanceOptions || '<option value="">蹂댁쑀 ?곗뒿???놁쓬</option>')
+        + '          </select>'
+        + '          <label style="font-size:12px;color:#4a3340;">媛뺥솕'
+        + '            <input id="memberEnhanceLevel" type="number" min="0" max="5" class="input" style="width:82px;margin-left:6px;" />'
+        + '          </label>'
+        + '          <label style="font-size:12px;color:#4a3340;">移대뱶?섎웾'
+        + '            <input id="memberEnhanceQty" type="number" min="0" class="input" style="width:92px;margin-left:6px;" />'
+        + '          </label>'
+        + '          <button type="button" class="btn" id="memberEnhanceApplyBtn">媛뺥솕 諛섏쁺</button>'
+        + '        </div>'
+        + '      </div>'
+        + '      <div style="margin-top:12px;font-size:12px;color:#8e6f7f;">理쒓렐 ??</div>'
+        + '      <div style="margin-top:8px;">'+runsHtml+'</div>'
+        + '      <div style="margin-top:12px;font-size:12px;color:#8e6f7f;">理쒓렐 ?쒕룞</div>'
+        + '      <div style="margin-top:8px;border:1px solid rgba(244,114,182,.12);border-radius:10px;padding:6px 8px;background:#fffafb;">'+activityHtml+'</div>'
+        + '      <div style="margin-top:12px;font-size:12px;color:#8e6f7f;">理쒓렐 ?쒖옱</div>'
+        + '      <div style="margin-top:8px;border:1px solid rgba(244,114,182,.12);border-radius:10px;padding:6px 8px;background:#fffafb;">'+sanctionsHtml+'</div>'
+        + '      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">'
+        + '        <button type="button" class="btn" onclick="document.getElementById(\'memberDetailOverlay\').remove()">?リ린</button>'
+        + '      </div>'
+        + '    </div>'
+        + '  </div>'
+        + '</div>';
+      document.body.insertAdjacentHTML('beforeend', html);
+      var saveBtn = document.getElementById('memberDetailSaveRank');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', function(){
+          var sel = document.getElementById('memberDetailRankSel');
+          var code = sel ? sel.value : '';
+          if (!code) { alert('?깃툒???좏깮?섏꽭??'); return; }
+          var body = 'memberRankCode=' + encodeURIComponent(code);
+          safeFetch(ctx + '/admin/members/' + mno + '/grade', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            body: body
+          })
+            .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
+            .then(function(x){
+              if (!x.ok || (x.j && x.j.error)) { alert((x.j && x.j.error) ? x.j.error : '??μ뿉 ?ㅽ뙣?덉뒿?덈떎.'); return; }
+              alert('?깃툒????λ릺?덉뒿?덈떎.');
+              document.getElementById('memberDetailOverlay').remove();
+              openMemberDetail(mno);
+            })
+            .catch(function(){ alert('??μ뿉 ?ㅽ뙣?덉뒿?덈떎.'); });
+        });
+      }
+      var coinBtn = document.getElementById('memberCoinApply');
+      if (coinBtn) {
+        coinBtn.addEventListener('click', function(){
+          var type = (document.getElementById('memberCoinType') || {}).value || 'ADD';
+          var amount = Number((document.getElementById('memberCoinAmount') || {}).value || 0);
+          var reason = (document.getElementById('memberCoinReason') || {}).value || '';
+          if (amount <= 0) { alert('?섎웾? 1 ?댁긽?댁뼱???⑸땲??'); return; }
+          safeFetch(ctx + '/admin/member/' + mno + '/coin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+            body: JSON.stringify({ memberId: mno, type: type, amount: amount, reason: reason })
+          })
+          .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
+          .then(function(x){
+            if (!x.ok || (x.j && x.j.error)) { alert((x.j && x.j.error) ? x.j.error : '肄붿씤 泥섎━???ㅽ뙣?덉뒿?덈떎.'); return; }
+            alert('肄붿씤 蹂寃쎌씠 諛섏쁺?섏뿀?듬땲??');
+            document.getElementById('memberDetailOverlay').remove();
+            openMemberDetail(mno);
+          })
+          .catch(function(){ alert('肄붿씤 泥섎━???ㅽ뙣?덉뒿?덈떎.'); });
+        });
+      }
+      var addTraineeBtn = document.getElementById('memberAddTraineeBtn');
+      if (addTraineeBtn) {
+        addTraineeBtn.addEventListener('click', function(){
+          var selected = Array.prototype.slice.call(document.querySelectorAll('.js-trainee-check:checked')).map(function(el){ return el.value; });
+          if (!selected.length) { alert('?곗뒿?앹쓣 ?좏깮?섏꽭??'); return; }
+          var params = selected.map(function(id){ return 'traineeIds=' + encodeURIComponent(id); }).join('&');
+          safeFetch(ctx + '/admin/member/' + mno + '/trainee?' + params, { method: 'POST' })
+            .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
+            .then(function(x){
+              if (!x.ok || (x.j && x.j.error)) { alert((x.j && x.j.error) ? x.j.error : '?곗뒿??異붽????ㅽ뙣?덉뒿?덈떎.'); return; }
+              alert('?곗뒿??異붽? ?꾨즺: ' + (x.j.addedCount || 0) + '嫄?(以묐났/嫄대꼫? ' + (x.j.skippedCount || 0) + '嫄?');
+              document.getElementById('memberDetailOverlay').remove();
+              openMemberDetail(mno);
+            })
+            .catch(function(){ alert('?곗뒿??異붽????ㅽ뙣?덉뒿?덈떎.'); });
+        });
+      }
+      var grantPhotoBtn = document.getElementById('memberGrantPhotoBtn');
+      if (grantPhotoBtn) {
+        grantPhotoBtn.addEventListener('click', function(){
+          var selected = Array.prototype.slice.call(document.querySelectorAll('.js-photo-trainee-check:checked')).map(function(el){ return Number(el.value); });
+          var grade = (document.getElementById('memberPhotoGradeSel') || {}).value || 'R';
+          if (!selected.length) { alert('?곗뒿?앹쓣 ?좏깮?섏꽭??'); return; }
+          safeFetch(ctx + '/admin/member/' + mno + '/photocard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+            body: JSON.stringify({ memberId: mno, traineeIds: selected, grade: grade })
+          })
+          .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
+          .then(function(x){
+            if (!x.ok || (x.j && x.j.error)) { alert((x.j && x.j.error) ? x.j.error : '?ы넗移대뱶 吏湲됱뿉 ?ㅽ뙣?덉뒿?덈떎.'); return; }
+            alert('?ы넗移대뱶 吏湲??꾨즺: ' + (x.j.grantedCount || 0) + '嫄?(以묐났/嫄대꼫? ' + (x.j.skippedCount || 0) + '嫄?');
+            document.getElementById('memberDetailOverlay').remove();
+            openMemberDetail(mno);
+          })
+          .catch(function(){ alert('?ы넗移대뱶 吏湲됱뿉 ?ㅽ뙣?덉뒿?덈떎.'); });
+        });
+      }
+      var enhanceSel = document.getElementById('memberEnhanceTraineeSel');
+      var enhanceLevelInput = document.getElementById('memberEnhanceLevel');
+      var enhanceQtyInput = document.getElementById('memberEnhanceQty');
+      function syncEnhanceInputsFromSelect() {
+        if (!enhanceSel) return;
+        var opt = enhanceSel.options[enhanceSel.selectedIndex];
+        if (!opt) return;
+        if (enhanceLevelInput) enhanceLevelInput.value = Number(opt.getAttribute('data-lv') || 0);
+        if (enhanceQtyInput) enhanceQtyInput.value = Number(opt.getAttribute('data-qty') || 0);
+      }
+      if (enhanceSel) {
+        enhanceSel.addEventListener('change', syncEnhanceInputsFromSelect);
+        syncEnhanceInputsFromSelect();
+      }
+      var enhanceApplyBtn = document.getElementById('memberEnhanceApplyBtn');
+      if (enhanceApplyBtn) {
+        enhanceApplyBtn.addEventListener('click', function(){
+          if (!enhanceSel || !enhanceSel.value) { alert('蹂댁쑀 ?곗뒿?앹씠 ?놁뒿?덈떎.'); return; }
+          var traineeId = Number(enhanceSel.value || 0);
+          var lv = Number((enhanceLevelInput || {}).value || 0);
+          var qty = Number((enhanceQtyInput || {}).value || 0);
+          if (!traineeId) { alert('?곗뒿?앹쓣 ?좏깮?섏꽭??'); return; }
+          if (lv < 0 || lv > 5 || !Number.isFinite(lv)) { alert('媛뺥솕 ?④퀎??0~5留?媛?ν빀?덈떎.'); return; }
+          if (qty < 0 || !Number.isFinite(qty)) { alert('移대뱶 ?섎웾? 0 ?댁긽?댁뼱???⑸땲??'); return; }
+          safeFetch(ctx + '/admin/member/' + mno + '/enhance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+            body: JSON.stringify({ traineeId: traineeId, enhanceLevel: lv, quantity: qty })
+          })
+          .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
+          .then(function(x){
+            if (!x.ok || (x.j && x.j.error)) { alert((x.j && x.j.error) ? x.j.error : '媛뺥솕 諛섏쁺???ㅽ뙣?덉뒿?덈떎.'); return; }
+            alert('媛뺥솕 ?뺣낫媛 諛섏쁺?섏뿀?듬땲??');
+            document.getElementById('memberDetailOverlay').remove();
+            openMemberDetail(mno);
+          })
+          .catch(function(){ alert('媛뺥솕 諛섏쁺???ㅽ뙣?덉뒿?덈떎.'); });
+        });
+      }
+    })
+    .catch(function(){ alert('遺덈윭?ㅺ린???ㅽ뙣?덉뒿?덈떎. (?쒕쾭 ?ㅻ쪟?????덉뒿?덈떎)'); });
+}
+wireListFilter('gameSceneListFilter', '.js-game-scene-preview');
+wireListFilter('gameSceneEditFilter', '.js-game-scene-edit');
+wireListFilter('gameChoiceEditFilter', '.js-game-choice-edit');
+</script>
+</body>
+</html>
+

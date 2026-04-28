@@ -4486,6 +4486,14 @@
     </script>
   </c:if>
 
+  <c:if test="${param.noContinue eq '1'}">
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        alert('이어할 데이터가 없습니다. 새 게임을 시작해 주세요.');
+      });
+    </script>
+  </c:if>
+
   <script>
     window.mainPageConfig = {
       ctx: '${ctx}',

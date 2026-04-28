@@ -23,7 +23,7 @@ import com.java.service.StarterTraineeGrantService;
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    private static final String NICK_REGEX = "^[A-Za-z0-9가-힣]{3,12}$";
+    private static final String NICK_REGEX = "^[A-Za-z0-9\\uAC00-\\uD7A3]{3,12}$";
 
     private final DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
     private final MemberRepository memberRepository;

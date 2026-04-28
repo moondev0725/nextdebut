@@ -88,6 +88,12 @@
   </c:if>
 
   <section class="card">
+    <div class="section-body" style="padding-bottom:0;">
+      <div class="tools" style="justify-content:flex-start;">
+        <a class="btn ${reportStatusFilter eq 'pending' ? 'danger' : ''}" href="${ctx}/admin/reports?status=pending">처리 대기</a>
+        <a class="btn ${reportStatusFilter eq 'completed' ? 'danger' : ''}" href="${ctx}/admin/reports?status=completed">처리 완료</a>
+      </div>
+    </div>
     <div class="section-head">신고 목록 · <fmt:formatNumber value="${empty reportedPosts ? 0 : fn:length(reportedPosts)}" pattern="#,##0"/>건</div>
     <div class="section-body">
       <c:choose>
@@ -133,12 +139,14 @@
                         <form method="post" action="${ctx}/admin/reports/${r.id}/handle" style="margin:0;" onsubmit="return confirm('이 글을 사용자 신고판에서 처리완료로 표시할까요?');">
                           <input type="hidden" name="action" value="complete"/>
                           <input type="hidden" name="from" value="reports"/>
+                          <input type="hidden" name="status" value="${reportStatusFilter}"/>
                           <button type="submit" class="btn" style="font-size:12px;padding:7px 10px;">처리완료</button>
                         </form>
                       </c:if>
                       <form method="post" action="${ctx}/admin/reports/${r.id}/handle" style="margin:0;" onsubmit="return confirm('이 신고 글을 삭제할까요?');">
                         <input type="hidden" name="action" value="delete"/>
                         <input type="hidden" name="from" value="reports"/>
+                        <input type="hidden" name="status" value="${reportStatusFilter}"/>
                         <button type="submit" class="btn danger" style="font-size:12px;padding:7px 10px;">삭제</button>
                       </form>
                     </div>

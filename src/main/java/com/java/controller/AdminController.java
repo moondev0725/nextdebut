@@ -363,7 +363,7 @@ public class AdminController {
 		long blindedCount = boardService.getBlindedCount();
 		Map<String, Long> boardTrend = boardService.getBoardTrend(7);
 		Map<String, Long> reportTrend = boardService.getReportTrend(7);
-		List<Map<String, Object>> recentReports = boardService.getRecentReports(10);
+		List<Map<String, Object>> recentReports = boardService.getRecentReports(200);
 		int noticePage = Math.max(1, noticePageParam);
 		Page<Board> noticePageData = boardRepository.findByBoardTypeOrderByCreatedAtDesc("notice",
 				PageRequest.of(noticePage - 1, NOTICE_PAGE_SIZE));
@@ -971,17 +971,27 @@ public class AdminController {
 
 	/* ─────────────── 신고 게시글 목록 ─────────────── */
 	@GetMapping("/reports")
-	public String reportList(HttpSession session, Model model) {
+	public String reportList(
+			@RequestParam(name = "status", defaultValue = "pending") String status,
+			HttpSession session, Model model) {
 		if (session.getAttribute("LOGIN_MEMBER") == null) {
 			return "redirect:/login";
 		}
-		List<Board> reportedPosts = boardRepository.findByBoardTypeOrderByCreatedAtDesc("report");
+		String normalizedStatus = "completed".equalsIgnoreCase(status) ? "completed" : "pending";
+		List<Board> reportedPosts = boardRepository.findByBoardTypeOrderByCreatedAtDesc("report").stream()
+				.filter(board -> {
+					boolean handled = boardService.isReportHandled(board);
+					return "completed".equals(normalizedStatus) ? handled : !handled;
+				})
+				.toList();
 		Map<Long, Boolean> reportHandledMap = new LinkedHashMap<>();
 		for (Board b : reportedPosts) {
-			reportHandledMap.put(b.getId(), boardService.isReportHandled(b));
+			boolean handled = boardService.isReportHandled(b);
+			reportHandledMap.put(b.getId(), handled);
 		}
 		model.addAttribute("reportedPosts", reportedPosts);
 		model.addAttribute("reportHandledMap", reportHandledMap);
+		model.addAttribute("reportStatusFilter", normalizedStatus);
 		return "admin/reports";
 	}
 
@@ -990,6 +1000,7 @@ public class AdminController {
 	@Transactional
 	public String handleReport(@PathVariable("id") Long id, @RequestParam("action") String action,
 			@RequestParam(value = "from", required = false) String from,
+			@RequestParam(value = "status", required = false) String status,
 			HttpSession session, RedirectAttributes ra) {
 		if (session.getAttribute("LOGIN_MEMBER") == null) {
 			return "redirect:/login";
@@ -1005,7 +1016,12 @@ public class AdminController {
 			message = boardService.handleReportAction(id, action);
 		}
 		ra.addFlashAttribute("success", message == null ? "신고 처리 요청이 반영되지 않았습니다." : message);
-		return "reports".equalsIgnoreCase(from) ? "redirect:/admin/reports" : "redirect:/admin";
+		if ("reports".equalsIgnoreCase(from)) {
+			String nextStatus = "complete".equalsIgnoreCase(action) ? "completed"
+					: ("completed".equalsIgnoreCase(status) ? "completed" : "pending");
+			return "redirect:/admin/reports?status=" + nextStatus;
+		}
+		return "redirect:/admin";
 	}
 
 	@PostMapping("/reports/{id}/comment")
@@ -2018,12 +2034,12 @@ public class AdminController {
 		long ml = 0L;
 		long rule = 0L;
 		long fallback = 0L;
-		double confSum = 0.0;
+		double mlConfSum = 0.0;
 		Map<String, Long> mlDecisionReasonCounts = new LinkedHashMap<>();
 
 		Path p = resolveMlTrainingLogPath();
 		if (p == null || !Files.exists(p)) {
-			return mlChoiceStatsMap(total, ml, rule, fallback, confSum, mlDecisionReasonCounts);
+			return mlChoiceStatsMap(total, ml, rule, fallback, mlConfSum, mlDecisionReasonCounts);
 		}
 
 		try (var lines = Files.lines(p)) {
@@ -2032,19 +2048,17 @@ public class AdminController {
 				if (raw.isEmpty()) {
 					continue;
 				}
+				String predictedKey = extractJsonString(raw, "predictedKey");
+				String mlDecisionReason = extractJsonString(raw, "mlDecisionReason");
 				total++;
-				String resolverType = extractJsonString(raw, "resolverType");
-				if ("ML".equalsIgnoreCase(resolverType)) {
+				double confidence = extractJsonDouble(raw, "predictionConfidence");
+				if (isPredictedMlCandidate(predictedKey)) {
 					ml++;
-				} else if ("RULE".equalsIgnoreCase(resolverType)) {
+					mlConfSum += confidence;
+				} else {
 					rule++;
-				}
-				Boolean usedFallback = extractJsonBoolean(raw, "usedFallback");
-				if (Boolean.TRUE.equals(usedFallback)) {
 					fallback++;
 				}
-				confSum += extractJsonDouble(raw, "predictionConfidence");
-				String mlDecisionReason = extractJsonString(raw, "mlDecisionReason");
 				if (!mlDecisionReason.isBlank()) {
 					mlDecisionReasonCounts.merge(mlDecisionReason, 1L, Long::sum);
 				}
@@ -2052,7 +2066,7 @@ public class AdminController {
 		} catch (IOException ignored) {
 			// 관리 페이지 지표는 부가 정보이므로 읽기 실패 시 빈 통계 반환
 		}
-		return mlChoiceStatsMap(total, ml, rule, fallback, confSum, mlDecisionReasonCounts);
+		return mlChoiceStatsMap(total, ml, rule, fallback, mlConfSum, mlDecisionReasonCounts);
 	}
 
 	private Path resolveMlTrainingLogPath() {
@@ -2067,14 +2081,15 @@ public class AdminController {
 		return Paths.get(System.getProperty("user.dir")).resolve(p).normalize();
 	}
 
-	private static Map<String, Object> mlChoiceStatsMap(long total, long ml, long rule, long fallback, double confSum,
+	private static Map<String, Object> mlChoiceStatsMap(long total, long ml, long rule, long fallback,
+			double mlConfSum,
 			Map<String, Long> mlDecisionReasonCounts) {
 		Map<String, Object> out = new LinkedHashMap<>();
 		out.put("total", total);
 		out.put("ml", ml);
 		out.put("rule", rule);
 		out.put("fallback", fallback);
-		double avgConf = total > 0 ? confSum / total : 0.0;
+		double avgConf = ml > 0 ? mlConfSum / ml : 0.0;
 		double mlRate = total > 0 ? (ml * 100.0) / total : 0.0;
 		double fallbackRate = total > 0 ? (fallback * 100.0) / total : 0.0;
 		out.put("avgConfidence", avgConf);
@@ -2082,6 +2097,17 @@ public class AdminController {
 		out.put("fallbackRate", fallbackRate);
 		out.put("mlDecisionReasonCounts", mlDecisionReasonCounts == null ? Map.of() : mlDecisionReasonCounts);
 		return out;
+	}
+
+	private static boolean isPredictedMlCandidate(String predictedKey) {
+		if (predictedKey == null) {
+			return false;
+		}
+		String normalized = predictedKey.trim();
+		if (normalized.isBlank()) {
+			return false;
+		}
+		return !"NONE".equalsIgnoreCase(normalized);
 	}
 
 	private static String extractJsonString(String jsonLine, String key) {
@@ -2113,7 +2139,7 @@ public class AdminController {
 		if (from < 0) {
 			return null;
 		}
-		int start = from + needle.length();
+		int start = skipJsonWhitespace(jsonLine, from + needle.length());
 		int end = start;
 		while (end < jsonLine.length() && Character.isLetter(jsonLine.charAt(end))) {
 			end++;
@@ -2140,7 +2166,7 @@ public class AdminController {
 		if (from < 0) {
 			return 0.0;
 		}
-		int start = from + needle.length();
+		int start = skipJsonWhitespace(jsonLine, from + needle.length());
 		int end = start;
 		while (end < jsonLine.length()) {
 			char c = jsonLine.charAt(end);
@@ -2158,6 +2184,14 @@ public class AdminController {
 		} catch (NumberFormatException e) {
 			return 0.0;
 		}
+	}
+
+	private static int skipJsonWhitespace(String jsonLine, int index) {
+		int i = Math.max(0, index);
+		while (i < jsonLine.length() && Character.isWhitespace(jsonLine.charAt(i))) {
+			i++;
+		}
+		return i;
 	}
 
 	/* 접속 로그/팝업 설정 기능은 DB 변경이 필요해서 제외 */

@@ -738,8 +738,7 @@ function Start-NextDebutAndOpen([string]$modeName, [string]$targetUrl) {
                 $springLines += "set `"JAVA_HOME=$javaHomeForGradle`""
                 $springLines += "set `"PATH=$javaHomeForGradle\bin;%PATH%`""
             }
-            $springLines += "type nul > `"$springLog`""
-            $springLines += "call $springStartCommand >> `"$springLog`" 2>&1"
+            $springLines += "call .\gradlew.bat --no-daemon bootRun"
             Write-ConsoleScript $springConsoleScript $springLines
             $springConsoleProc = Start-Process -FilePath "cmd.exe" -ArgumentList @("/c", "`"$springConsoleScript`"") -PassThru
             Save-PidFile $springConsolePidFile $springConsoleProc
